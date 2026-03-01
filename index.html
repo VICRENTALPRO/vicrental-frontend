@@ -1095,6 +1095,22 @@ body {
   gap: 14px;
 }
 
+.import-dropzone {
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  padding: 28px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--cream);
+}
+.import-dropzone:hover, .import-dropzone.drag-over {
+  border-color: var(--gold);
+  background: var(--gold-pale);
+}
+
+
+
 .prop-card {
   background: var(--white);
   border: 1px solid var(--border);
@@ -1689,6 +1705,16 @@ window.addEventListener('DOMContentLoaded', function() {
       <div class="nav-item" id="nav-activity" onclick="showPage('activity')">
         <span class="nav-icon">⚡</span> Activity Log
       </div>
+      <div class="nav-section">Admin</div>
+      <div class="nav-item" id="nav-owners" onclick="showPage('owners')">
+        <span class="nav-icon">👤</span> Manage Owners
+      </div>
+      <div class="nav-item" id="nav-manageprops" onclick="showPage('manageprops')">
+        <span class="nav-icon">🏘️</span> Manage Properties
+      </div>
+      <div class="nav-item" id="nav-import" onclick="showPage('import')">
+        <span class="nav-icon">⬆️</span> Import Data
+      </div>
     </nav>
 
     <div class="sidebar-footer">
@@ -2003,6 +2029,128 @@ window.addEventListener('DOMContentLoaded', function() {
           <div style="padding:0 14px 8px;" id="activityFull">
             <div class="activity-item" style="color:var(--muted);">No activity recorded yet.</div>
           </div>
+        </div>
+      </div>
+
+      <!-- ═══ MANAGE OWNERS ═══ -->
+      <div class="page" id="page-owners">
+        <div class="panel" style="margin-bottom:20px;">
+          <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:14px;">Add New Owner</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;">
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Owner Full Name *</label>
+              <input type="text" id="newOwnerName" placeholder="e.g. Michael Chen" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+            </div>
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Password *</label>
+              <input type="text" id="newOwnerPassword" placeholder="e.g. owner123" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+            </div>
+            <button class="btn btn-primary" onclick="addOwner()" style="padding:9px 20px;white-space:nowrap;">+ Add Owner</button>
+          </div>
+          <div id="ownerAddError" style="display:none;margin-top:10px;color:var(--red);font-size:0.8rem;"></div>
+          <div id="ownerAddSuccess" style="display:none;margin-top:10px;color:var(--green);font-size:0.8rem;font-weight:600;"></div>
+          <div style="margin-top:14px;padding:12px 14px;background:var(--amber-pale);border-radius:8px;border:1px solid rgba(181,110,0,0.2);font-size:0.75rem;color:var(--amber);">
+            ⚠️ Owners log in at the <strong>Owner Portal</strong> using their full name and the password you set here. Passwords are sent to your Railway backend and stored securely.
+          </div>
+        </div>
+
+        <div class="panel">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Existing Owners</div>
+            <button class="btn btn-ghost" onclick="loadOwners()" style="font-size:0.75rem;padding:5px 12px;">↺ Refresh</button>
+          </div>
+          <div id="ownersList"><div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">Loading owners…</div></div>
+        </div>
+      </div>
+
+      <!-- ═══ MANAGE PROPERTIES ═══ -->
+      <div class="page" id="page-manageprops">
+        <!-- Add Property -->
+        <div class="panel" style="margin-bottom:20px;">
+          <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:14px;">Add New Property</div>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:12px;align-items:end;flex-wrap:wrap;">
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Property Address *</label>
+              <input type="text" id="newPropAddress" placeholder="e.g. 42 Sample Street, Richmond VIC 3121" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+            </div>
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Owner Name *</label>
+              <input type="text" id="newPropOwner" placeholder="e.g. Michael Chen" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+            </div>
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Tenant Name</label>
+              <input type="text" id="newPropTenant" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+            </div>
+            <button class="btn btn-primary" onclick="addProperty()" style="padding:9px 20px;white-space:nowrap;">+ Add Property</button>
+          </div>
+          <div id="propAddError" style="display:none;margin-top:10px;color:var(--red);font-size:0.8rem;"></div>
+          <div id="propAddSuccess" style="display:none;margin-top:10px;color:var(--green);font-size:0.8rem;font-weight:600;"></div>
+        </div>
+
+        <!-- Property List -->
+        <div class="panel">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Managed Properties</div>
+            <div style="display:flex;gap:8px;">
+              <input type="text" id="propSearch" placeholder="🔍 Search address or owner…" oninput="renderManagedProps()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'DM Sans',sans-serif;font-size:0.8rem;width:220px;">
+            </div>
+          </div>
+          <div id="managedPropsList"></div>
+        </div>
+      </div>
+
+      <!-- ═══ IMPORT DATA ═══ -->
+      <div class="page" id="page-import">
+        <!-- Header info -->
+        <div class="panel" style="margin-bottom:20px;background:linear-gradient(135deg,var(--navy) 0%,var(--navy-soft) 100%);color:#fff;border:none;">
+          <div style="font-size:1rem;font-weight:700;margin-bottom:6px;">⬆️ Import from External System</div>
+          <div style="font-size:0.82rem;opacity:0.75;line-height:1.6;">Import owners and properties in bulk from property management software like Console Cloud, PropertyMe, MRI, Re-Leased, or any CSV export. Download a template to get started.</div>
+          <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
+            <button class="btn" onclick="downloadOwnerTemplate()" style="background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.2);font-size:0.78rem;padding:7px 14px;">⬇ Owner CSV Template</button>
+            <button class="btn" onclick="downloadPropertyTemplate()" style="background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.2);font-size:0.78rem;padding:7px 14px;">⬇ Property CSV Template</button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+          <!-- Import Owners -->
+          <div class="panel">
+            <div style="font-size:0.85rem;font-weight:700;margin-bottom:4px;">👤 Import Owners</div>
+            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:14px;">CSV columns: <code>name, password</code></div>
+            <div id="ownerDropZone" class="import-dropzone" onclick="document.getElementById('ownerCsvInput').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleImportDrop(event,'owner')">
+              <div style="font-size:2rem;margin-bottom:8px;">📄</div>
+              <div style="font-size:0.82rem;font-weight:600;color:var(--navy);">Drop CSV here or click to browse</div>
+              <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">Supports .csv files</div>
+            </div>
+            <input type="file" id="ownerCsvInput" accept=".csv" style="display:none" onchange="handleImportFile(event,'owner')">
+            <div id="ownerImportPreview" style="display:none;margin-top:14px;"></div>
+            <div style="display:flex;gap:8px;margin-top:12px;" id="ownerImportActions" style="display:none;">
+              <button class="btn btn-primary" id="ownerImportBtn" onclick="executeImport('owner')" style="display:none;">⬆ Import Owners</button>
+              <button class="btn btn-ghost" id="ownerImportClear" onclick="clearImport('owner')" style="display:none;">✕ Clear</button>
+            </div>
+          </div>
+
+          <!-- Import Properties -->
+          <div class="panel">
+            <div style="font-size:0.85rem;font-weight:700;margin-bottom:4px;">🏘️ Import Properties</div>
+            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:14px;">CSV columns: <code>address, owner_name, tenant_name</code></div>
+            <div id="propDropZone" class="import-dropzone" onclick="document.getElementById('propCsvInput').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleImportDrop(event,'property')">
+              <div style="font-size:2rem;margin-bottom:8px;">📄</div>
+              <div style="font-size:0.82rem;font-weight:600;color:var(--navy);">Drop CSV here or click to browse</div>
+              <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">Supports .csv files</div>
+            </div>
+            <input type="file" id="propCsvInput" accept=".csv" style="display:none" onchange="handleImportFile(event,'property')">
+            <div id="propImportPreview" style="display:none;margin-top:14px;"></div>
+            <div style="display:flex;gap:8px;margin-top:12px;">
+              <button class="btn btn-primary" id="propImportBtn" onclick="executeImport('property')" style="display:none;">⬆ Import Properties</button>
+              <button class="btn btn-ghost" id="propImportClear" onclick="clearImport('property')" style="display:none;">✕ Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Import Log -->
+        <div class="panel" style="margin-top:20px;">
+          <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:12px;">Import History</div>
+          <div id="importLog" style="font-size:0.8rem;color:var(--muted);font-style:italic;">No imports yet this session.</div>
         </div>
       </div>
 
@@ -2324,6 +2472,9 @@ const PAGE_CONFIG = {
   quotes:     { title: 'Repair Quotes',      sub: 'Upload quotes for owner approval before scheduling repairs', mainBtn: '+ New Quote', extraBtn: null },
   tenantreqs: { title: 'Tenant Requests',    sub: 'Maintenance requests submitted by tenants via the Tenant Portal', mainBtn: '+ New Work Order', extraBtn: null },
   activity:   { title: 'Activity Log',       sub: 'Full audit trail of all changes', mainBtn: '+ New Work Order', extraBtn: null },
+  owners:     { title: 'Manage Owners',      sub: 'Add and manage owner portal accounts', mainBtn: '+ New Work Order', extraBtn: null },
+  manageprops:{ title: 'Manage Properties',  sub: 'Add and manage your property portfolio', mainBtn: '+ Add Property', extraBtn: null },
+  import:     { title: 'Import Data',        sub: 'Bulk import owners and properties from external systems', mainBtn: '+ New Work Order', extraBtn: null },
 };
 
 let currentPage = 'dashboard';
@@ -2358,6 +2509,9 @@ function showPage(id) {
   else if (id === 'properties') renderProperties();
   else if (id === 'reports') renderReports();
   else if (id === 'activity') renderActivityPage();
+  else if (id === 'owners') loadOwners();
+  else if (id === 'manageprops') renderManagedProps();
+  else if (id === 'import') renderImportPage();
   else if (id === 'vault') renderVault();
   else if (id === 'quotes')      { populateQuoteWODropdown(); renderQuotes(); }
   else if (id === 'tenantreqs')  { renderTenantReqs(); }
@@ -2370,6 +2524,7 @@ function topbarMainAction() {
   if (currentPage === 'checklist') downloadInspectionReport();
   else if (currentPage === 'vault') document.getElementById('vaultFileInput')?.click();
   else if (currentPage === 'quotes') document.getElementById('qProperty')?.focus();
+  else if (currentPage === 'manageprops') document.getElementById('newPropAddress')?.focus();
   else openNewWOModal();
 }
 
@@ -4471,8 +4626,389 @@ function openTRPhoto(dataUrl) {
 }
 
 // ═══════════════════════════════════════════════
-// SEED DEMO DATA
+// OWNER MANAGEMENT
 // ═══════════════════════════════════════════════
+const BACKEND = 'https://vicrental-backend1-production.up.railway.app/api';
+
+function getAuthHeaders() {
+  const token = localStorage.getItem('vr_token');
+  return token ? { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+}
+
+async function addOwner() {
+  const name     = document.getElementById('newOwnerName').value.trim();
+  const password = document.getElementById('newOwnerPassword').value.trim();
+  const errEl    = document.getElementById('ownerAddError');
+  const okEl     = document.getElementById('ownerAddSuccess');
+  errEl.style.display = 'none';
+  okEl.style.display  = 'none';
+
+  if (!name || !password) {
+    errEl.textContent = 'Please enter both a name and password.';
+    errEl.style.display = '';
+    return;
+  }
+
+  try {
+    const res = await fetch(`${BACKEND}/auth/owner/register`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ name, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
+    okEl.textContent = `✅ Owner "${name}" added successfully! They can now log in at the Owner Portal.`;
+    okEl.style.display = '';
+    document.getElementById('newOwnerName').value = '';
+    document.getElementById('newOwnerPassword').value = '';
+    logActivity(`Owner account created: ${name}`, '#1d7a50');
+    loadOwners();
+  } catch (err) {
+    errEl.textContent = `Failed to add owner: ${err.message}`;
+    errEl.style.display = '';
+  }
+}
+
+async function loadOwners() {
+  const el = document.getElementById('ownersList');
+  if (!el) return;
+  el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">Loading…</div>';
+
+  try {
+    const res = await fetch(`${BACKEND}/auth/owner/list`, { headers: getAuthHeaders() });
+    if (res.status === 404) {
+      // Endpoint may not exist — show manual instructions
+      el.innerHTML = `
+        <div style="padding:20px;background:var(--blue-pale);border-radius:8px;font-size:0.82rem;line-height:1.7;">
+          <strong>Owner list not available via API.</strong><br>
+          Currently registered owner: <strong>Michael Chen</strong> (password: <code>owner123</code>)<br><br>
+          To add more owners, use the form above. If the backend doesn't support owner registration yet, you can update the hardcoded owners in <code>owner-portal.html</code>.
+        </div>`;
+      return;
+    }
+    const data = await res.json();
+    const owners = data.owners || data || [];
+    if (!owners.length) {
+      el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">No owners found.</div>';
+      return;
+    }
+    el.innerHTML = `
+      <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+        <thead>
+          <tr style="border-bottom:2px solid var(--border);">
+            <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Name</th>
+            <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Created</th>
+            <th style="padding:8px 12px;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${owners.map(o => `
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:10px 12px;font-weight:600;">👤 ${o.name || o.username || '—'}</td>
+              <td style="padding:10px 12px;color:var(--muted);">${o.createdAt ? new Date(o.createdAt).toLocaleDateString('en-AU') : '—'}</td>
+              <td style="padding:10px 12px;text-align:right;">
+                <button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteOwner('${o.id || o.name}', '${o.name || o.username}')">🗑 Remove</button>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  } catch (err) {
+    el.innerHTML = `
+      <div style="padding:16px;background:var(--red-pale);border-radius:8px;font-size:0.8rem;color:var(--red);">
+        Could not load owners from backend: ${err.message}<br><br>
+        <strong>Current hardcoded owner:</strong> Michael Chen / owner123
+      </div>`;
+  }
+}
+
+async function deleteOwner(id, name) {
+  if (!confirm(`Remove owner "${name}"? They will no longer be able to log in.`)) return;
+  try {
+    const res = await fetch(`${BACKEND}/auth/owner/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    if (!res.ok) throw new Error(`Error ${res.status}`);
+    toast(`Owner "${name}" removed`, 'success');
+    logActivity(`Owner account removed: ${name}`, '#c0392b');
+    loadOwners();
+  } catch (err) {
+    toast(`Could not remove owner: ${err.message}`, 'error');
+  }
+}
+
+
+// ═══════════════════════════════════════════════
+// MANAGED PROPERTIES
+// ═══════════════════════════════════════════════
+const KEY_MANAGED_PROPS = 'vr_managed_properties';
+
+function getManagedProps() { return S.get(KEY_MANAGED_PROPS, []); }
+function saveManagedProps(props) { S.set(KEY_MANAGED_PROPS, props); }
+
+function addProperty() {
+  const address  = document.getElementById('newPropAddress').value.trim();
+  const owner    = document.getElementById('newPropOwner').value.trim();
+  const tenant   = document.getElementById('newPropTenant').value.trim();
+  const errEl    = document.getElementById('propAddError');
+  const okEl     = document.getElementById('propAddSuccess');
+  errEl.style.display = 'none';
+  okEl.style.display  = 'none';
+
+  if (!address || !owner) {
+    errEl.textContent = 'Please enter at least an address and owner name.';
+    errEl.style.display = '';
+    return;
+  }
+
+  const props = getManagedProps();
+  if (props.find(p => p.address.toLowerCase() === address.toLowerCase())) {
+    errEl.textContent = 'A property with this address already exists.';
+    errEl.style.display = '';
+    return;
+  }
+
+  const newProp = {
+    id: 'PROP-' + Date.now(),
+    address, owner,
+    tenant: tenant || '',
+    createdAt: new Date().toISOString(),
+  };
+  props.unshift(newProp);
+  saveManagedProps(props);
+
+  okEl.textContent = `✅ Property "${address}" added successfully!`;
+  okEl.style.display = '';
+  document.getElementById('newPropAddress').value = '';
+  document.getElementById('newPropOwner').value = '';
+  document.getElementById('newPropTenant').value = '';
+  logActivity(`Property added: ${address} (Owner: ${owner})`, '#1d7a50');
+  updateSidebarBadges();
+  renderManagedProps();
+}
+
+function deleteProperty(id) {
+  const props = getManagedProps();
+  const prop  = props.find(p => p.id === id);
+  if (!prop) return;
+  if (!confirm(`Remove property "${prop.address}"? This only removes it from the managed list — work orders are not affected.`)) return;
+  saveManagedProps(props.filter(p => p.id !== id));
+  toast('Property removed', 'info');
+  logActivity(`Property removed: ${prop.address}`, '#c0392b');
+  renderManagedProps();
+}
+
+function renderManagedProps() {
+  const el = document.getElementById('managedPropsList');
+  if (!el) return;
+
+  const search = (document.getElementById('propSearch')?.value || '').toLowerCase();
+  let props = getManagedProps();
+
+  // Also surface properties that appear in work orders but haven't been added manually
+  const woProps = [...new Set(getWOs().map(w => w.property).filter(Boolean))];
+  woProps.forEach(addr => {
+    if (!props.find(p => p.address === addr)) {
+      props.push({ id: 'auto-' + addr, address: addr, owner: '—', tenant: '', createdAt: null, auto: true });
+    }
+  });
+
+  if (search) props = props.filter(p =>
+    p.address.toLowerCase().includes(search) || p.owner.toLowerCase().includes(search)
+  );
+
+  if (!props.length) {
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">No properties yet. Add one above or import from CSV.</div>';
+    return;
+  }
+
+  const wos = getWOs();
+  el.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+      <thead>
+        <tr style="border-bottom:2px solid var(--border);">
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Address</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Owner</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Tenant</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Work Orders</th>
+          <th style="padding:8px 12px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${props.map(p => {
+          const propWOs = wos.filter(w => w.property === p.address);
+          const open = propWOs.filter(w => w.status === 'open' || w.status === 'inprogress').length;
+          const badge = open > 0
+            ? `<span style="background:var(--red);color:#fff;font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:10px;">${open} open</span>`
+            : `<span style="background:var(--green-pale);color:var(--green);font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:10px;">✓ clear</span>`;
+          const autoTag = p.auto
+            ? `<span style="font-size:0.6rem;background:var(--blue-pale);color:var(--blue);padding:1px 6px;border-radius:4px;margin-left:6px;">from WO</span>`
+            : '';
+          return `
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:10px 12px;font-weight:600;">📍 ${p.address}${autoTag}</td>
+              <td style="padding:10px 12px;">👤 ${p.owner}</td>
+              <td style="padding:10px 12px;color:var(--muted);">${p.tenant || '—'}</td>
+              <td style="padding:10px 12px;">${badge} <span style="color:var(--muted);font-size:0.75rem;margin-left:4px;">${propWOs.length} total</span></td>
+              <td style="padding:10px 12px;text-align:right;">
+                ${!p.auto ? `<button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteProperty('${p.id}')">🗑 Remove</button>` : ''}
+              </td>
+            </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+}
+
+// ═══════════════════════════════════════════════
+// IMPORT DATA
+// ═══════════════════════════════════════════════
+let importData = { owner: null, property: null };
+
+function renderImportPage() { /* static page */ }
+
+function downloadOwnerTemplate() {
+  downloadCSVBlob('name,password\nMichael Chen,owner123\nSarah Williams,secure456\n', 'owner-import-template.csv');
+}
+
+function downloadPropertyTemplate() {
+  downloadCSVBlob('address,owner_name,tenant_name\n42 Sample Street Richmond VIC 3121,Michael Chen,John Smith\n7 Demo Lane Fitzroy VIC 3065,Sarah Williams,\n', 'property-import-template.csv');
+}
+
+function downloadCSVBlob(content, filename) {
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob([content], { type: 'text/csv' })),
+    download: filename
+  });
+  a.click();
+}
+
+function handleImportDrop(e, type) {
+  e.preventDefault();
+  document.getElementById(type === 'owner' ? 'ownerDropZone' : 'propDropZone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) parseImportCSV(file, type);
+}
+
+function handleImportFile(e, type) {
+  const file = e.target.files[0];
+  if (file) parseImportCSV(file, type);
+}
+
+function parseImportCSV(file, type) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const lines   = e.target.result.trim().split('\n').map(l => l.split(',').map(c => c.trim().replace(/^"|"$/g, '')));
+    if (lines.length < 2) { toast('CSV appears empty', 'error'); return; }
+    importData[type] = { headers: lines[0].map(h => h.toLowerCase()), rows: lines.slice(1).filter(r => r.some(c => c)), filename: file.name };
+    renderImportPreview(type);
+  };
+  reader.readAsText(file);
+}
+
+function renderImportPreview(type) {
+  const data      = importData[type];
+  const isOwner   = type === 'owner';
+  const previewEl = document.getElementById(isOwner ? 'ownerImportPreview' : 'propImportPreview');
+  const btnEl     = document.getElementById(isOwner ? 'ownerImportBtn'    : 'propImportBtn');
+  const clearEl   = document.getElementById(isOwner ? 'ownerImportClear'  : 'propImportClear');
+  if (!data || !previewEl) return;
+
+  const required = isOwner ? ['name','password'] : ['address','owner_name'];
+  const missing  = required.filter(r => !data.headers.includes(r));
+
+  clearEl.style.display = '';
+  if (missing.length) {
+    previewEl.style.display = '';
+    previewEl.innerHTML = `<div style="padding:12px;background:var(--red-pale);border-radius:8px;font-size:0.8rem;color:var(--red);">⚠️ Missing required columns: <strong>${missing.join(', ')}</strong></div>`;
+    btnEl.style.display = 'none';
+    return;
+  }
+
+  const preview = data.rows.slice(0, 5);
+  previewEl.style.display = '';
+  previewEl.innerHTML = `
+    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;">Preview: <strong>${data.rows.length} row${data.rows.length!==1?'s':''}</strong> in ${data.filename}</div>
+    <table style="width:100%;border-collapse:collapse;font-size:0.78rem;border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+      <thead style="background:var(--warm);">
+        <tr>${data.headers.map(h=>`<th style="padding:7px 10px;text-align:left;font-weight:600;color:var(--muted);">${h}</th>`).join('')}</tr>
+      </thead>
+      <tbody>
+        ${preview.map(row=>`<tr style="border-top:1px solid var(--border);">${row.map(c=>`<td style="padding:7px 10px;">${c||'—'}</td>`).join('')}</tr>`).join('')}
+        ${data.rows.length>5?`<tr><td colspan="${data.headers.length}" style="padding:7px 10px;color:var(--muted);font-style:italic;border-top:1px solid var(--border);">…and ${data.rows.length-5} more rows</td></tr>`:''}
+      </tbody>
+    </table>`;
+  btnEl.style.display = '';
+}
+
+async function executeImport(type) {
+  const data    = importData[type];
+  if (!data) return;
+  const isOwner = type === 'owner';
+  const btnEl   = document.getElementById(isOwner ? 'ownerImportBtn' : 'propImportBtn');
+  btnEl.textContent = 'Importing…'; btnEl.disabled = true;
+
+  let success = 0, failed = 0, errors = [];
+
+  if (isOwner) {
+    const ni = data.headers.indexOf('name'), pi = data.headers.indexOf('password');
+    for (const row of data.rows) {
+      const name = row[ni], password = row[pi];
+      if (!name || !password) { failed++; continue; }
+      try {
+        const res = await fetch(`${BACKEND}/auth/owner/register`, {
+          method:'POST', headers: getAuthHeaders(), body: JSON.stringify({ name, password })
+        });
+        const d = await res.json();
+        if (!res.ok) throw new Error(d.error || `HTTP ${res.status}`);
+        success++;
+      } catch(err) { failed++; errors.push(`${name}: ${err.message}`); }
+    }
+  } else {
+    const ai = data.headers.indexOf('address'), oi = data.headers.indexOf('owner_name'), ti = data.headers.indexOf('tenant_name');
+    const props = getManagedProps();
+    for (const row of data.rows) {
+      const address = row[ai], owner = row[oi], tenant = ti >= 0 ? row[ti] : '';
+      if (!address || !owner) { failed++; continue; }
+      if (props.find(p => p.address.toLowerCase() === address.toLowerCase())) { failed++; errors.push(`${address}: duplicate`); continue; }
+      props.unshift({ id: 'PROP-' + Date.now() + Math.random(), address, owner, tenant: tenant||'', createdAt: new Date().toISOString() });
+      success++;
+    }
+    saveManagedProps(props);
+    updateSidebarBadges();
+  }
+
+  btnEl.textContent = isOwner ? '⬆ Import Owners' : '⬆ Import Properties';
+  btnEl.disabled = false;
+
+  // Add to import log
+  const logEl = document.getElementById('importLog');
+  if (logEl) {
+    if (logEl.querySelector('i') || logEl.style.fontStyle==='italic') logEl.innerHTML='';
+    const entry = document.createElement('div');
+    entry.style.cssText = `padding:10px 14px;border-radius:8px;margin-bottom:8px;font-size:0.8rem;background:${failed===0?'var(--green-pale)':'var(--amber-pale)'};border:1px solid ${failed===0?'rgba(26,122,74,0.2)':'rgba(181,110,0,0.2)'};`;
+    entry.innerHTML = `<strong>${new Date().toLocaleString('en-AU')}</strong> — ${isOwner?'Owner':'Property'} import: <span style="color:var(--green)">✅ ${success} imported</span>${failed?` <span style="color:var(--red)">⚠️ ${failed} failed</span>`:''}${errors.length?`<br><span style="color:var(--muted);font-size:0.75rem;">${errors.slice(0,3).join(' · ')}${errors.length>3?` +${errors.length-3} more`:''}</span>`:''}`;
+    logEl.prepend(entry);
+  }
+
+  if (success > 0) {
+    toast(`${success} ${isOwner?'owner':'propert'}${success!==1?(isOwner?'s':'ies'):(isOwner?'':'y')} imported`, 'success');
+    logActivity(`Imported ${success} ${isOwner?'owners':'properties'} via CSV`, '#1d7a50');
+    if (!isOwner) renderManagedProps();
+  }
+  if (failed > 0) toast(`${failed} row${failed!==1?'s':''} failed — see import log`, 'error');
+}
+
+function clearImport(type) {
+  importData[type] = null;
+  const isOwner = type === 'owner';
+  ['Preview','Btn','Clear'].forEach(s => {
+    const el = document.getElementById((isOwner?'owner':'prop') + 'Import' + s);
+    if (el) { el.style.display = 'none'; if (s==='Preview') el.innerHTML=''; }
+  });
+  const inp = document.getElementById(isOwner ? 'ownerCsvInput' : 'propCsvInput');
+  if (inp) inp.value = '';
+}
+
 function seedDemo() {
   if (getWOs().length === 0 && S.get(KEY_PORT,[]).length === 0) {
     const wos = [
