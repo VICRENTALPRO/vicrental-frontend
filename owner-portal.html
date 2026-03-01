@@ -1,0 +1,2096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owner Portal — VicRental Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   TOKENS — refined luxury property aesthetic
+══════════════════════════════════════════ */
+:root {
+  --ink:       #0e1623;
+  --ink-mid:   #16243a;
+  --navy:      #1a3260;
+  --gold:      #b8892a;
+  --gold-lt:   #d4a843;
+  --gold-pale: #fdf6e8;
+  --gold-dim:  rgba(184,137,42,0.12);
+  --cream:     #faf7f2;
+  --warm:      #f3ede3;
+  --white:     #ffffff;
+  --red:       #b83232;
+  --red-pale:  #fceaea;
+  --red-dim:   rgba(184,50,50,0.10);
+  --green:     #1d7a50;
+  --green-pale:#e8f6ee;
+  --green-dim: rgba(29,122,80,0.10);
+  --amber:     #a05800;
+  --amber-pale:#fff4e0;
+  --slate:     #5a6a8a;
+  --border:    #e8e0d2;
+  --text:      #1a1a2c;
+  --muted:     #7a8099;
+  --radius:    10px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cream); color: var(--text); }
+
+/* ══════════════════════════════════════════
+   LOGIN SCREEN
+══════════════════════════════════════════ */
+#loginScreen {
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+  position: relative;
+}
+
+.login-left {
+  width: 420px;
+  flex-shrink: 0;
+  background: var(--ink);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 52px 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-left::before {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 360px; height: 360px;
+  background: radial-gradient(circle, rgba(184,137,42,0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.login-left::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; left: -60px;
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(26,50,96,0.6) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.login-brand {
+  position: relative;
+  z-index: 1;
+}
+
+.login-emblem {
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-lt));
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 24px rgba(184,137,42,0.3);
+}
+
+.login-brand-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.15;
+  margin-bottom: 6px;
+}
+
+.login-brand-sub {
+  font-size: 0.72rem;
+  color: var(--gold-lt);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.login-tagline {
+  position: relative;
+  z-index: 1;
+}
+
+.login-tagline p {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-style: italic;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.6;
+}
+
+.login-tagline-line {
+  width: 40px; height: 2px;
+  background: var(--gold);
+  margin-bottom: 16px;
+}
+
+.login-legal {
+  position: relative;
+  z-index: 1;
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.25);
+  line-height: 1.7;
+}
+
+.login-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  background: var(--cream);
+}
+
+.login-form-wrap {
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.login-sub {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-bottom: 36px;
+  line-height: 1.6;
+}
+
+.form-field {
+  margin-bottom: 18px;
+}
+
+.form-field label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--slate);
+  margin-bottom: 6px;
+}
+
+.form-field input {
+  width: 100%;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  font-family: 'Jost', sans-serif;
+  color: var(--text);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-field input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(184,137,42,0.12);
+}
+
+.btn-login {
+  width: 100%;
+  background: linear-gradient(135deg, var(--ink), var(--ink-mid));
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 14px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: 'Jost', sans-serif;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.btn-login:hover {
+  background: linear-gradient(135deg, var(--navy), var(--ink));
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(14,22,35,0.25);
+}
+
+.login-error {
+  background: var(--red-pale);
+  border: 1px solid #f5c6c2;
+  color: var(--red);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  margin-top: 14px;
+  display: none;
+}
+
+.login-demo-hint {
+  margin-top: 24px;
+  padding: 14px 16px;
+  background: var(--gold-pale);
+  border: 1px solid #e8c86a;
+  border-radius: var(--radius);
+  font-size: 0.75rem;
+  color: var(--amber);
+  line-height: 1.7;
+}
+
+.login-demo-hint strong { color: var(--ink); }
+
+@media (max-width: 700px) {
+  .login-left { display: none; }
+  .login-right { padding: 32px 24px; }
+}
+
+/* ══════════════════════════════════════════
+   PORTAL SCREEN (hidden until logged in)
+══════════════════════════════════════════ */
+#portalScreen { display: none; min-height: 100vh; flex-direction: column; }
+#portalScreen.visible { display: flex; }
+
+/* ── Header ── */
+.portal-header {
+  background: var(--ink);
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.portal-header-inner {
+  max-width: 1020px;
+  margin: 0 auto;
+  padding: 18px 28px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.portal-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.portal-logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-lt));
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.portal-logo-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.portal-logo-sub {
+  font-size: 0.6rem;
+  color: var(--gold-lt);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  display: block;
+}
+
+.portal-header-owner {
+  margin-left: auto;
+  text-align: right;
+}
+
+.portal-header-owner span {
+  display: block;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 2px;
+}
+
+.portal-header-owner strong {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--gold-lt);
+}
+
+.btn-logout {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.6);
+  border-radius: 7px;
+  padding: 7px 14px;
+  font-size: 0.75rem;
+  font-family: 'Jost', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.btn-logout:hover { background: rgba(255,255,255,0.13); color: #fff; }
+
+/* Compliance status bar */
+.status-bar {
+  background: var(--ink-mid);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.status-bar-inner {
+  max-width: 1020px;
+  margin: 0 auto;
+  padding: 10px 28px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.status-chip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+
+.chip-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-chip span { color: rgba(255,255,255,0.45); }
+.status-chip strong { color: #fff; }
+
+.compliance-badge {
+  margin-left: auto;
+  padding: 4px 16px;
+  border-radius: 20px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.cb-compliant { background: rgba(29,122,80,0.25); color: #6ee7b7; border: 1px solid rgba(29,122,80,0.4); }
+.cb-noncompliant { background: rgba(184,50,50,0.3); color: #fca5a5; border: 1px solid rgba(184,50,50,0.4); }
+.cb-partial { background: rgba(160,88,0,0.25); color: #fcd34d; border: 1px solid rgba(160,88,0,0.4); }
+.cb-pending { background: rgba(90,106,138,0.2); color: #94a3b8; border: 1px solid rgba(90,106,138,0.3); }
+
+/* ── Main Content ── */
+.portal-main {
+  flex: 1;
+  max-width: 1020px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 28px 80px;
+}
+
+/* ── Notice ── */
+.portal-notice {
+  background: var(--gold-pale);
+  border: 1px solid #e8c86a;
+  border-radius: var(--radius);
+  padding: 13px 16px;
+  font-size: 0.78rem;
+  color: #6b4800;
+  line-height: 1.7;
+  margin-bottom: 24px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+/* ── KPI Grid ── */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.kpi {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.kpi-red::after { background: var(--red); }
+.kpi-amber::after { background: var(--gold); }
+.kpi-green::after { background: var(--green); }
+.kpi-slate::after { background: var(--slate); }
+
+.kpi-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); margin-bottom: 8px; }
+.kpi-val { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; line-height: 1; margin-bottom: 2px; }
+.kpi-red .kpi-val { color: var(--red); }
+.kpi-amber .kpi-val { color: var(--gold); }
+.kpi-green .kpi-val { color: var(--green); }
+.kpi-slate .kpi-val { color: var(--slate); }
+.kpi-sub { font-size: 0.68rem; color: var(--muted); }
+.kpi-icon { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 1.8rem; opacity: 0.07; }
+
+/* ── Filter Tabs ── */
+.filter-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.ftab {
+  padding: 7px 16px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.ftab-all { border-color: var(--border); color: var(--muted); background: #fff; }
+.ftab-all:hover, .ftab-all.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+.ftab-nc { border-color: #f5c6c2; color: var(--red); background: #fff; }
+.ftab-nc:hover, .ftab-nc.active { background: var(--red); color: #fff; border-color: var(--red); }
+.ftab-ip { border-color: #f0d080; color: var(--amber); background: #fff; }
+.ftab-ip:hover, .ftab-ip.active { background: var(--amber); color: #fff; border-color: var(--amber); }
+.ftab-ok { border-color: #a7d8be; color: var(--green); background: #fff; }
+.ftab-ok:hover, .ftab-ok.active { background: var(--green); color: #fff; border-color: var(--green); }
+.ftab-pending { border-color: #c8b8e8; color: #6040a8; background: #fff; }
+.ftab-pending:hover, .ftab-pending.active { background: #6040a8; color: #fff; border-color: #6040a8; }
+
+/* ── Property Group ── */
+.prop-group {
+  margin-bottom: 28px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.prop-group-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 20px;
+  background: var(--ink);
+}
+
+.prop-group-header h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #fff;
+  flex: 1;
+  line-height: 1.3;
+}
+
+.prop-group-header small { font-size: 0.68rem; color: rgba(255,255,255,0.4); display: block; margin-top: 1px; }
+
+/* ── Issue Card ── */
+.issue-card {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 18px 20px;
+  transition: background 0.12s;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  align-items: start;
+}
+.issue-card:last-child { border-bottom: none; }
+.issue-card:hover { background: #fdfaf5; }
+
+.issue-icon {
+  width: 44px; height: 44px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.ic-nc { background: var(--red-pale); border: 1px solid #f5c6c2; }
+.ic-ip { background: var(--amber-pale); border: 1px solid #f0d080; }
+.ic-ok { background: var(--green-pale); border: 1px solid #a7d8be; }
+.ic-pending { background: #f0ebfc; border: 1px solid #c8b8e8; }
+
+.issue-cat {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 3px;
+}
+.ic-nc .issue-cat-text { color: var(--red); }
+.ic-ip .issue-cat-text, .cat-ip { color: var(--amber); }
+.ic-ok .issue-cat-text, .cat-ok { color: var(--green); }
+.ic-pending .issue-cat-text, .cat-pending { color: #6040a8; }
+.cat-nc { color: var(--red); }
+
+.issue-title { font-size: 0.92rem; font-weight: 600; line-height: 1.4; margin-bottom: 5px; color: var(--text); }
+.issue-action { font-size: 0.77rem; color: var(--muted); line-height: 1.5; margin-bottom: 8px; }
+
+.issue-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.7rem;
+  color: var(--muted);
+  align-items: center;
+}
+.issue-meta strong { color: var(--text); }
+
+.legal-tag {
+  font-size: 0.6rem;
+  background: var(--ink);
+  color: rgba(255,255,255,0.6);
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+
+/* ── Issue right panel ── */
+.issue-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+  min-width: 160px;
+}
+
+/* ── Status Pills ── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.63rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 10px;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+.p-nc { background: var(--red-pale); color: var(--red); border: 1px solid #f5c6c2; }
+.p-ip { background: var(--amber-pale); color: var(--amber); border: 1px solid #f0d080; }
+.p-ok { background: var(--green-pale); color: var(--green); border: 1px solid #a7d8be; }
+.p-pending { background: #f0ebfc; color: #6040a8; border: 1px solid #c8b8e8; }
+.p-critical { background: var(--red-pale); color: var(--red); border: 1px solid #f5c6c2; }
+.p-high { background: var(--amber-pale); color: var(--amber); border: 1px solid #f0d080; }
+.p-approved { background: var(--green-pale); color: var(--green); border: 1px solid #a7d8be; }
+.p-rejected { background: var(--red-pale); color: var(--red); border: 1px solid #f5c6c2; }
+
+/* ── Approve/Reject Buttons ── */
+.action-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.btn-approve {
+  width: 100%;
+  background: var(--green-pale);
+  color: var(--green);
+  border: 1.5px solid #a7d8be;
+  border-radius: 7px;
+  padding: 7px 14px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+  transition: all 0.15s;
+  letter-spacing: 0.03em;
+}
+.btn-approve:hover { background: var(--green); color: #fff; border-color: var(--green); }
+
+.btn-reject {
+  width: 100%;
+  background: var(--red-pale);
+  color: var(--red);
+  border: 1.5px solid #f5c6c2;
+  border-radius: 7px;
+  padding: 7px 14px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+  transition: all 0.15s;
+  letter-spacing: 0.03em;
+}
+.btn-reject:hover { background: var(--red); color: #fff; border-color: var(--red); }
+
+.btn-rescind {
+  width: 100%;
+  background: var(--warm);
+  color: var(--muted);
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  padding: 6px 14px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+  transition: all 0.15s;
+}
+.btn-rescind:hover { background: var(--border); color: var(--text); }
+
+/* ── Comment Box ── */
+.comment-section {
+  margin-top: 10px;
+  padding: 12px 16px;
+  background: var(--warm);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  animation: slideDown 0.18s ease;
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.comment-section label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.comment-section textarea {
+  width: 100%;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  font-family: 'Jost', sans-serif;
+  color: var(--text);
+  resize: vertical;
+  min-height: 70px;
+  transition: border-color 0.15s;
+}
+.comment-section textarea:focus { outline: none; border-color: var(--gold); }
+
+.comment-btns { display: flex; gap: 8px; margin-top: 8px; justify-content: flex-end; }
+
+.btn-sm {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+  border: 1.5px solid;
+  transition: all 0.15s;
+}
+
+.btn-confirm-approve { background: var(--green); color: #fff; border-color: var(--green); }
+.btn-confirm-approve:hover { background: #165e3c; }
+.btn-confirm-reject { background: var(--red); color: #fff; border-color: var(--red); }
+.btn-confirm-reject:hover { background: #912222; }
+.btn-cancel-action { background: #fff; color: var(--muted); border-color: var(--border); }
+.btn-cancel-action:hover { background: var(--warm); }
+
+/* ── Existing comment display ── */
+.owner-comment {
+  margin-top: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.oc-approve { background: var(--green-pale); border: 1px solid #a7d8be; color: var(--green); }
+.oc-reject { background: var(--red-pale); border: 1px solid #f5c6c2; color: var(--red); }
+.oc-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+.oc-body { flex: 1; }
+.oc-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+.oc-comment { color: var(--text); font-size: 0.8rem; }
+.oc-time { font-size: 0.65rem; color: var(--muted); margin-top: 3px; }
+
+/* ── Empty State ── */
+.empty {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--muted);
+}
+.empty-icon { font-size: 3rem; margin-bottom: 14px; }
+.empty h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--text); margin-bottom: 8px; }
+.empty p { font-size: 0.83rem; line-height: 1.6; max-width: 340px; margin: 0 auto; }
+
+/* ── Disclaimer ── */
+.disclaimer {
+  margin-top: 40px;
+  font-size: 0.69rem;
+  color: var(--muted);
+  line-height: 1.8;
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+}
+
+/* ── Toast ── */
+.toast-wrap {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: var(--ink);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  animation: toastIn 0.25s ease;
+  max-width: 300px;
+}
+.toast.ok { border-left: 3px solid var(--green); }
+.toast.no { border-left: 3px solid var(--red); }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Confirm Modal ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(14,22,35,0.55);
+  z-index: 800;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(3px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--white);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 460px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-header h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 600; flex: 1; }
+.modal-body { padding: 20px 22px; }
+.modal-body p { font-size: 0.84rem; line-height: 1.7; color: var(--muted); margin-bottom: 14px; }
+.modal-body .issue-ref {
+  background: var(--warm);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 14px 22px;
+  border-top: 1px solid var(--border);
+  background: var(--warm);
+}
+
+/* ── Vault in Owner Portal ── */
+.owner-vault-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+.owner-vault-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.15s;
+}
+.owner-vault-card:hover { border-color: var(--gold); box-shadow: 0 3px 14px rgba(184,137,42,0.1); }
+.ovc-preview {
+  height: 110px;
+  background: var(--warm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+}
+.ovc-preview img { width:100%;height:100%;object-fit:cover;position:absolute;inset:0; }
+.ovc-body { padding: 11px 14px; }
+.ovc-cat { font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold);margin-bottom:3px; }
+.ovc-name { font-size:0.84rem;font-weight:600;line-height:1.3;margin-bottom:3px;color:var(--text); }
+.ovc-prop { font-size:0.68rem;color:var(--muted);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.ovc-meta { font-size:0.65rem;color:var(--muted); }
+.ovc-actions { display:flex;gap:6px;padding:9px 14px;border-top:1px solid var(--border);background:var(--warm); }
+.ovc-btn { flex:1;padding:6px 10px;border-radius:6px;font-size:0.72rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--white);color:var(--ink);font-family:'Jost',sans-serif;transition:all 0.12s;text-align:center; }
+.ovc-btn:hover { background:var(--ink);color:#fff;border-color:var(--ink); }
+
+/* ── Owner Quotes ── */
+.oq-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+}
+.oq-card:hover { box-shadow: 0 3px 14px rgba(0,0,0,0.07); }
+.oq-card.oqs-pending { border-left-color: #a78bfa; }
+.oq-card.oqs-approved { border-left-color: var(--green); }
+.oq-card.oqs-rejected { border-left-color: var(--red); }
+.oq-card.oqs-expired  { border-left-color: var(--muted); opacity:0.75; }
+
+.oq-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  padding: 16px 18px;
+  align-items: start;
+}
+.oq-icon {
+  width: 48px; height: 48px;
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; flex-shrink: 0;
+  background: var(--gold-pale); border: 1px solid #e8c86a;
+}
+.oq-cat { font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--gold); margin-bottom:3px; }
+.oq-desc { font-size:0.92rem; font-weight:600; margin-bottom:4px; line-height:1.4; }
+.oq-property { font-size:0.74rem; color:var(--muted); margin-bottom:6px; }
+.oq-meta { display:flex; flex-wrap:wrap; gap:10px; font-size:0.7rem; color:var(--muted); }
+.oq-meta strong { color:var(--text); }
+.oq-notes { margin-top:8px; padding:9px 12px; background:var(--warm); border-radius:7px; font-size:0.78rem; color:var(--muted); font-style:italic; border-left:2px solid var(--gold); }
+
+.oq-amount-wrap { display:flex; flex-direction:column; align-items:flex-end; gap:8px; min-width:140px; }
+.oq-amount { font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:600; color:var(--ink); line-height:1; }
+.oq-amount span { font-family:'Jost',sans-serif; font-size:0.68rem; color:var(--muted); display:block; margin-bottom:2px; }
+
+.oq-action-zone {
+  padding: 14px 18px;
+  border-top: 1px solid var(--border);
+  background: var(--warm);
+}
+.oq-action-btns { display:flex; gap:10px; }
+.oq-btn-approve {
+  flex: 1; padding: 10px 16px;
+  background: var(--green-pale); color: var(--green);
+  border: 1.5px solid #a7d8be; border-radius: 8px;
+  font-size: 0.82rem; font-weight: 700; cursor: pointer;
+  font-family: 'Jost', sans-serif; transition: all 0.15s;
+}
+.oq-btn-approve:hover { background: var(--green); color: #fff; border-color: var(--green); }
+.oq-btn-reject {
+  flex: 1; padding: 10px 16px;
+  background: var(--red-pale); color: var(--red);
+  border: 1.5px solid #f5c6c2; border-radius: 8px;
+  font-size: 0.82rem; font-weight: 700; cursor: pointer;
+  font-family: 'Jost', sans-serif; transition: all 0.15s;
+}
+.oq-btn-reject:hover { background: var(--red); color: #fff; border-color: var(--red); }
+.oq-btn-rescind {
+  padding: 8px 14px;
+  background: var(--white); color: var(--muted);
+  border: 1px solid var(--border); border-radius: 7px;
+  font-size: 0.72rem; font-weight: 600; cursor: pointer;
+  font-family: 'Jost', sans-serif; transition: all 0.15s;
+}
+.oq-btn-rescind:hover { background: var(--warm); color: var(--text); }
+.oq-comment-box { margin-top: 10px; animation: slideDown 0.18s ease; }
+.oq-comment-box textarea {
+  width: 100%; border: 1px solid var(--border); border-radius: 7px;
+  padding: 9px 12px; font-family: 'Jost', sans-serif; font-size: 0.82rem;
+  background: var(--white); resize: vertical; min-height: 64px; margin-bottom: 8px;
+}
+.oq-comment-box textarea:focus { outline: none; border-color: var(--gold); }
+.oq-comment-confirm { display:flex; gap:8px; justify-content:flex-end; }
+.oq-response-display {
+  margin-top: 10px; padding: 10px 14px; border-radius: 8px;
+  display: flex; gap: 10px; align-items: flex-start;
+  font-size: 0.78rem; line-height: 1.5;
+}
+.oq-rd-approve { background: var(--green-pale); border: 1px solid #a7d8be; }
+.oq-rd-reject  { background: var(--red-pale);   border: 1px solid #f5c6c2; }
+.oq-rd-label { font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:2px; }
+.oq-rd-comment { color: var(--text); }
+.oq-rd-time { font-size:0.65rem; color:var(--muted); margin-top:3px; }
+.expired-notice { font-size:0.75rem; color:var(--muted); font-style:italic; padding:10px 18px; border-top:1px solid var(--border); background:var(--warm); }
+.doc-modal { position:fixed;inset:0;background:rgba(14,22,35,0.8);z-index:900;display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px); }
+.doc-modal.open { display:flex; }
+.doc-modal-inner { background:var(--white);border-radius:14px;overflow:hidden;max-width:760px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,0.25); }
+.doc-modal-head { display:flex;align-items:center;gap:12px;padding:15px 20px;border-bottom:1px solid var(--border);background:var(--ink);flex-shrink:0; }
+.doc-modal-head h3 { font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;color:#fff;flex:1; }
+.doc-modal-body { flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;background:var(--warm);padding:20px;min-height:250px; }
+.doc-modal-body img { max-width:100%;max-height:55vh;border-radius:8px; }
+.doc-modal-foot { padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;background:var(--warm);flex-shrink:0; }
+</style>
+<script>
+const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
+</script>
+</head>
+<body>
+
+<!-- ══════════════════════ LOGIN SCREEN ══════════════════════ -->
+<div id="loginScreen">
+  <div class="login-left">
+    <div class="login-brand">
+      <div class="login-emblem">🏠</div>
+      <div class="login-brand-name">VicRental Pro<br>Owner Portal</div>
+      <div class="login-brand-sub">Victoria · Property Compliance</div>
+    </div>
+    <div class="login-tagline">
+      <div class="login-tagline-line"></div>
+      <p>Stay informed about your property's compliance status and work orders, all in one place.</p>
+    </div>
+    <div class="login-legal">
+      Residential Tenancies Act 1997 · Victoria<br>
+      Consumer Affairs Victoria — consumer.vic.gov.au
+    </div>
+  </div>
+  <div class="login-right">
+    <div class="login-form-wrap">
+      <div class="login-heading">Welcome back</div>
+      <div class="login-sub">Sign in to view your property compliance dashboard and work orders.</div>
+
+      <div class="form-field">
+        <label>Owner Name</label>
+        <input type="text" id="loginName" placeholder="Your full name" autocomplete="name">
+      </div>
+      <div class="form-field">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+
+      <div class="login-error" id="loginError">Incorrect name or password. Please try again.</div>
+
+      <button class="btn-login" onclick="doLogin()">
+        <span>Sign In</span> <span>→</span>
+      </button>
+
+      <div class="login-demo-hint">
+        <strong>Demo access:</strong><br>
+        Name: <strong>Michael Chen</strong> · Password: <strong>owner123</strong><br>
+        To add more owners, use the property manager console and assign a password to each owner.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ PORTAL SCREEN ══════════════════════ -->
+<div id="portalScreen">
+
+  <!-- Header -->
+  <div class="portal-header">
+    <div class="portal-header-inner">
+      <div class="portal-logo">
+        <div class="portal-logo-icon">🏠</div>
+        <div>
+          <div class="portal-logo-text">Owner Portal</div>
+          <span class="portal-logo-sub">VicRental Pro · Victoria</span>
+        </div>
+      </div>
+      <div class="portal-header-owner">
+        <span>Signed in as</span>
+        <strong id="displayOwnerName">—</strong>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Sign Out</button>
+    </div>
+    <div class="status-bar">
+      <div class="status-bar-inner">
+        <div class="status-chip">
+          <div class="chip-dot" style="background:#f87171;"></div>
+          <strong id="chipNC">0</strong><span>Non-Compliant</span>
+        </div>
+        <div class="status-chip">
+          <div class="chip-dot" style="background:#fbbf24;"></div>
+          <strong id="chipIP">0</strong><span>In Progress</span>
+        </div>
+        <div class="status-chip">
+          <div class="chip-dot" style="background:#34d399;"></div>
+          <strong id="chipOK">0</strong><span>Resolved</span>
+        </div>
+        <div class="status-chip">
+          <div class="chip-dot" style="background:#a78bfa;"></div>
+          <strong id="chipPending">0</strong><span>Awaiting Owner Approval</span>
+        </div>
+        <div class="compliance-badge cb-pending" id="complianceBadge">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <main class="portal-main">
+
+    <div class="portal-notice">
+      <span style="font-size:1.1rem;flex-shrink:0;">⚖️</span>
+      <div>
+        <strong>Your property compliance status is shown below.</strong>
+        Under the <em>Residential Tenancies Act 1997</em>, rental minimum standards must be met at all times. Work orders raised by your property manager require your review — please <strong>approve or reject</strong> each item. Approved work orders will proceed to scheduling.
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-strip">
+      <div class="kpi kpi-red"><div class="kpi-label">Non-Compliant</div><div class="kpi-val" id="kpiNC">0</div><div class="kpi-sub">Open issues</div><div class="kpi-icon">⚠️</div></div>
+      <div class="kpi kpi-amber"><div class="kpi-label">In Progress</div><div class="kpi-val" id="kpiIP">0</div><div class="kpi-sub">Repairs underway</div><div class="kpi-icon">🔨</div></div>
+      <div class="kpi kpi-green"><div class="kpi-label">Resolved</div><div class="kpi-val" id="kpiOK">0</div><div class="kpi-sub">Completed</div><div class="kpi-icon">✅</div></div>
+      <div class="kpi kpi-slate" style="--slate:#6040a8;"><div class="kpi-label">Awaiting Approval</div><div class="kpi-val" id="kpiPending" style="color:#6040a8;">0</div><div class="kpi-sub">Your action needed</div><div class="kpi-icon">🔔</div></div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-tabs" id="mainFilterTabs">
+      <div class="ftab ftab-all active" id="ftab-all" onclick="setView('issues','all')">All Issues</div>
+      <div class="ftab ftab-nc" id="ftab-nc" onclick="setView('issues','nc')">Non-Compliant</div>
+      <div class="ftab ftab-ip" id="ftab-ip" onclick="setView('issues','ip')">In Progress</div>
+      <div class="ftab ftab-ok" id="ftab-ok" onclick="setView('issues','ok')">Resolved</div>
+      <div class="ftab ftab-pending" id="ftab-pending" onclick="setView('issues','pending')">
+        Awaiting Approval <span id="pendingTabCount" style="display:none;background:#6040a8;color:#fff;font-size:0.6rem;padding:0 5px;border-radius:10px;margin-left:4px;">0</span>
+      </div>
+      <div class="ftab" id="ftab-vault" onclick="setView('vault','all')" style="border-color:#c8b8e8;color:#6040a8;background:#fff;margin-left:auto;">🗄️ Documents</div>
+      <div class="ftab" id="ftab-quotes" onclick="setView('quotes','all')" style="border-color:#a7d8be;color:var(--green);background:#fff;position:relative;">
+        💰 Quotes
+        <span id="ownerQuoteBadge" style="display:none;position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;font-size:0.58rem;font-weight:700;padding:1px 5px;border-radius:8px;min-width:16px;text-align:center;">0</span>
+      </div>
+    </div>
+
+    <!-- Portal Content (issues) -->
+    <div id="portalContent"></div>
+
+    <!-- Vault Content -->
+    <div id="vaultContent" style="display:none;">      <div style="background:var(--gold-pale);border:1px solid #e8c86a;border-radius:10px;padding:12px 16px;font-size:0.78rem;color:#6b4800;margin-bottom:20px;display:flex;gap:10px;align-items:flex-start;">
+        <span style="font-size:1.1rem;flex-shrink:0;">🗄️</span>
+        <div>Documents shared by your property manager are available below. These may include compliance certificates, invoices, inspection reports, and other important records for your properties.</div>
+      </div>
+      <!-- Vault filters -->
+      <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+        <input type="text" id="ownerVaultSearch" placeholder="🔍 Search documents…" oninput="renderOwnerVault()" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:0.82rem;font-family:'Jost',sans-serif;flex:1;min-width:180px;max-width:260px;">
+        <select id="ownerVaultCat" onchange="renderOwnerVault()" style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:0.82rem;font-family:'Jost',sans-serif;background:#fff;color:var(--text);">
+          <option value="all">All categories</option>
+          <option value="Compliance Certificate">Compliance Certificates</option>
+          <option value="Invoice">Invoices</option>
+          <option value="Inspection Report">Inspection Reports</option>
+          <option value="Lease Agreement">Lease Agreements</option>
+          <option value="Insurance">Insurance</option>
+          <option value="Council Notice">Council Notices</option>
+          <option value="Correspondence">Correspondence</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div id="ownerVaultGrid"></div>
+    </div>
+
+    <!-- Quotes Content -->
+    <div id="quotesContent" style="display:none;">
+      <div style="background:var(--green-pale);border:1px solid #a7d8be;border-radius:10px;padding:12px 16px;font-size:0.78rem;color:#1a5c3a;margin-bottom:20px;display:flex;gap:10px;align-items:flex-start;">
+        <span style="font-size:1.1rem;flex-shrink:0;">💰</span>
+        <div>Your property manager has submitted repair quotes for your approval. Please review each quote carefully — <strong>approved quotes will proceed to scheduling, rejected quotes will be flagged for discussion.</strong> You may add a comment with each decision.</div>
+      </div>
+
+      <!-- Quote filters -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <div class="ftab ftab-all active" id="oqf-all" onclick="setOwnerQuoteFilter('all')" style="font-size:0.72rem;padding:6px 14px;">All Quotes</div>
+        <div class="ftab" id="oqf-pending" onclick="setOwnerQuoteFilter('pending')" style="font-size:0.72rem;padding:6px 14px;border-color:#c8b8e8;color:#6040a8;background:#fff;">Awaiting Decision</div>
+        <div class="ftab ftab-ok" id="oqf-approved" onclick="setOwnerQuoteFilter('approved')" style="font-size:0.72rem;padding:6px 14px;">Approved</div>
+        <div class="ftab ftab-nc" id="oqf-rejected" onclick="setOwnerQuoteFilter('rejected')" style="font-size:0.72rem;padding:6px 14px;">Rejected</div>
+      </div>
+
+      <div id="ownerQuotesList"></div>
+    </div>
+
+    <div class="disclaimer">
+      <strong>Disclaimer:</strong> This portal is provided for informational purposes only and reflects data recorded during the most recent inspection by your property manager. It is not a legal document. For official advice, refer to <strong>Consumer Affairs Victoria</strong> (consumer.vic.gov.au) or seek independent legal counsel. Work order approvals recorded here are advisory — your property manager retains operational authority in accordance with your management agreement.
+    </div>
+  </main>
+</div>
+
+<!-- Confirm Modal -->
+<div class="modal-overlay" id="confirmModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <span id="modalIcon" style="font-size:1.4rem;">✅</span>
+      <h3 id="modalTitle">Confirm Action</h3>
+    </div>
+    <div class="modal-body">
+      <div class="issue-ref" id="modalIssueRef"></div>
+      <p id="modalDesc"></p>
+      <label style="display:block;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:6px;" id="modalCommentLabel">Comment (optional)</label>
+      <textarea id="modalComment" rows="3" placeholder="Add a note or reason…" style="width:100%;background:var(--warm);border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Jost',sans-serif;font-size:0.82rem;resize:vertical;"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-sm btn-cancel-action" onclick="closeModal()">Cancel</button>
+      <button class="btn-sm" id="modalConfirmBtn" onclick="executeAction()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Doc Preview Modal -->
+<div class="doc-modal" id="ownerDocModal" onclick="if(event.target===this)closeOwnerDocModal()">
+  <div class="doc-modal-inner">
+    <div class="doc-modal-head">
+      <h3 id="ownerDocTitle">Document</h3>
+      <button style="background:rgba(255,255,255,0.1);border:none;color:rgba(255,255,255,0.7);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;" onclick="closeOwnerDocModal()">✕</button>
+    </div>
+    <div class="doc-modal-body" id="ownerDocBody"></div>
+    <div class="doc-modal-foot">
+      <button class="btn-login" onclick="closeOwnerDocModal()" style="width:auto;padding:8px 18px;margin:0;font-size:0.8rem;">Close</button>
+      <a id="ownerDocDownload" download style="background:linear-gradient(135deg,var(--ink),var(--ink-mid));color:#fff;border:none;border-radius:9px;padding:8px 18px;font-size:0.8rem;font-weight:600;font-family:'Jost',sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">⬇ Download</a>
+    </div>
+  </div>
+</div>
+
+<!-- Toasts -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════════
+const S = {
+  get: (k, def) => { try { const v = localStorage.getItem(k); return v !== null ? JSON.parse(v) : def; } catch(e) { return def; } },
+  set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} },
+};
+
+const KEY_WO      = 'vicrental_workorders';
+const KEY_PORT    = 'vicrental_portal';
+const KEY_OWNERS  = 'vicrental_owners';
+const KEY_REVIEWS = 'vicrental_owner_reviews';
+const KEY_SESSION = 'vicrental_owner_session';
+
+// ═══════════════════════════════════════════════
+// DEFAULT OWNERS (property manager sets these up
+// in the main platform — here we seed defaults)
+// ═══════════════════════════════════════════════
+function getOwners() {
+  const existing = S.get(KEY_OWNERS, null);
+  if (existing) return existing;
+  // Default demo owner — PMs add more via main platform
+  const defaults = [
+    { name: 'Michael Chen', password: 'owner123' },
+  ];
+  S.set(KEY_OWNERS, defaults);
+  return defaults;
+}
+
+// ═══════════════════════════════════════════════
+// LOGIN / LOGOUT
+// ═══════════════════════════════════════════════
+function doLogin() {
+  const name = document.getElementById('loginName').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+
+  if (!name || !password) {
+    errEl.textContent = 'Please enter your name and password.';
+    errEl.style.display = '';
+    return;
+  }
+
+  const btn = document.querySelector('.btn-login');
+  btn.textContent = 'Signing in…';
+  btn.disabled = true;
+
+  fetch('https://vicrental-backend1-production.up.railway.app/api/auth/owner/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, password })
+  })
+  .then(r => r.json())
+  .then(data => {
+    btn.textContent = 'Sign In';
+    btn.disabled = false;
+    if (data.error) {
+      errEl.textContent = 'Incorrect name or password. Please try again.';
+      errEl.style.display = '';
+      document.getElementById('loginPassword').value = '';
+      return;
+    }
+    localStorage.setItem('vr_token', data.token);
+    localStorage.setItem('vr_user', JSON.stringify(data.user));
+    errEl.style.display = 'none';
+    showPortal(data.user.name);
+  })
+  .catch(() => {
+    btn.textContent = 'Sign In';
+    btn.disabled = false;
+    errEl.textContent = 'Connection error. Please try again.';
+    errEl.style.display = '';
+  });
+}
+
+function doLogout() {
+  localStorage.removeItem('vr_token');
+  localStorage.removeItem('vr_user');
+  document.getElementById('portalScreen').classList.remove('visible');
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginName').value = '';
+  document.getElementById('loginPassword').value = '';
+}
+
+function checkSession() {
+  const token = localStorage.getItem('vr_token');
+  const user = (() => { try { return JSON.parse(localStorage.getItem('vr_user') || 'null'); } catch { return null; } })();
+  if (token && user && user.name) {
+    showPortal(user.name);
+  }
+}
+
+function showPortal(ownerName) {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('portalScreen').classList.add('visible');
+  document.getElementById('displayOwnerName').textContent = ownerName;
+  currentOwner = ownerName;
+  activeFilter = 'all';
+  activeView = 'issues';
+  document.getElementById('portalContent').style.display  = '';
+  document.getElementById('vaultContent').style.display   = 'none';
+  document.getElementById('quotesContent').style.display  = 'none';
+  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+  document.getElementById('ftab-all')?.classList.add('active');
+  updateOwnerQuoteBadge();
+  renderPortal();
+}
+
+// ═══════════════════════════════════════════════
+// PORTAL STATE
+// ═══════════════════════════════════════════════
+let currentOwner = '';
+let activeFilter = 'all';
+let activeView = 'issues'; // 'issues' | 'vault'
+let pendingAction = null; // { id, type: 'approve'|'reject' }
+
+function setView(view, filter) {
+  activeView = view;
+  // Hide all content panels
+  document.getElementById('portalContent').style.display  = 'none';
+  document.getElementById('vaultContent').style.display   = 'none';
+  document.getElementById('quotesContent').style.display  = 'none';
+  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+
+  if (view === 'issues') {
+    activeFilter = filter;
+    document.getElementById('portalContent').style.display = '';
+    const tabId = { all:'ftab-all', nc:'ftab-nc', ip:'ftab-ip', ok:'ftab-ok', pending:'ftab-pending' }[filter];
+    if (tabId) document.getElementById(tabId)?.classList.add('active');
+    renderPortal();
+  } else if (view === 'vault') {
+    document.getElementById('vaultContent').style.display = '';
+    document.getElementById('ftab-vault')?.classList.add('active');
+    renderOwnerVault();
+  } else if (view === 'quotes') {
+    document.getElementById('quotesContent').style.display = '';
+    document.getElementById('ftab-quotes')?.classList.add('active');
+    ownerQuoteFilter = 'all';
+    document.querySelectorAll('[id^="oqf-"]').forEach(el => el.classList.remove('active'));
+    document.getElementById('oqf-all')?.classList.add('active');
+    renderOwnerQuotes();
+  }
+}
+
+// Keep backward compat
+function setFilter(f) { setView('issues', f); }
+
+function getEffectiveStatus(item, wo, reviews) {
+  const review = reviews[item.id];
+  if (review && review.type === 'reject') return 'nc'; // rejected stays nc
+  if (!wo) return 'nc';
+  if (wo.status === 'completed' || wo.status === 'cancelled') return 'ok';
+  if (wo.status === 'inprogress') return 'ip';
+  // open + approved = pending scheduling
+  if (review && review.type === 'approve') return 'ip';
+  return 'nc'; // open, no approval yet = needs action
+}
+
+function getReviewStatus(item, reviews) {
+  const r = reviews[item.id];
+  if (!r) return 'awaiting'; // no review yet
+  return r.type; // 'approve' or 'reject'
+}
+
+// ═══════════════════════════════════════════════
+// RENDER PORTAL
+// ═══════════════════════════════════════════════
+function renderPortal() {
+  const allPortal = S.get(KEY_PORT, []);
+  const wos = S.get(KEY_WO, []);
+  const reviews = S.get(KEY_REVIEWS, {});
+
+  // Filter to this owner's items
+  const ownerItems = allPortal.filter(p =>
+    p.ownerName?.toLowerCase() === currentOwner.toLowerCase()
+  );
+
+  // Enrich with status
+  const enriched = ownerItems.map(item => {
+    const wo = wos.find(w => w.id === item.id);
+    const es = getEffectiveStatus(item, wo, reviews);
+    const review = reviews[item.id] || null;
+    const needsAction = es === 'nc' && !review; // open, no review yet
+    return { ...item, wo, es, review, needsAction };
+  });
+
+  // Counts
+  const nc = enriched.filter(i => i.es === 'nc').length;
+  const ip = enriched.filter(i => i.es === 'ip').length;
+  const ok = enriched.filter(i => i.es === 'ok').length;
+  const pending = enriched.filter(i => i.needsAction).length;
+  const total = enriched.length;
+
+  // Update header chips
+  document.getElementById('chipNC').textContent = nc;
+  document.getElementById('chipIP').textContent = ip;
+  document.getElementById('chipOK').textContent = ok;
+  document.getElementById('chipPending').textContent = pending;
+  document.getElementById('kpiNC').textContent = nc;
+  document.getElementById('kpiIP').textContent = ip;
+  document.getElementById('kpiOK').textContent = ok;
+  document.getElementById('kpiPending').textContent = pending;
+
+  // Pending tab badge
+  const ptc = document.getElementById('pendingTabCount');
+  ptc.textContent = pending;
+  ptc.style.display = pending > 0 ? '' : 'none';
+
+  // Compliance badge
+  const badge = document.getElementById('complianceBadge');
+  if (total === 0) {
+    badge.textContent = 'No Issues Recorded';
+    badge.className = 'compliance-badge cb-pending';
+  } else if (nc === 0 && ip === 0) {
+    badge.textContent = '✅ Fully Compliant';
+    badge.className = 'compliance-badge cb-compliant';
+  } else if (nc > 0) {
+    badge.textContent = `⚠ Non-Compliant — ${nc} issue${nc!==1?'s':''} outstanding`;
+    badge.className = 'compliance-badge cb-noncompliant';
+  } else {
+    badge.textContent = `🔨 ${ip} Repair${ip!==1?'s':''} In Progress`;
+    badge.className = 'compliance-badge cb-partial';
+  }
+
+  // Filter
+  let filtered = enriched;
+  if (activeFilter === 'nc') filtered = enriched.filter(i => i.es === 'nc');
+  else if (activeFilter === 'ip') filtered = enriched.filter(i => i.es === 'ip');
+  else if (activeFilter === 'ok') filtered = enriched.filter(i => i.es === 'ok');
+  else if (activeFilter === 'pending') filtered = enriched.filter(i => i.needsAction);
+
+  const container = document.getElementById('portalContent');
+
+  if (total === 0) {
+    container.innerHTML = `<div class="empty">
+      <div class="empty-icon">🏠</div>
+      <h3>No issues recorded</h3>
+      <p>Your property manager hasn't flagged any compliance issues for your properties yet. You'll be notified here when inspections are completed.</p>
+    </div>`;
+    return;
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="empty">
+      <div class="empty-icon">✅</div>
+      <h3>No items in this category</h3>
+      <p>No issues match the current filter.</p>
+    </div>`;
+    return;
+  }
+
+  // Group by property
+  const groups = {};
+  filtered.forEach(item => {
+    if (!groups[item.property]) groups[item.property] = [];
+    groups[item.property].push(item);
+  });
+
+  // Sort: needsAction first, then nc, ip, ok
+  const sortOrder = { nc: 1, ip: 2, ok: 3 };
+
+  container.innerHTML = Object.entries(groups).map(([prop, items]) => {
+    const pNC = items.filter(i=>i.es==='nc').length;
+    const pIP = items.filter(i=>i.es==='ip').length;
+    const pOK = items.filter(i=>i.es==='ok').length;
+    const pPending = items.filter(i=>i.needsAction).length;
+
+    let propPill = pNC > 0
+      ? `<span class="pill p-nc">⚠ ${pNC} Non-Compliant</span>`
+      : pIP > 0 ? `<span class="pill p-ip">🔨 ${pIP} In Progress</span>`
+      : `<span class="pill p-ok">✅ Compliant</span>`;
+
+    const sorted = [...items].sort((a,b) => {
+      if (a.needsAction && !b.needsAction) return -1;
+      if (!a.needsAction && b.needsAction) return 1;
+      return (sortOrder[a.es]||9) - (sortOrder[b.es]||9);
+    });
+
+    const cards = sorted.map(item => renderIssueCard(item)).join('');
+
+    return `<div class="prop-group">
+      <div class="prop-group-header">
+        <div>
+          <h2>🏠 ${prop}</h2>
+          <small>${items.length} issue${items.length!==1?'s':''} · ${pNC} non-compliant · ${pIP} in progress · ${pOK} resolved${pPending>0?` · <strong style="color:#fbbf24;">${pPending} awaiting your approval</strong>`:''}</small>
+        </div>
+        ${propPill}
+      </div>
+      <div>${cards}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderIssueCard(item) {
+  const es = item.es;
+  const review = item.review;
+  const needsAction = item.needsAction;
+
+  const icClass = es==='ok'?'ic-ok':es==='ip'?'ic-ip':needsAction?'ic-pending':'ic-nc';
+  const catClass = es==='ok'?'cat-ok':es==='ip'?'cat-ip':needsAction?'cat-pending':'cat-nc';
+
+  let statusPill;
+  if (es === 'ok') statusPill = '<span class="pill p-ok">✅ Resolved</span>';
+  else if (es === 'ip') {
+    if (review?.type === 'approve') statusPill = '<span class="pill p-approved">✅ Approved by You</span>';
+    else statusPill = '<span class="pill p-ip">🔨 In Progress</span>';
+  } else if (needsAction) {
+    statusPill = '<span class="pill p-pending">🔔 Awaiting Your Approval</span>';
+  } else if (review?.type === 'reject') {
+    statusPill = '<span class="pill p-rejected">✗ Rejected by You</span>';
+  } else {
+    statusPill = '<span class="pill p-nc">✗ Non-Compliant</span>';
+  }
+
+  const dueStr = item.dueDate
+    ? new Date(item.dueDate).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'})
+    : '—';
+
+  const notifiedStr = item.notifiedAt
+    ? new Date(item.notifiedAt).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'})
+    : '—';
+
+  // Approve/reject controls
+  let actionHtml = '';
+  if (es !== 'ok') {
+    if (!review) {
+      // Needs action
+      actionHtml = `<div class="action-btns">
+        <button class="btn-approve" onclick="openAction('${item.id}','approve')">✓ Approve Work Order</button>
+        <button class="btn-reject" onclick="openAction('${item.id}','reject')">✗ Reject Work Order</button>
+      </div>`;
+    } else {
+      // Already reviewed — show rescind option
+      const reviewedLabel = review.type === 'approve'
+        ? `<span class="pill p-approved">Approved ${formatDate(review.time)}</span>`
+        : `<span class="pill p-rejected">Rejected ${formatDate(review.time)}</span>`;
+      actionHtml = `<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+        ${reviewedLabel}
+        <button class="btn-rescind" onclick="rescindReview('${item.id}')">↺ Change Decision</button>
+      </div>`;
+    }
+  }
+
+  // Owner comment display
+  let commentHtml = '';
+  if (review?.comment) {
+    const isApprove = review.type === 'approve';
+    commentHtml = `<div class="owner-comment ${isApprove?'oc-approve':'oc-reject'}">
+      <div class="oc-icon">${isApprove?'✅':'✗'}</div>
+      <div class="oc-body">
+        <div class="oc-label">${isApprove?'Approved':'Rejected'} by ${currentOwner}</div>
+        <div class="oc-comment">${escHtml(review.comment)}</div>
+        <div class="oc-time">${new Date(review.time).toLocaleString('en-AU')}</div>
+      </div>
+    </div>`;
+  }
+
+  // Evidence badge
+  const wo = item.wo;
+  const evidBadge = wo?.evidenceDocs?.length > 0
+    ? '<span class="pill p-ok" style="font-size:0.6rem;">📎 Evidence on file</span>'
+    : es !== 'ok' ? '<span class="pill" style="font-size:0.6rem;background:#f1f1f5;color:var(--muted);border:1px solid #ddd;">⏳ Evidence pending</span>' : '';
+
+  return `<div class="issue-card">
+    <div class="issue-icon ${icClass}">${item.categoryIcon||'🔧'}</div>
+    <div>
+      <div class="issue-cat" style="margin-bottom:3px;"><span class="${catClass}">${item.category}</span></div>
+      <div class="issue-title">${item.issue}</div>
+      <div class="issue-action">→ ${item.action}</div>
+      <div class="issue-meta">
+        <span>📅 Due: <strong>${dueStr}</strong></span>
+        <span>🔧 <strong>${item.trade}</strong></span>
+        <span>👤 Inspector: <strong>${item.inspector}</strong></span>
+        <span>📆 Notified: ${notifiedStr}</span>
+        ${item.legalRef ? `<span class="legal-tag">${item.legalRef}</span>` : ''}
+        <span class="pill ${item.priority==='critical'?'p-critical':'p-high'}">${item.priority==='critical'?'🔴 Critical':'🟡 High'}</span>
+      </div>
+      ${commentHtml}
+    </div>
+    <div class="issue-right">
+      ${statusPill}
+      ${evidBadge}
+      ${actionHtml}
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════
+// APPROVE / REJECT
+// ═══════════════════════════════════════════════
+function openAction(itemId, type) {
+  const allPortal = S.get(KEY_PORT, []);
+  const item = allPortal.find(p => p.id === itemId);
+  if (!item) return;
+
+  pendingAction = { id: itemId, type };
+
+  const isApprove = type === 'approve';
+  document.getElementById('modalIcon').textContent = isApprove ? '✅' : '✗';
+  document.getElementById('modalTitle').textContent = isApprove ? 'Approve Work Order' : 'Reject Work Order';
+  document.getElementById('modalIssueRef').textContent = `${item.categoryIcon||'🔧'} ${item.issue} — ${item.property}`;
+  document.getElementById('modalDesc').textContent = isApprove
+    ? 'Approving this work order authorises your property manager to schedule and proceed with the repair. The contractor will be engaged based on the quoted trade and due date.'
+    : 'Rejecting this work order will flag it for review with your property manager. They will contact you to discuss alternative arrangements. Note: under the Residential Tenancies Act 1997, minimum standards must still be met.';
+  document.getElementById('modalComment').value = '';
+
+  const confirmBtn = document.getElementById('modalConfirmBtn');
+  confirmBtn.textContent = isApprove ? '✓ Approve Work Order' : '✗ Reject Work Order';
+  confirmBtn.className = `btn-sm ${isApprove ? 'btn-confirm-approve' : 'btn-confirm-reject'}`;
+
+  document.getElementById('confirmModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('confirmModal').classList.remove('open');
+  pendingAction = null;
+}
+
+function executeAction() {
+  if (!pendingAction) return;
+  const { id, type } = pendingAction;
+  const comment = document.getElementById('modalComment').value.trim();
+
+  const reviews = S.get(KEY_REVIEWS, {});
+  reviews[id] = {
+    type,
+    comment,
+    owner: currentOwner,
+    time: new Date().toISOString(),
+  };
+  S.set(KEY_REVIEWS, reviews);
+
+  // If approved, push WO to inprogress if it's open
+  if (type === 'approve') {
+    const wos = S.get(KEY_WO, []);
+    const idx = wos.findIndex(w => w.id === id);
+    if (idx >= 0 && wos[idx].status === 'open') {
+      wos[idx].status = 'inprogress';
+      if (!wos[idx].timeline) wos[idx].timeline = [];
+      wos[idx].timeline.push({
+        type: 'inprogress',
+        msg: `Owner ${currentOwner} approved work order — status moved to In Progress`,
+        time: new Date().toISOString(),
+      });
+      S.set(KEY_WO, wos);
+    }
+  }
+
+  closeModal();
+  const label = type === 'approve' ? 'approved' : 'rejected';
+  toast(`Work order ${label} successfully`, type === 'approve' ? 'ok' : 'no');
+  renderPortal();
+}
+
+function rescindReview(itemId) {
+  if (!confirm('Remove your current decision and allow re-review?')) return;
+  const reviews = S.get(KEY_REVIEWS, {});
+
+  // If was approved and WO was moved to inprogress, revert
+  const old = reviews[itemId];
+  if (old?.type === 'approve') {
+    const wos = S.get(KEY_WO, []);
+    const idx = wos.findIndex(w => w.id === itemId);
+    if (idx >= 0 && wos[idx].status === 'inprogress') {
+      wos[idx].status = 'open';
+      if (!wos[idx].timeline) wos[idx].timeline = [];
+      wos[idx].timeline.push({
+        type: 'open',
+        msg: `Owner ${currentOwner} rescinded approval — status reverted to Open`,
+        time: new Date().toISOString(),
+      });
+      S.set(KEY_WO, wos);
+    }
+  }
+
+  delete reviews[itemId];
+  S.set(KEY_REVIEWS, reviews);
+  toast('Decision removed — you can now re-review this item', 'ok');
+  renderPortal();
+}
+
+// ═══════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════
+function formatDate(iso) {
+  return new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'short'});
+}
+
+function escHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function toast(msg, type='ok') {
+  const icons = { ok:'✅', no:'❌' };
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+  document.getElementById('toastWrap').appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity 0.4s'; }, 3200);
+  setTimeout(()=>el.remove(), 3700);
+}
+
+// ═══════════════════════════════════════════════
+// SEED DEMO DATA (mirrors main platform)
+// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+// OWNER QUOTES
+// ═══════════════════════════════════════════════
+const KEY_QUOTES        = 'vicrental_quotes';
+const KEY_QUOTE_REVIEWS = 'vicrental_quote_reviews';
+
+const OQ_CAT_ICONS = {
+  'Smoke Alarms':'🔴','Heating/Cooling':'🌡️','Plumbing':'🚿','Electrical':'⚡',
+  'Locks & Security':'🔒','Mould & Dampness':'🌿','Structural':'🏗️',
+  'General Maintenance':'🔧','Appliances':'🍳','Other':'📋'
+};
+
+let ownerQuoteFilter = 'all';
+let pendingQuoteAction = null; // { id, type: 'approve'|'reject' }
+
+function updateOwnerQuoteBadge() {
+  const quotes = S.get(KEY_QUOTES, []);
+  const now = new Date();
+  // Count quotes for this owner that are pending and not expired
+  const count = quotes.filter(q =>
+    q.ownerName?.toLowerCase() === currentOwner.toLowerCase() &&
+    q.status === 'pending' &&
+    !(q.expiry && new Date(q.expiry) < now)
+  ).length;
+  const badge = document.getElementById('ownerQuoteBadge');
+  if (badge) {
+    badge.textContent = count;
+    badge.style.display = count > 0 ? '' : 'none';
+  }
+}
+
+function setOwnerQuoteFilter(f) {
+  ownerQuoteFilter = f;
+  document.querySelectorAll('[id^="oqf-"]').forEach(el => el.classList.remove('active'));
+  document.getElementById('oqf-' + f)?.classList.add('active');
+  renderOwnerQuotes();
+}
+
+function renderOwnerQuotes() {
+  updateOwnerQuoteBadge();
+  const now = new Date();
+  const qReviews = S.get(KEY_QUOTE_REVIEWS, {});
+  let quotes = S.get(KEY_QUOTES, []).filter(q =>
+    q.ownerName?.toLowerCase() === currentOwner.toLowerCase()
+  );
+
+  // Merge owner review decisions into quote objects
+  quotes = quotes.map(q => {
+    const review = qReviews[q.id] || null;
+    let es = q.status;
+    if (review) es = review.type === 'approve' ? 'approved' : 'rejected';
+    else if (es === 'pending' && q.expiry && new Date(q.expiry) < now) es = 'expired';
+    return { ...q, es, review };
+  });
+
+  if (ownerQuoteFilter !== 'all') quotes = quotes.filter(q => q.es === ownerQuoteFilter);
+
+  const container = document.getElementById('ownerQuotesList');
+  if (!container) return;
+
+  const allOwnerQuotes = S.get(KEY_QUOTES, []).filter(q => q.ownerName?.toLowerCase() === currentOwner.toLowerCase());
+
+  if (allOwnerQuotes.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:56px 24px;color:var(--muted);">
+      <div style="font-size:3rem;margin-bottom:14px;">💰</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--text);margin-bottom:8px;">No quotes yet</div>
+      <div style="font-size:0.82rem;line-height:1.6;max-width:340px;margin:0 auto;">Your property manager will upload repair quotes here for your review before any work is scheduled.</div>
+    </div>`;
+    return;
+  }
+  if (quotes.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:40px 24px;color:var(--muted);">
+      <div style="font-size:2rem;margin-bottom:10px;">🔍</div>
+      <div style="font-size:0.88rem;">No quotes match this filter.</div>
+    </div>`;
+    return;
+  }
+
+  const fmtAmt  = (n) => `$${Number(n).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+  const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+  const escH    = (s) => { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
+
+  container.innerHTML = quotes.map(q => {
+    const icon = OQ_CAT_ICONS[q.category] || '📋';
+    const isExpired = q.es === 'expired';
+    const needsAction = q.es === 'pending';
+
+    const pillMap = {
+      pending:  ['pill-qpending',  '🔔 Awaiting Your Decision'],
+      approved: ['pill-qapproved', '✅ You Approved'],
+      rejected: ['pill-qrejected', '✗ You Rejected'],
+      expired:  ['pill-qexpired',  '⏰ Expired'],
+    };
+    const [pillClass, pillLabel] = pillMap[q.es] || pillMap.pending;
+
+    const expiryStyle = q.expiry && new Date(q.expiry) < now ? 'color:var(--red);font-weight:600;' : '';
+
+    // Owner response display
+    let responseHtml = '';
+    if (q.review) {
+      const isApp = q.review.type === 'approve';
+      responseHtml = `<div class="oq-response-display ${isApp ? 'oq-rd-approve' : 'oq-rd-reject'}">
+        <span style="font-size:1rem;flex-shrink:0;margin-top:1px;">${isApp ? '✅' : '✗'}</span>
+        <div>
+          <div class="oq-rd-label" style="color:${isApp ? 'var(--green)' : 'var(--red)'};">${isApp ? 'You approved this quote' : 'You rejected this quote'}</div>
+          ${q.review.comment ? `<div class="oq-rd-comment">"${escH(q.review.comment)}"</div>` : ''}
+          <div class="oq-rd-time">${new Date(q.review.time).toLocaleString('en-AU')}</div>
+        </div>
+      </div>`;
+    }
+
+    // Action zone
+    let actionZone = '';
+    if (needsAction) {
+      actionZone = `<div class="oq-action-zone">
+        <div class="oq-action-btns" id="oqbtns-${q.id}">
+          <button class="oq-btn-approve" onclick="showQuoteCommentBox('${q.id}','approve')">✓ Approve This Quote</button>
+          <button class="oq-btn-reject"  onclick="showQuoteCommentBox('${q.id}','reject')">✗ Reject This Quote</button>
+          ${q.file ? `<button class="oq-btn-rescind" onclick="previewOwnerQuoteDoc('${q.id}')">📎 View Quote</button>` : ''}
+        </div>
+        <div class="oq-comment-box" id="oqcomment-${q.id}" style="display:none;">
+          <textarea placeholder="Add a comment or reason (optional)…" id="oqcommenttext-${q.id}"></textarea>
+          <div class="oq-comment-confirm">
+            <button class="btn-sm btn-cancel-action" onclick="hideQuoteCommentBox('${q.id}')">Cancel</button>
+            <button class="btn-sm" id="oqconfirmbtn-${q.id}" onclick="submitQuoteDecision('${q.id}')">Confirm</button>
+          </div>
+        </div>
+        ${responseHtml}
+      </div>`;
+    } else if (isExpired) {
+      actionZone = `<div class="expired-notice">This quote has expired. Please contact your property manager to obtain a new quote.</div>`;
+    } else if (q.review) {
+      actionZone = `<div class="oq-action-zone">
+        ${responseHtml}
+        <div style="margin-top:8px;text-align:right;">
+          <button class="oq-btn-rescind" onclick="rescindQuoteDecision('${q.id}')">↺ Change Decision</button>
+        </div>
+      </div>`;
+    }
+
+    return `<div class="oq-card oqs-${q.es}">
+      <div class="oq-header">
+        <div class="oq-icon">${icon}</div>
+        <div>
+          <div class="oq-cat">${escH(q.category)}</div>
+          <div class="oq-desc">${escH(q.description)}</div>
+          <div class="oq-property">📍 ${escH(q.property)}</div>
+          <div class="oq-meta">
+            <span>🆔 <strong>${escH(q.id)}</strong></span>
+            ${q.contractor ? `<span>🏢 <strong>${escH(q.contractor)}</strong></span>` : ''}
+            <span>📅 Submitted: <strong>${fmtDate(q.createdAt)}</strong></span>
+            ${q.expiry ? `<span>⏰ Expiry: <strong style="${expiryStyle}">${fmtDate(q.expiry)}</strong></span>` : ''}
+          </div>
+          ${q.notes ? `<div class="oq-notes">📝 ${escH(q.notes)}</div>` : ''}
+        </div>
+        <div class="oq-amount-wrap">
+          <div class="oq-amount"><span>Quote Amount</span>${fmtAmt(q.amount)}</div>
+          <span class="pill ${pillClass}">${pillLabel}</span>
+          ${q.file ? `<span style="font-size:0.65rem;color:var(--muted);">📎 ${escH(q.file.name)}</span>` : ''}
+        </div>
+      </div>
+      ${actionZone}
+    </div>`;
+  }).join('');
+}
+
+function showQuoteCommentBox(quoteId, type) {
+  pendingQuoteAction = { id: quoteId, type };
+  const box = document.getElementById('oqcomment-' + quoteId);
+  const btns = document.getElementById('oqbtns-' + quoteId);
+  const confirmBtn = document.getElementById('oqconfirmbtn-' + quoteId);
+  if (box) {
+    box.style.display = '';
+    if (btns) btns.style.display = 'none';
+    if (confirmBtn) {
+      confirmBtn.textContent = type === 'approve' ? '✓ Approve Quote' : '✗ Reject Quote';
+      confirmBtn.className = `btn-sm ${type === 'approve' ? 'btn-confirm-approve' : 'btn-confirm-reject'}`;
+    }
+    const ta = document.getElementById('oqcommenttext-' + quoteId);
+    if (ta) ta.focus();
+  }
+}
+
+function hideQuoteCommentBox(quoteId) {
+  const box = document.getElementById('oqcomment-' + quoteId);
+  const btns = document.getElementById('oqbtns-' + quoteId);
+  if (box) box.style.display = 'none';
+  if (btns) btns.style.display = '';
+  pendingQuoteAction = null;
+}
+
+function submitQuoteDecision(quoteId) {
+  const action = pendingQuoteAction;
+  if (!action || action.id !== quoteId) return;
+  const comment = (document.getElementById('oqcommenttext-' + quoteId)?.value || '').trim();
+
+  const qReviews = S.get(KEY_QUOTE_REVIEWS, {});
+  qReviews[quoteId] = {
+    type: action.type,
+    comment,
+    owner: currentOwner,
+    time: new Date().toISOString(),
+  };
+  S.set(KEY_QUOTE_REVIEWS, qReviews);
+
+  // Also update the quote status in the main quotes store
+  const quotes = S.get(KEY_QUOTES, []);
+  const idx = quotes.findIndex(q => q.id === quoteId);
+  if (idx >= 0) {
+    quotes[idx].status = action.type === 'approve' ? 'approved' : 'rejected';
+    quotes[idx].ownerResponse = qReviews[quoteId];
+    S.set(KEY_QUOTES, quotes);
+  }
+
+  pendingQuoteAction = null;
+  const label = action.type === 'approve' ? 'approved' : 'rejected';
+  toast(`Quote ${label} successfully`, action.type === 'approve' ? 'ok' : 'no');
+  updateOwnerQuoteBadge();
+  renderOwnerQuotes();
+}
+
+function rescindQuoteDecision(quoteId) {
+  if (!confirm('Remove your decision and allow re-review of this quote?')) return;
+  const qReviews = S.get(KEY_QUOTE_REVIEWS, {});
+  delete qReviews[quoteId];
+  S.set(KEY_QUOTE_REVIEWS, qReviews);
+
+  // Revert status in main store
+  const quotes = S.get(KEY_QUOTES, []);
+  const idx = quotes.findIndex(q => q.id === quoteId);
+  if (idx >= 0) {
+    quotes[idx].status = 'pending';
+    quotes[idx].ownerResponse = null;
+    S.set(KEY_QUOTES, quotes);
+  }
+
+  toast('Decision removed — you can now re-review this quote', 'ok');
+  updateOwnerQuoteBadge();
+  renderOwnerQuotes();
+}
+
+function previewOwnerQuoteDoc(quoteId) {
+  const q = S.get(KEY_QUOTES, []).find(x => x.id === quoteId);
+  if (!q?.file) return;
+  const modal = document.getElementById('ownerDocModal');
+  document.getElementById('ownerDocTitle').textContent = q.file.name;
+  const body = document.getElementById('ownerDocBody');
+  if (q.file.isImage) {
+    body.innerHTML = `<img src="${q.file.dataUrl}" alt="${q.file.name}" style="max-width:100%;max-height:55vh;border-radius:8px;">`;
+  } else {
+    const icon = OQ_CAT_ICONS[q.category] || '📄';
+    body.innerHTML = `<div style="text-align:center;padding:32px;">
+      <div style="font-size:4rem;margin-bottom:14px;">${icon}</div>
+      <div style="font-size:0.95rem;font-weight:600;margin-bottom:16px;">${q.file.name}</div>
+    </div>`;
+  }
+  const dl = document.getElementById('ownerDocDownload');
+  dl.href = q.file.dataUrl; dl.download = q.file.name;
+  if (modal) modal.classList.add('open');
+}
+
+// ═══════════════════════════════════════════════
+// OWNER VAULT (read-only, owner-visible docs only)
+// ═══════════════════════════════════════════════
+const KEY_VAULT = 'vicrental_vault';
+
+const VAULT_ICONS_O = {
+  'Compliance Certificate':'📜','Invoice':'🧾','Inspection Report':'📋',
+  'Lease Agreement':'📄','Insurance':'🛡️','Council Notice':'🏛️','Correspondence':'✉️','Other':'📁',
+};
+
+function renderOwnerVault() {
+  const search = (document.getElementById('ownerVaultSearch')?.value || '').toLowerCase();
+  const catFilter = document.getElementById('ownerVaultCat')?.value || 'all';
+
+  // Only show docs marked ownerVisible = 'yes'
+  let docs = S.get(KEY_VAULT, []).filter(d => d.ownerVisible === 'yes');
+
+  // Filter by this owner's properties
+  const allPortal = S.get('vicrental_portal', []);
+  const ownerProps = [...new Set(allPortal
+    .filter(p => p.ownerName?.toLowerCase() === currentOwner.toLowerCase())
+    .map(p => p.property))];
+
+  // Show docs that match owner's properties OR have no property set
+  docs = docs.filter(d => !d.property || ownerProps.some(p => p.toLowerCase().includes(d.property.toLowerCase()) || d.property.toLowerCase().includes(p.toLowerCase())));
+
+  if (catFilter !== 'all') docs = docs.filter(d => d.category === catFilter);
+  if (search) docs = docs.filter(d =>
+    d.name.toLowerCase().includes(search) ||
+    d.category.toLowerCase().includes(search) ||
+    (d.property || '').toLowerCase().includes(search)
+  );
+
+  const grid = document.getElementById('ownerVaultGrid');
+  if (!grid) return;
+
+  if (docs.length === 0) {
+    const allVisible = S.get(KEY_VAULT, []).filter(d => d.ownerVisible === 'yes').length;
+    grid.innerHTML = `<div style="text-align:center;padding:52px 24px;color:var(--muted);">
+      <div style="font-size:3rem;margin-bottom:14px;">🗄️</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--text);margin-bottom:8px;">${allVisible === 0 ? 'No documents shared yet' : 'No documents match'}</div>
+      <div style="font-size:0.82rem;line-height:1.6;max-width:320px;margin:0 auto;">${allVisible === 0 ? 'Your property manager will share compliance certificates, invoices and reports here once available.' : 'Try adjusting your search or category filter.'}</div>
+    </div>`;
+    return;
+  }
+
+  const formatSize = (b) => b < 1048576 ? `${(b/1024).toFixed(0)} KB` : `${(b/1048576).toFixed(1)} MB`;
+  const formatDate = (iso) => new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'});
+
+  grid.innerHTML = `<div class="owner-vault-grid">${docs.map(doc => {
+    const icon = VAULT_ICONS_O[doc.category] || '📁';
+    const previewContent = doc.isImage
+      ? `<img src="${doc.dataUrl}" alt="${doc.name}" loading="lazy">`
+      : `<span style="font-size:2.8rem;position:relative;z-index:1;">${icon}</span>`;
+
+    return `<div class="owner-vault-card">
+      <div class="ovc-preview" onclick="openOwnerDocModal('${doc.id}')">${previewContent}</div>
+      <div class="ovc-body">
+        <div class="ovc-cat">${doc.category}</div>
+        <div class="ovc-name">${escHtml(doc.name)}</div>
+        ${doc.property ? `<div class="ovc-prop">📍 ${escHtml(doc.property)}</div>` : ''}
+        <div class="ovc-meta">${doc.fileName} · ${formatSize(doc.fileSize)} · ${formatDate(doc.uploadedAt)}</div>
+      </div>
+      <div class="ovc-actions">
+        <button class="ovc-btn" onclick="openOwnerDocModal('${doc.id}')">👁 View</button>
+        <button class="ovc-btn" onclick="downloadOwnerDoc('${doc.id}')">⬇ Download</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function openOwnerDocModal(docId) {
+  const doc = S.get(KEY_VAULT, []).find(d => String(d.id) === String(docId));
+  if (!doc) return;
+  document.getElementById('ownerDocTitle').textContent = doc.name;
+  const body = document.getElementById('ownerDocBody');
+  if (doc.isImage) {
+    body.innerHTML = `<img src="${doc.dataUrl}" alt="${doc.name}">`;
+  } else {
+    body.innerHTML = `<div style="text-align:center;padding:32px;">
+      <div style="font-size:4rem;margin-bottom:16px;">${VAULT_ICONS_O[doc.category]||'📁'}</div>
+      <div style="font-size:0.95rem;font-weight:600;margin-bottom:6px;">${escHtml(doc.fileName)}</div>
+      <div style="font-size:0.8rem;color:var(--muted);margin-bottom:18px;">Click Download to save this file</div>
+    </div>`;
+  }
+  const dl = document.getElementById('ownerDocDownload');
+  dl.href = doc.dataUrl;
+  dl.download = doc.fileName;
+  document.getElementById('ownerDocModal').classList.add('open');
+}
+
+function closeOwnerDocModal() {
+  document.getElementById('ownerDocModal').classList.remove('open');
+}
+
+function downloadOwnerDoc(docId) {
+  const doc = S.get(KEY_VAULT, []).find(d => String(d.id) === String(docId));
+  if (!doc) return;
+  const a = document.createElement('a');
+  a.href = doc.dataUrl; a.download = doc.fileName; a.click();
+  toast(`Downloading ${doc.fileName}`, 'ok');
+}
+
+function seedDemo() {
+  // Only seed if portal is empty
+  const existing = S.get(KEY_PORT, null);
+  if (existing !== null) return;
+
+  const wos = [
+    { id:'WO-0001', property:'42 Sample Street, Richmond VIC 3121', ownerName:'Michael Chen', issue:'Working smoke alarm on every storey', category:'Smoke Alarms', categoryIcon:'🔴', priority:'critical', legalRef:'Building Regs', action:'Install working smoke alarms on every storey before occupancy.', trade:'Electrician', dueDate:new Date(Date.now()+86400000).toISOString().split('T')[0], inspector:'Jane Smith', status:'open', createdAt:new Date(Date.now()-86400000*2).toISOString(), photos:[], evidenceDocs:[], timeline:[] },
+    { id:'WO-0002', property:'42 Sample Street, Richmond VIC 3121', ownerName:'Michael Chen', issue:'Fixed heater present in main living area', category:'Heating', categoryIcon:'🌡️', priority:'critical', legalRef:'Reg 5I', action:'Install a fixed, energy-efficient heater in the main living area.', trade:'HVAC Technician', dueDate:new Date(Date.now()+86400000*2).toISOString().split('T')[0], inspector:'Jane Smith', status:'inprogress', createdAt:new Date(Date.now()-86400000*3).toISOString(), assignedTo:'Melbourne HVAC Pty Ltd', photos:[], evidenceDocs:[], timeline:[] },
+    { id:'WO-0003', property:'7 Demo Lane, Fitzroy VIC 3065', ownerName:'Michael Chen', issue:'External entry doors have functioning deadlatch or deadlock', category:'Locks & Security', categoryIcon:'🔒', priority:'critical', legalRef:'Reg 5A', action:'Install or repair deadlatch/deadlock on all external entry doors.', trade:'Locksmith', dueDate:new Date(Date.now()-86400000*2).toISOString().split('T')[0], inspector:'Mark Johnson', status:'completed', createdAt:new Date(Date.now()-86400000*5).toISOString(), assignedTo:'SecureLock Melbourne', photos:[], evidenceDocs:[{id:1,dataUrl:'',name:'invoice.jpg'}], timeline:[] },
+    { id:'WO-0004', property:'7 Demo Lane, Fitzroy VIC 3065', ownerName:'Michael Chen', issue:'No visible mould on walls, ceilings, or floors', category:'Mould & Dampness', categoryIcon:'🌿', priority:'high', legalRef:'Reg 5J', action:'Identify and remediate source of mould.', trade:'Remediation Specialist', dueDate:new Date(Date.now()+86400000*7).toISOString().split('T')[0], inspector:'Mark Johnson', status:'open', createdAt:new Date(Date.now()-86400000).toISOString(), photos:[], evidenceDocs:[], timeline:[] },
+  ];
+
+  S.set(KEY_WO, wos);
+  S.set(KEY_PORT, wos.map(wo => ({
+    id: wo.id, property: wo.property, ownerName: wo.ownerName,
+    issue: wo.issue, category: wo.category, categoryIcon: wo.categoryIcon,
+    priority: wo.priority, legalRef: wo.legalRef, action: wo.action,
+    trade: wo.trade, inspector: wo.inspector, dueDate: wo.dueDate,
+    notifiedAt: wo.createdAt,
+  })));
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+seedDemo();
+getOwners(); // ensure owners table exists
+checkSession(); // auto-login if session exists
+</script>
+</body>
+</html>

@@ -1,0 +1,1862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tenant Portal — VicRental Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════════════════ */
+:root {
+  --sky:       #0f4c81;
+  --sky-mid:   #1a5f9e;
+  --sky-lt:    #2d7bc4;
+  --sky-pale:  #eef5fc;
+  --sky-dim:   rgba(15,76,129,0.08);
+  --teal:      #0d8a6e;
+  --teal-pale: #e8f7f3;
+  --teal-dim:  rgba(13,138,110,0.12);
+  --coral:     #d44c2d;
+  --coral-pale:#fdf0ec;
+  --coral-dim: rgba(212,76,45,0.1);
+  --amber:     #c07c00;
+  --amber-pale:#fff8e6;
+  --slate:     #3d5068;
+  --fog:       #f5f7fa;
+  --white:     #ffffff;
+  --ink:       #182030;
+  --text:      #1e2d42;
+  --muted:     #6b7d96;
+  --border:    #dde4ed;
+  --warm:      #f8f9fc;
+  --radius:    12px;
+  --radius-sm: 8px;
+  --shadow:    0 2px 16px rgba(15,76,129,0.08);
+  --shadow-lg: 0 8px 40px rgba(15,76,129,0.14);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { min-height: 100%; font-family: 'DM Sans', sans-serif; background: var(--fog); color: var(--text); }
+
+/* ══════════════════════════════════════════════════════
+   SCREEN MANAGER
+══════════════════════════════════════════════════════ */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ══════════════════════════════════════════════════════
+   LOGIN SCREEN
+══════════════════════════════════════════════════════ */
+#loginScreen {
+  min-height: 100vh;
+  display: flex;
+  background: linear-gradient(145deg, #0a3356 0%, #0f4c81 45%, #1a6baa 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Geometric background pattern */
+#loginScreen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(45,123,196,0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(13,138,110,0.2) 0%, transparent 50%),
+    radial-gradient(circle at 60% 60%, rgba(15,76,129,0.4) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+/* Floating circles */
+.bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.06);
+  pointer-events: none;
+  animation: floatCircle 20s linear infinite;
+}
+.bg-circle:nth-child(1) { width: 400px; height: 400px; top: -100px; right: -100px; animation-duration: 30s; }
+.bg-circle:nth-child(2) { width: 200px; height: 200px; bottom: 100px; left: -60px; animation-duration: 20s; animation-direction: reverse; }
+.bg-circle:nth-child(3) { width: 120px; height: 120px; top: 40%; right: 15%; animation-duration: 15s; }
+
+@keyframes floatCircle {
+  from { transform: rotate(0deg) translateX(10px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(10px) rotate(-360deg); }
+}
+
+.login-pane {
+  margin: auto;
+  width: 100%;
+  max-width: 440px;
+  padding: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.login-card {
+  background: var(--white);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255,255,255,0.1);
+}
+
+.login-card-top {
+  background: linear-gradient(135deg, var(--sky), var(--sky-mid));
+  padding: 32px 36px 28px;
+  position: relative;
+  overflow: hidden;
+}
+.login-card-top::after {
+  content: '';
+  position: absolute;
+  bottom: -30px; right: -30px;
+  width: 120px; height: 120px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+}
+
+.login-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.login-logo-mark {
+  width: 44px; height: 44px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  backdrop-filter: blur(4px);
+}
+.login-logo-name {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: #fff;
+  line-height: 1.2;
+}
+.login-logo-name small {
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-style: normal;
+}
+
+.login-heading {
+  font-family: 'Fraunces', serif;
+  font-size: 1.9rem;
+  font-weight: 500;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.login-heading em { font-style: italic; font-weight: 300; }
+.login-sub {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.6;
+}
+
+.login-card-body { padding: 28px 36px 32px; }
+
+.field { margin-bottom: 16px; }
+.field label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.field input, .field select {
+  width: 100%;
+  background: var(--fog);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 11px 14px;
+  font-size: 0.88rem;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  transition: all 0.18s;
+}
+.field input:focus, .field select:focus {
+  outline: none;
+  border-color: var(--sky-lt);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(15,76,129,0.1);
+}
+
+.btn-signin {
+  width: 100%;
+  background: linear-gradient(135deg, var(--sky), var(--sky-mid));
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 13px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: 0.02em;
+}
+.btn-signin:hover { transform: translateY(-1px); box-shadow: 0 4px 18px rgba(15,76,129,0.35); }
+
+.login-error {
+  background: var(--coral-pale);
+  border: 1px solid rgba(212,76,45,0.25);
+  color: var(--coral);
+  border-radius: var(--radius-sm);
+  padding: 9px 13px;
+  font-size: 0.78rem;
+  margin-top: 10px;
+  display: none;
+}
+
+.login-hint {
+  margin-top: 18px;
+  padding: 13px 15px;
+  background: var(--sky-pale);
+  border: 1px solid rgba(15,76,129,0.12);
+  border-radius: var(--radius-sm);
+  font-size: 0.74rem;
+  color: var(--slate);
+  line-height: 1.7;
+}
+.login-hint strong { color: var(--sky); }
+
+/* Register link */
+.login-footer {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.5);
+}
+.login-footer a {
+  color: rgba(255,255,255,0.8);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* ══════════════════════════════════════════════════════
+   REGISTER PANEL (inside login card)
+══════════════════════════════════════════════════════ */
+#registerPanel { display: none; }
+
+/* ══════════════════════════════════════════════════════
+   PORTAL SCREEN
+══════════════════════════════════════════════════════ */
+#portalScreen { min-height: 100vh; display: none; flex-direction: column; }
+#portalScreen.visible { display: flex; }
+
+/* ── Top Nav ── */
+.top-nav {
+  background: var(--sky);
+  position: sticky; top: 0; z-index: 200;
+}
+.top-nav-inner {
+  max-width: 1000px; margin: 0 auto;
+  padding: 0 24px;
+  display: flex; align-items: stretch;
+  gap: 0;
+}
+
+.nav-brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 20px 14px 0;
+  text-decoration: none;
+  margin-right: auto;
+}
+.nav-brand-icon {
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+}
+.nav-brand-name {
+  font-family: 'Fraunces', serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #fff;
+  line-height: 1.2;
+}
+.nav-brand-name small {
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.58rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-style: normal;
+}
+
+.nav-tab {
+  display: flex; align-items: center; gap: 7px;
+  padding: 14px 18px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.6);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  white-space: nowrap;
+  position: relative;
+}
+.nav-tab:hover { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.06); }
+.nav-tab.active { color: #fff; border-bottom-color: rgba(255,255,255,0.7); }
+
+.nav-badge {
+  background: var(--coral);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 8px;
+  min-width: 16px;
+  text-align: center;
+  display: none;
+}
+.nav-badge.show { display: inline-block; }
+
+/* Tenant info chip */
+.nav-tenant-chip {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px;
+  margin: auto 0;
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.ntc-avatar {
+  width: 26px; height: 26px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #fff;
+}
+.ntc-name { font-size: 0.78rem; color: rgba(255,255,255,0.85); font-weight: 500; }
+.btn-signout {
+  background: transparent; border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.55); border-radius: 6px;
+  padding: 5px 10px; font-size: 0.7rem; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: all 0.15s; margin-left: 8px;
+}
+.btn-signout:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+/* ── Page Content ── */
+.portal-body {
+  flex: 1;
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 28px 24px 80px;
+}
+
+.page-tab { display: none; }
+.page-tab.active { display: block; }
+
+/* ══════════════════════════════════════════════════════
+   MAINTENANCE CATEGORIES GRID
+══════════════════════════════════════════════════════ */
+.maint-step {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+
+.step-header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border);
+  background: var(--fog);
+}
+.step-num {
+  width: 28px; height: 28px;
+  background: var(--sky);
+  color: #fff;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.78rem; font-weight: 700;
+  flex-shrink: 0;
+}
+.step-num.done { background: var(--teal); }
+.step-title { font-weight: 600; font-size: 0.92rem; }
+.step-sub { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+
+.step-body { padding: 22px; }
+
+/* Category grid */
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+}
+
+.cat-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 10px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+  background: var(--white);
+  position: relative;
+  user-select: none;
+}
+.cat-tile:hover { border-color: var(--sky-lt); background: var(--sky-pale); }
+.cat-tile.selected {
+  border-color: var(--sky);
+  background: var(--sky-pale);
+  box-shadow: 0 0 0 3px rgba(15,76,129,0.12);
+}
+.cat-tile.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 6px; right: 8px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--sky);
+  background: rgba(15,76,129,0.1);
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.cat-icon { font-size: 1.8rem; line-height: 1; }
+.cat-label { font-size: 0.72rem; font-weight: 600; color: var(--text); line-height: 1.3; }
+.cat-tile.selected .cat-label { color: var(--sky); }
+
+/* Selected summary chips */
+.selected-chips {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: var(--sky-pale);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(15,76,129,0.12);
+  min-height: 48px;
+  align-items: center;
+}
+.chip-placeholder { font-size: 0.78rem; color: var(--muted); font-style: italic; }
+.sel-chip {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--sky);
+  color: #fff;
+  padding: 4px 10px 4px 8px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.sel-chip button {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: #fff;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.6rem; line-height: 1;
+  padding: 0;
+}
+.sel-chip button:hover { background: rgba(255,255,255,0.35); }
+
+/* ── Details Section ── */
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.details-grid .full { grid-column: 1/-1; }
+
+.fld label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.fld input, .fld select, .fld textarea {
+  width: 100%;
+  background: var(--fog);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 13px;
+  font-size: 0.85rem;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  transition: all 0.15s;
+}
+.fld input:focus, .fld select:focus, .fld textarea:focus {
+  outline: none;
+  border-color: var(--sky-lt);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(15,76,129,0.08);
+}
+.fld textarea { resize: vertical; min-height: 90px; }
+.fld .hint { font-size: 0.68rem; color: var(--muted); margin-top: 4px; }
+
+/* Priority selector */
+.priority-row {
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+.priority-opt {
+  flex: 1; min-width: 90px;
+  padding: 10px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+  background: var(--white);
+  user-select: none;
+}
+.priority-opt .po-icon { font-size: 1.3rem; margin-bottom: 4px; }
+.priority-opt .po-label { font-size: 0.72rem; font-weight: 600; }
+.priority-opt .po-sub { font-size: 0.64rem; color: var(--muted); margin-top: 1px; }
+.priority-opt.selected.pr-emergency { border-color: var(--coral); background: var(--coral-pale); }
+.priority-opt.selected.pr-emergency .po-label { color: var(--coral); }
+.priority-opt.selected.pr-urgent { border-color: var(--amber); background: var(--amber-pale); }
+.priority-opt.selected.pr-urgent .po-label { color: var(--amber); }
+.priority-opt.selected.pr-routine { border-color: var(--teal); background: var(--teal-pale); }
+.priority-opt.selected.pr-routine .po-label { color: var(--teal); }
+.priority-opt:hover { border-color: var(--sky-lt); }
+
+/* Photo upload */
+.photo-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--fog);
+}
+.photo-zone:hover { border-color: var(--sky-lt); background: var(--sky-pale); }
+.photo-zone .pz-icon { font-size: 2rem; margin-bottom: 8px; }
+.photo-zone .pz-title { font-size: 0.85rem; font-weight: 600; color: var(--sky); margin-bottom: 3px; }
+.photo-zone .pz-sub { font-size: 0.72rem; color: var(--muted); }
+
+.photo-previews {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+.photo-thumb {
+  position: relative;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  aspect-ratio: 1;
+}
+.photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.photo-thumb .del-photo {
+  position: absolute; top: 4px; right: 4px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: none; cursor: pointer;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  font-size: 0.6rem;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── Submit Button ── */
+.btn-submit {
+  width: 100%;
+  background: linear-gradient(135deg, var(--sky), var(--sky-mid));
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  letter-spacing: 0.02em;
+}
+.btn-submit:hover { transform: translateY(-1px); box-shadow: 0 5px 20px rgba(15,76,129,0.3); }
+.btn-submit:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* ── Requests List ── */
+.req-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+}
+.req-card:hover { box-shadow: 0 4px 20px rgba(15,76,129,0.1); }
+.req-card.st-submitted { border-left-color: var(--sky); }
+.req-card.st-inprogress { border-left-color: var(--amber); }
+.req-card.st-completed { border-left-color: var(--teal); }
+.req-card.st-cancelled { border-left-color: var(--muted); opacity: 0.75; }
+
+.req-inner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 14px;
+  padding: 16px 18px;
+  align-items: start;
+}
+
+.req-icon {
+  width: 46px; height: 46px;
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; flex-shrink: 0;
+}
+.ri-submitted  { background: var(--sky-pale);   border: 1px solid rgba(15,76,129,0.15); }
+.ri-inprogress { background: var(--amber-pale);  border: 1px solid rgba(192,124,0,0.2); }
+.ri-completed  { background: var(--teal-pale);   border: 1px solid rgba(13,138,110,0.2); }
+.ri-cancelled  { background: var(--fog);          border: 1px solid var(--border); }
+
+.req-id { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 3px; }
+.req-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 3px; line-height: 1.35; }
+.req-cats { font-size: 0.72rem; color: var(--muted); margin-bottom: 6px; }
+.req-meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.7rem; color: var(--muted); align-items: center; }
+.req-meta strong { color: var(--text); }
+
+.req-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; min-width: 110px; }
+
+/* Status Pills */
+.pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 5px;
+  font-size: 0.62rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;
+}
+.p-submitted  { background: var(--sky-pale);   color: var(--sky);   border: 1px solid rgba(15,76,129,0.2); }
+.p-inprogress { background: var(--amber-pale);  color: var(--amber); border: 1px solid rgba(192,124,0,0.2); }
+.p-completed  { background: var(--teal-pale);   color: var(--teal);  border: 1px solid rgba(13,138,110,0.2); }
+.p-cancelled  { background: var(--fog);          color: var(--muted); border: 1px solid var(--border); }
+.p-emergency  { background: var(--coral-pale);   color: var(--coral); border: 1px solid rgba(212,76,45,0.2); }
+.p-urgent     { background: var(--amber-pale);   color: var(--amber); border: 1px solid rgba(192,124,0,0.2); }
+.p-routine    { background: var(--teal-pale);    color: var(--teal);  border: 1px solid rgba(13,138,110,0.2); }
+
+/* PM response panel */
+.pm-response {
+  background: var(--sky-pale);
+  border-top: 1px solid rgba(15,76,129,0.1);
+  padding: 12px 18px;
+  font-size: 0.78rem;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.pm-response-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+.pm-response-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--sky); margin-bottom: 2px; }
+.pm-response-body { color: var(--text); }
+.pm-response-time { font-size: 0.65rem; color: var(--muted); margin-top: 3px; }
+
+/* Photo thumbnails on card */
+.req-photos {
+  padding: 0 18px 14px;
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.req-photo-thumb {
+  width: 60px; height: 60px;
+  border-radius: 7px;
+  overflow: hidden; cursor: pointer;
+}
+.req-photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ══════════════════════════════════════════════════════
+   DASHBOARD TAB
+══════════════════════════════════════════════════════ */
+.dash-welcome {
+  background: linear-gradient(135deg, var(--sky), var(--sky-mid));
+  border-radius: 16px;
+  padding: 28px 32px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+}
+.dash-welcome::after {
+  content: '🏠';
+  position: absolute;
+  right: 24px; bottom: -10px;
+  font-size: 5rem;
+  opacity: 0.12;
+}
+.dw-greeting {
+  font-family: 'Fraunces', serif;
+  font-size: 1.6rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.dw-greeting em { font-style: italic; font-weight: 300; }
+.dw-property { font-size: 0.82rem; color: rgba(255,255,255,0.65); margin-bottom: 18px; }
+.dw-stats {
+  display: flex; gap: 20px; flex-wrap: wrap;
+}
+.dw-stat { text-align: center; }
+.dw-stat-val { font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 500; line-height: 1; }
+.dw-stat-lbl { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.09em; color: rgba(255,255,255,0.55); margin-top: 2px; }
+
+.dash-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.dc {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+.dc-icon { font-size: 1.5rem; margin-bottom: 8px; }
+.dc-val { font-family: 'Fraunces', serif; font-size: 1.8rem; font-weight: 500; line-height: 1; margin-bottom: 3px; }
+.dc-lbl { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+
+.dash-section-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 12px;
+  color: var(--ink);
+}
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.qa-btn {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+  font-family: 'DM Sans', sans-serif;
+}
+.qa-btn:hover { border-color: var(--sky-lt); background: var(--sky-pale); box-shadow: var(--shadow); }
+.qa-icon { font-size: 1.5rem; flex-shrink: 0; }
+.qa-label { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+.qa-sub { font-size: 0.7rem; color: var(--muted); margin-top: 1px; }
+
+/* ══════════════════════════════════════════════════════
+   NOTICES/INFO TAB
+══════════════════════════════════════════════════════ */
+.notice-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+  display: flex; gap: 14px; align-items: flex-start;
+}
+.notice-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 1px; }
+.notice-title { font-size: 0.88rem; font-weight: 600; margin-bottom: 4px; }
+.notice-body { font-size: 0.8rem; color: var(--muted); line-height: 1.65; }
+.notice-tag { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px; }
+
+/* ══════════════════════════════════════════════════════
+   SUCCESS TOAST & MODAL
+══════════════════════════════════════════════════════ */
+.toast-wrap { position: fixed; bottom: 24px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast {
+  background: var(--ink);
+  color: #fff;
+  padding: 11px 16px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  display: flex; gap: 9px; align-items: center;
+  animation: toastIn 0.25s ease;
+  max-width: 320px;
+}
+.toast.ok { border-left: 3px solid var(--teal); }
+.toast.err { border-left: 3px solid var(--coral); }
+@keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Lightbox */
+.lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 900; display: none; align-items: center; justify-content: center; padding: 20px; }
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 100%; max-height: 90vh; border-radius: 10px; }
+.lightbox-close { position: fixed; top: 18px; right: 22px; background: rgba(255,255,255,0.15); border: none; color: #fff; width: 36px; height: 36px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+/* Success screen */
+#successScreen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 48px 24px;
+  animation: fadeUp 0.4s ease;
+}
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.success-icon { font-size: 4rem; margin-bottom: 16px; }
+.success-title { font-family: 'Fraunces', serif; font-size: 1.8rem; font-weight: 500; margin-bottom: 8px; color: var(--ink); }
+.success-sub { font-size: 0.85rem; color: var(--muted); line-height: 1.7; max-width: 380px; margin: 0 auto 24px; }
+.success-ref { background: var(--sky-pale); border: 1px solid rgba(15,76,129,0.15); border-radius: 10px; padding: 12px 20px; font-size: 0.82rem; margin-bottom: 20px; display: inline-block; }
+.success-ref strong { color: var(--sky); }
+
+/* ── Empty state ── */
+.empty { text-align: center; padding: 56px 24px; color: var(--muted); }
+.empty-icon { font-size: 3.5rem; margin-bottom: 14px; }
+.empty h3 { font-family: 'Fraunces', serif; font-size: 1.3rem; color: var(--ink); margin-bottom: 8px; }
+.empty p { font-size: 0.82rem; line-height: 1.65; max-width: 340px; margin: 0 auto; }
+
+/* ── Emergency banner ── */
+.emergency-banner {
+  background: linear-gradient(135deg, var(--coral), #b83c1e);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.emergency-banner p { font-size: 0.8rem; color: rgba(255,255,255,0.9); line-height: 1.6; }
+.emergency-banner strong { color: #fff; }
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .login-pane { padding: 16px; }
+  .login-card-top { padding: 24px 22px 20px; }
+  .login-card-body { padding: 22px 22px 26px; }
+  .login-heading { font-size: 1.55rem; }
+  .cat-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+  .details-grid { grid-template-columns: 1fr; }
+  .details-grid .full { grid-column: 1; }
+  #makeModelGrid { grid-template-columns: 1fr 1fr !important; }
+  #makeModelGrid .fld[style*="grid-column:2"] { grid-column: 1/-1 !important; }
+  .dash-cards { grid-template-columns: 1fr 1fr; }
+  .quick-actions { grid-template-columns: 1fr; }
+  .top-nav-inner { flex-wrap: wrap; padding: 0 12px; }
+  .nav-tab { padding: 12px 12px; font-size: 0.75rem; }
+  .portal-body { padding: 18px 14px 60px; }
+  .req-inner { grid-template-columns: auto 1fr; }
+  .req-right { grid-column: 1/-1; flex-direction: row; flex-wrap: wrap; }
+}
+</style>
+<script>
+const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
+</script>
+</head>
+<body>
+
+<!-- ═══════════════════ FLOATING BG ═══════════════════ -->
+<div class="bg-circle"></div>
+<div class="bg-circle"></div>
+<div class="bg-circle"></div>
+
+<!-- ═══════════════════════════════════════════════════
+   LOGIN / REGISTER SCREEN
+═══════════════════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-pane">
+    <div class="login-card">
+      <div class="login-card-top">
+        <div class="login-logo">
+          <div class="login-logo-mark">🏡</div>
+          <div class="login-logo-name">
+            Tenant Portal
+            <small>VicRental Pro · Victoria</small>
+          </div>
+        </div>
+        <div class="login-heading">Welcome <em>home.</em></div>
+        <div class="login-sub">Sign in to report maintenance, track requests, and stay up to date with your property.</div>
+      </div>
+      <div class="login-card-body">
+
+        <!-- Login Form -->
+        <div id="loginForm">
+          <div class="field">
+            <label>Email Address</label>
+            <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doTenantLogin()">
+          </div>
+          <div class="login-error" id="loginError">Incorrect email or password. Please try again.</div>
+          <button class="btn-signin" onclick="doTenantLogin()">Sign In <span>→</span></button>
+          <div class="login-hint" style="margin-top:16px;">
+            <strong>Demo tenant:</strong><br>
+            Email: <strong>sarah.johnson@email.com</strong><br>
+            Password: <strong>tenant123</strong>
+          </div>
+        </div>
+
+        <!-- Register Form -->
+        <div id="registerForm" style="display:none;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="field"><label>First Name</label><input type="text" id="regFirst" placeholder="Sarah"></div>
+            <div class="field"><label>Last Name</label><input type="text" id="regLast" placeholder="Johnson"></div>
+          </div>
+          <div class="field"><label>Email Address</label><input type="email" id="regEmail" placeholder="you@example.com"></div>
+          <div class="field"><label>Property Address</label><input type="text" id="regProperty" placeholder="42 Sample Street, Richmond VIC 3121"></div>
+          <div class="field"><label>Mobile Number</label><input type="tel" id="regPhone" placeholder="04XX XXX XXX"></div>
+          <div class="field"><label>Password</label><input type="password" id="regPassword" placeholder="Create a password"></div>
+          <div class="login-error" id="regError">Please fill in all required fields.</div>
+          <button class="btn-signin" onclick="doTenantRegister()">Create Account <span>→</span></button>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="login-footer">
+      <span id="loginToggleText">New tenant? </span>
+      <a onclick="toggleAuthMode()"><span id="loginToggleLink">Create an account</span></a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+   PORTAL SCREEN
+═══════════════════════════════════════════════════ -->
+<div id="portalScreen">
+
+  <!-- Top Nav -->
+  <div class="top-nav">
+    <div class="top-nav-inner">
+      <div class="nav-brand">
+        <div class="nav-brand-icon">🏡</div>
+        <div class="nav-brand-name">
+          Tenant Portal
+          <small>VicRental Pro</small>
+        </div>
+      </div>
+
+      <div class="nav-tab active" id="ntab-dash" onclick="showTab('dash')">
+        <span>🏠</span> Home
+      </div>
+      <div class="nav-tab" id="ntab-maint" onclick="showTab('maint')">
+        <span>🔧</span> Report Issue
+      </div>
+      <div class="nav-tab" id="ntab-requests" onclick="showTab('requests')">
+        <span>📋</span> My Requests
+        <span class="nav-badge" id="requestsBadge">0</span>
+      </div>
+      <div class="nav-tab" id="ntab-info" onclick="showTab('info')">
+        <span>ℹ️</span> Info & Contacts
+      </div>
+
+      <div class="nav-tenant-chip" id="tenantChip">
+        <div class="ntc-avatar" id="tenantInitial">T</div>
+        <span class="ntc-name" id="tenantDisplayName">Tenant</span>
+      </div>
+      <button class="btn-signout" onclick="doTenantLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="portal-body">
+
+    <!-- ═══ DASHBOARD TAB ═══ -->
+    <div class="page-tab active" id="tab-dash">
+
+      <div class="dash-welcome">
+        <div class="dw-greeting">Hello, <em id="dashFirstName">there</em>.</div>
+        <div class="dw-property" id="dashProperty">Loading your property…</div>
+        <div class="dw-stats">
+          <div class="dw-stat">
+            <div class="dw-stat-val" id="dashTotal">0</div>
+            <div class="dw-stat-lbl">Total requests</div>
+          </div>
+          <div class="dw-stat" style="border-left:1px solid rgba(255,255,255,0.2);padding-left:20px;">
+            <div class="dw-stat-val" id="dashOpen">0</div>
+            <div class="dw-stat-lbl">Open</div>
+          </div>
+          <div class="dw-stat" style="border-left:1px solid rgba(255,255,255,0.2);padding-left:20px;">
+            <div class="dw-stat-val" id="dashDone">0</div>
+            <div class="dw-stat-lbl">Resolved</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-cards">
+        <div class="dc">
+          <div class="dc-icon">🔧</div>
+          <div class="dc-val" id="dcSubmitted" style="color:var(--sky);">0</div>
+          <div class="dc-lbl">Submitted</div>
+        </div>
+        <div class="dc">
+          <div class="dc-icon">⚙️</div>
+          <div class="dc-val" id="dcInProgress" style="color:var(--amber);">0</div>
+          <div class="dc-lbl">In Progress</div>
+        </div>
+        <div class="dc">
+          <div class="dc-icon">✅</div>
+          <div class="dc-val" id="dcCompleted" style="color:var(--teal);">0</div>
+          <div class="dc-lbl">Completed</div>
+        </div>
+      </div>
+
+      <div class="dash-section-title">Quick Actions</div>
+      <div class="quick-actions">
+        <button class="qa-btn" onclick="showTab('maint')">
+          <div class="qa-icon">🔧</div>
+          <div><div class="qa-label">Report a maintenance issue</div><div class="qa-sub">Submit a new repair request</div></div>
+        </button>
+        <button class="qa-btn" onclick="showTab('requests')">
+          <div class="qa-icon">📋</div>
+          <div><div class="qa-label">View my requests</div><div class="qa-sub">Track open and past issues</div></div>
+        </button>
+        <button class="qa-btn" onclick="showTab('info')">
+          <div class="qa-icon">📞</div>
+          <div><div class="qa-label">Emergency contacts</div><div class="qa-sub">Property manager & utilities</div></div>
+        </button>
+        <button class="qa-btn" onclick="showTab('info')">
+          <div class="qa-icon">📄</div>
+          <div><div class="qa-label">Tenant rights in Victoria</div><div class="qa-sub">Residential Tenancies Act info</div></div>
+        </button>
+      </div>
+
+      <div class="dash-section-title">Recent Activity</div>
+      <div id="dashRecentActivity"></div>
+    </div>
+
+    <!-- ═══ MAINTENANCE REPORT TAB ═══ -->
+    <div class="page-tab" id="tab-maint">
+
+      <div class="emergency-banner" id="emergencyBanner" style="display:none;">
+        <span style="font-size:1.4rem;flex-shrink:0;">🚨</span>
+        <p><strong>If this is a life-threatening emergency,</strong> call <strong>000</strong> immediately. For urgent after-hours maintenance (gas leak, flooding, no hot water in winter), contact your property manager's emergency line.</p>
+      </div>
+
+      <!-- Step 1: Category -->
+      <div class="maint-step" id="step1">
+        <div class="step-header">
+          <div class="step-num" id="step1num">1</div>
+          <div>
+            <div class="step-title">What needs attention?</div>
+            <div class="step-sub">Select one or more categories that describe the issue</div>
+          </div>
+        </div>
+        <div class="step-body">
+          <div class="cat-grid" id="catGrid"></div>
+
+          <!-- Selected summary -->
+          <div class="selected-chips" id="selectedChips">
+            <span class="chip-placeholder" id="chipsPlaceholder">No categories selected yet — tap the tiles above</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Priority -->
+      <div class="maint-step" id="step2">
+        <div class="step-header">
+          <div class="step-num" id="step2num">2</div>
+          <div>
+            <div class="step-title">How urgent is this?</div>
+            <div class="step-sub">This helps your property manager prioritise the request</div>
+          </div>
+        </div>
+        <div class="step-body">
+          <div class="priority-row">
+            <div class="priority-opt pr-emergency" id="pr-emergency" onclick="selectPriority('emergency')">
+              <div class="po-icon">🚨</div>
+              <div class="po-label">Emergency</div>
+              <div class="po-sub">Safety risk, no power/water/heat</div>
+            </div>
+            <div class="priority-opt pr-urgent" id="pr-urgent" onclick="selectPriority('urgent')">
+              <div class="po-icon">⚠️</div>
+              <div class="po-label">Urgent</div>
+              <div class="po-sub">Affects daily living, within 3 days</div>
+            </div>
+            <div class="priority-opt pr-routine" id="pr-routine" onclick="selectPriority('routine')">
+              <div class="po-icon">🔧</div>
+              <div class="po-label">Routine</div>
+              <div class="po-sub">Non-urgent, schedule when possible</div>
+            </div>
+          </div>
+          <div id="emergencyNotice" style="display:none;margin-top:14px;" class="emergency-banner">
+            <span style="font-size:1.4rem;flex-shrink:0;">🚨</span>
+            <p><strong>Emergency maintenance:</strong> If it is safe to do so, your property manager will be notified immediately. For life-threatening emergencies call <strong>000</strong>. After-hours emergency maintenance line: <strong>(03) 9XXX XXXX</strong>.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Details -->
+      <div class="maint-step" id="step3">
+        <div class="step-header">
+          <div class="step-num" id="step3num">3</div>
+          <div>
+            <div class="step-title">Tell us more</div>
+            <div class="step-sub">Describe the issue and add photos to help your property manager</div>
+          </div>
+        </div>
+        <div class="step-body">
+          <div class="details-grid">
+            <div class="fld full">
+              <label>Describe the issue *</label>
+              <textarea id="maintDesc" placeholder="Please describe the problem in as much detail as possible. When did it start? What have you noticed? Is it getting worse?"></textarea>
+            </div>
+            <div class="fld">
+              <label>Preferred contact time</label>
+              <select id="maintContact">
+                <option value="">No preference</option>
+                <option>Morning (8am–12pm)</option>
+                <option>Afternoon (12pm–5pm)</option>
+                <option>Evening (5pm–7pm)</option>
+                <option>Weekends only</option>
+              </select>
+            </div>
+            <div class="fld">
+              <label>Best way to reach you</label>
+              <select id="maintReachBy">
+                <option>Phone call</option>
+                <option>Text/SMS</option>
+                <option>Email</option>
+              </select>
+            </div>
+            <div class="fld full">
+              <label>Additional notes</label>
+              <input type="text" id="maintNotes" placeholder="e.g. Entry via side gate, dog on property, specific room, etc.">
+              <div class="hint">Access instructions or anything else we should know</div>
+            </div>
+          </div>
+
+          <!-- Make & Model Section -->
+          <div style="margin-bottom:18px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);">
+              <span style="font-size:1.1rem;">🏷️</span>
+              <div>
+                <div style="font-size:0.82rem;font-weight:600;color:var(--text);">Appliance / Equipment Details</div>
+                <div style="font-size:0.7rem;color:var(--muted);margin-top:1px;">If the issue involves an appliance or equipment, please provide the details below — this helps get the right technician and parts faster</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;" id="makeModelGrid">
+              <div class="fld">
+                <label>Brand / Make</label>
+                <input type="text" id="maintMake" placeholder="e.g. Bosch, Daikin, Rheem">
+              </div>
+              <div class="fld">
+                <label>Model Number</label>
+                <input type="text" id="maintModel" placeholder="e.g. WAW28560AU">
+              </div>
+              <div class="fld">
+                <label>Serial Number</label>
+                <input type="text" id="maintSerial" placeholder="e.g. SN123456789">
+                <div class="hint">Usually on a sticker on the unit</div>
+              </div>
+              <div class="fld">
+                <label>Approximate Age</label>
+                <select id="maintAge">
+                  <option value="">Unknown / Not sure</option>
+                  <option>Less than 1 year</option>
+                  <option>1–3 years</option>
+                  <option>3–5 years</option>
+                  <option>5–10 years</option>
+                  <option>More than 10 years</option>
+                </select>
+              </div>
+              <div class="fld" style="grid-column:2/-1;">
+                <label>Location in property</label>
+                <input type="text" id="maintLocation" placeholder="e.g. Main bathroom, kitchen, laundry, garage">
+              </div>
+            </div>
+          </div>
+
+          <!-- Photo Upload -->
+          <div class="photo-zone" onclick="document.getElementById('photoInput').click()" id="photoZone">
+            <div class="pz-icon">📷</div>
+            <div class="pz-title">Add photos of the issue</div>
+            <div class="pz-sub">Photos help get repairs done faster — tap to upload (optional)</div>
+            <input type="file" id="photoInput" accept="image/*" multiple style="display:none;" onchange="handlePhotoUpload(event)">
+          </div>
+          <div class="photo-previews" id="photoPreviews"></div>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div id="submitSection">
+        <button class="btn-submit" onclick="submitRequest()" id="submitBtn">
+          <span>📤</span> Submit Maintenance Request
+        </button>
+        <div style="text-align:center;margin-top:10px;font-size:0.72rem;color:var(--muted);">
+          Your property manager will be notified and will respond within 1–2 business days.
+        </div>
+      </div>
+
+      <!-- Success screen (shown after submit) -->
+      <div id="successScreen">
+        <div class="success-icon">✅</div>
+        <div class="success-title">Request submitted!</div>
+        <div class="success-sub">Your maintenance request has been lodged and your property manager has been notified. You'll hear back within 1–2 business days.</div>
+        <div class="success-ref">Reference: <strong id="successRef">—</strong></div>
+        <button class="btn-submit" onclick="resetForm()" style="max-width:320px;margin:0 auto;">
+          + Submit another request
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══ MY REQUESTS TAB ═══ -->
+    <div class="page-tab" id="tab-requests">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:500;color:var(--ink);">My Requests</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:2px;">All maintenance requests you've submitted</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <div class="pill p-submitted" id="rf-all" onclick="setReqFilter('all')" style="cursor:pointer;padding:5px 12px;font-size:0.68rem;">All</div>
+          <div class="pill p-submitted" id="rf-submitted" onclick="setReqFilter('submitted')" style="cursor:pointer;padding:5px 12px;font-size:0.68rem;">Submitted</div>
+          <div class="pill p-inprogress" id="rf-inprogress" onclick="setReqFilter('inprogress')" style="cursor:pointer;padding:5px 12px;font-size:0.68rem;">In Progress</div>
+          <div class="pill p-completed" id="rf-completed" onclick="setReqFilter('completed')" style="cursor:pointer;padding:5px 12px;font-size:0.68rem;">Completed</div>
+        </div>
+      </div>
+      <div id="requestsList"></div>
+    </div>
+
+    <!-- ═══ INFO & CONTACTS TAB ═══ -->
+    <div class="page-tab" id="tab-info">
+      <div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:500;color:var(--ink);margin-bottom:16px;">Info & Contacts</div>
+
+      <div class="notice-card" style="background:var(--coral-pale);border-color:rgba(212,76,45,0.2);">
+        <div class="notice-icon">🚨</div>
+        <div>
+          <div class="notice-tag" style="color:var(--coral);">Emergency</div>
+          <div class="notice-title">Life-threatening emergency</div>
+          <div class="notice-body">Call <strong>000</strong> immediately for police, fire, or ambulance. Do not wait.</div>
+        </div>
+      </div>
+
+      <div class="notice-card">
+        <div class="notice-icon">📞</div>
+        <div>
+          <div class="notice-tag">Your Property Manager</div>
+          <div class="notice-title">VicRental Property Management</div>
+          <div class="notice-body">
+            <strong>Office:</strong> (03) 9XXX XXXX · Mon–Fri, 9am–5pm<br>
+            <strong>After-hours emergency:</strong> 1800 XXX XXX<br>
+            <strong>Email:</strong> maintenance@vicrental.com.au
+          </div>
+        </div>
+      </div>
+
+      <div class="notice-card">
+        <div class="notice-icon">⚡</div>
+        <div>
+          <div class="notice-tag">Utilities</div>
+          <div class="notice-title">Utility fault numbers</div>
+          <div class="notice-body">
+            <strong>AusNet (electricity faults):</strong> 13 17 99<br>
+            <strong>Jemena (gas emergencies):</strong> 13 25 98<br>
+            <strong>Melbourne Water (burst main):</strong> 13 16 79<br>
+            <strong>Yarra Valley Water:</strong> 13 27 62
+          </div>
+        </div>
+      </div>
+
+      <div class="notice-card">
+        <div class="notice-icon">⚖️</div>
+        <div>
+          <div class="notice-tag">Your Rights</div>
+          <div class="notice-title">Residential Tenancies Act 1997 — Victoria</div>
+          <div class="notice-body">
+            Landlords must ensure properties meet minimum standards at all times. Urgent repairs must be attended to within 24 hours (emergency) or 14 days (urgent). Routine repairs should be completed within a reasonable time.<br><br>
+            <strong>Consumer Affairs Victoria:</strong> <a href="https://consumer.vic.gov.au" target="_blank" style="color:var(--sky);">consumer.vic.gov.au</a> · 1300 55 81 81<br>
+            <strong>Victorian Civil and Administrative Tribunal (VCAT):</strong> <a href="https://vcat.vic.gov.au" target="_blank" style="color:var(--sky);">vcat.vic.gov.au</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="notice-card">
+        <div class="notice-icon">🔑</div>
+        <div>
+          <div class="notice-tag">Repairs Timeframes — Victoria</div>
+          <div class="notice-title">What to expect</div>
+          <div class="notice-body">
+            <strong>Emergency repairs</strong> (gas leaks, no power, security): within <strong>24 hours</strong><br>
+            <strong>Urgent repairs</strong> (hot water, essential appliances): within <strong>3 days</strong><br>
+            <strong>Routine repairs</strong> (non-urgent maintenance): within <strong>14 days</strong> or a reasonable time
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /portal-body -->
+</div><!-- /portalScreen -->
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('open')">
+  <button class="lightbox-close" onclick="document.getElementById('lightbox').classList.remove('open')">✕</button>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<!-- Toasts -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════════
+const S = {
+  get:  (k, def) => { try { const v = localStorage.getItem(k); return v !== null ? JSON.parse(v) : def; } catch(e) { return def; } },
+  set:  (k, v)   => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} },
+  del:  (k)       => localStorage.removeItem(k),
+};
+
+const KEY_TENANTS  = 'vicrental_tenants';
+const KEY_TREQS    = 'vicrental_tenant_requests';
+const KEY_TSESSION = 'vicrental_tenant_session';
+const KEY_WO       = 'vicrental_workorders'; // shared with PM platform
+
+// ═══════════════════════════════════════════════
+// MAINTENANCE CATEGORIES
+// ═══════════════════════════════════════════════
+const CATEGORIES = [
+  { id: 'appliances',         label: 'Appliances',            icon: '🍳' },
+  { id: 'heating_cooling',    label: 'Heating & Cooling',     icon: '🌡️' },
+  { id: 'hot_water',          label: 'Hot Water System',      icon: '🚿' },
+  { id: 'electrical',         label: 'Electrical',            icon: '⚡' },
+  { id: 'plumbing',           label: 'Plumbing',              icon: '🔧' },
+  { id: 'roof_leak',          label: 'Roof Leak',             icon: '🏚️' },
+  { id: 'fence_damage',       label: 'Fence Damage',          icon: '🪵' },
+  { id: 'garages',            label: 'Garages',               icon: '🚗' },
+  { id: 'locks_keys',         label: 'Locks & Keys',          icon: '🔑' },
+  { id: 'pool',               label: 'Pool',                  icon: '🏊' },
+  { id: 'gardening',          label: 'Gardening',             icon: '🌿' },
+  { id: 'electric_gates',     label: 'Electric Gates',        icon: '🚧' },
+  { id: 'windows_furnishings',label: 'Windows & Furnishings', icon: '🪟' },
+  { id: 'flooring',           label: 'Flooring',              icon: '🪵' },
+  { id: 'pests',              label: 'Pests',                 icon: '🐛' },
+  { id: 'rubbish',            label: 'Rubbish',               icon: '🗑️' },
+  { id: 'general',            label: 'General Maintenance',   icon: '🔨' },
+];
+
+// Categories that trigger emergency banner
+const EMERGENCY_CATS = new Set(['electrical', 'hot_water', 'roof_leak', 'plumbing']);
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let currentTenant = null;
+let selectedCats  = new Set();
+let selectedPri   = '';
+let uploadedPhotos = []; // [{dataUrl, name}]
+let reqFilter     = 'all';
+let currentTab    = 'dash';
+
+// ═══════════════════════════════════════════════
+// SEED DEMO TENANT
+// ═══════════════════════════════════════════════
+function seedDemo() {
+  const tenants = S.get(KEY_TENANTS, null);
+  if (tenants !== null) return;
+  S.set(KEY_TENANTS, [
+    {
+      id: 'T001',
+      firstName: 'Sarah',
+      lastName: 'Johnson',
+      email: 'sarah.johnson@email.com',
+      password: 'tenant123',
+      property: '42 Sample Street, Richmond VIC 3121',
+      phone: '0412 345 678',
+      createdAt: new Date().toISOString(),
+    }
+  ]);
+}
+
+// ═══════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════
+let authMode = 'login';
+
+function toggleAuthMode() {
+  authMode = authMode === 'login' ? 'register' : 'login';
+  document.getElementById('loginForm').style.display     = authMode === 'login'    ? '' : 'none';
+  document.getElementById('registerForm').style.display  = authMode === 'register' ? '' : 'none';
+  document.getElementById('loginToggleText').textContent = authMode === 'login'    ? 'New tenant? ' : 'Already have an account? ';
+  document.getElementById('loginToggleLink').textContent = authMode === 'login'    ? 'Create an account' : 'Sign in instead';
+  document.getElementById('loginError').style.display = 'none';
+  document.getElementById('regError').style.display   = 'none';
+}
+
+function doTenantLogin() {
+  const email    = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const password = document.getElementById('loginPassword').value;
+  const errEl    = document.getElementById('loginError');
+  const btn      = document.querySelector('.btn-signin');
+
+  if (!email || !password) { errEl.textContent = 'Please enter your email and password.'; errEl.style.display = ''; return; }
+
+  btn.textContent = 'Signing in…'; btn.disabled = true;
+
+  fetch('https://vicrental-backend1-production.up.railway.app/api/auth/tenant/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  })
+  .then(r => r.json())
+  .then(data => {
+    btn.innerHTML = 'Sign In <span>→</span>'; btn.disabled = false;
+    if (data.error) { errEl.style.display = ''; document.getElementById('loginPassword').value = ''; return; }
+    errEl.style.display = 'none';
+    localStorage.setItem('vr_token', data.token);
+    localStorage.setItem('vr_user', JSON.stringify(data.user));
+    launchPortal(data.user);
+  })
+  .catch(() => { btn.innerHTML = 'Sign In <span>→</span>'; btn.disabled = false; errEl.textContent = 'Connection error. Please try again.'; errEl.style.display = ''; });
+}
+
+function doTenantRegister() {
+  const first    = document.getElementById('regFirst').value.trim();
+  const last     = document.getElementById('regLast').value.trim();
+  const email    = document.getElementById('regEmail').value.trim().toLowerCase();
+  const property = document.getElementById('regProperty').value.trim();
+  const phone    = document.getElementById('regPhone').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const errEl    = document.getElementById('regError');
+  const btn      = document.querySelectorAll('.btn-signin')[1];
+
+  if (!first || !last || !email || !property || !password) { errEl.textContent = 'Please fill in all required fields.'; errEl.style.display = ''; return; }
+
+  btn.textContent = 'Creating account…'; btn.disabled = true;
+
+  fetch('https://vicrental-backend1-production.up.railway.app/api/auth/tenant/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ firstName: first, lastName: last, email, password, property, phone })
+  })
+  .then(r => r.json())
+  .then(data => {
+    btn.innerHTML = 'Create Account <span>→</span>'; btn.disabled = false;
+    if (data.error) { errEl.textContent = data.error; errEl.style.display = ''; return; }
+    errEl.style.display = 'none';
+    localStorage.setItem('vr_token', data.token);
+    localStorage.setItem('vr_user', JSON.stringify(data.user));
+    launchPortal(data.user);
+  })
+  .catch(() => { btn.innerHTML = 'Create Account <span>→</span>'; btn.disabled = false; errEl.textContent = 'Connection error. Please try again.'; errEl.style.display = ''; });
+}
+
+function doTenantLogout() {
+  localStorage.removeItem('vr_token');
+  localStorage.removeItem('vr_user');
+  currentTenant = null;
+  document.getElementById('portalScreen').classList.remove('visible');
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginPassword').value = '';
+}
+
+function checkSession() {
+  const token = localStorage.getItem('vr_token');
+  const user  = (() => { try { return JSON.parse(localStorage.getItem('vr_user') || 'null'); } catch { return null; } })();
+  if (token && user && user.firstName) launchPortal(user);
+}
+
+function launchPortal(tenant) {
+  currentTenant = tenant;
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('portalScreen').classList.add('visible');
+
+  const initials = (tenant.firstName[0] + (tenant.lastName?.[0] || '')).toUpperCase();
+  document.getElementById('tenantInitial').textContent    = initials;
+  document.getElementById('tenantDisplayName').textContent = tenant.firstName + ' ' + (tenant.lastName || '');
+  document.getElementById('dashFirstName').textContent    = tenant.firstName;
+  document.getElementById('dashProperty').textContent     = '📍 ' + tenant.property;
+
+  showTab('dash');
+  buildCatGrid();
+  updateBadges();
+  renderDashboard();
+}
+
+// ═══════════════════════════════════════════════
+// TAB NAVIGATION
+// ═══════════════════════════════════════════════
+function showTab(id) {
+  currentTab = id;
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('ntab-' + id)?.classList.add('active');
+  document.getElementById('tab-' + id)?.classList.add('active');
+
+  if (id === 'requests') renderRequests();
+  if (id === 'dash')     renderDashboard();
+}
+
+// ═══════════════════════════════════════════════
+// CATEGORY GRID
+// ═══════════════════════════════════════════════
+function buildCatGrid() {
+  const grid = document.getElementById('catGrid');
+  grid.innerHTML = CATEGORIES.map(c => `
+    <div class="cat-tile" id="tile-${c.id}" onclick="toggleCat('${c.id}')">
+      <div class="cat-icon">${c.icon}</div>
+      <div class="cat-label">${c.label}</div>
+    </div>`).join('');
+}
+
+function toggleCat(id) {
+  if (selectedCats.has(id)) {
+    selectedCats.delete(id);
+    document.getElementById('tile-' + id)?.classList.remove('selected');
+  } else {
+    selectedCats.add(id);
+    document.getElementById('tile-' + id)?.classList.add('selected');
+  }
+  updateChips();
+  updateEmergencyBanner();
+}
+
+function updateChips() {
+  const container = document.getElementById('selectedChips');
+  const placeholder = document.getElementById('chipsPlaceholder');
+
+  if (selectedCats.size === 0) {
+    container.innerHTML = '<span class="chip-placeholder" id="chipsPlaceholder">No categories selected yet — tap the tiles above</span>';
+    return;
+  }
+
+  container.innerHTML = [...selectedCats].map(id => {
+    const cat = CATEGORIES.find(c => c.id === id);
+    return `<span class="sel-chip">${cat.icon} ${cat.label}<button onclick="event.stopPropagation();toggleCat('${id}')">✕</button></span>`;
+  }).join('');
+}
+
+function updateEmergencyBanner() {
+  const hasEmergency = [...selectedCats].some(id => EMERGENCY_CATS.has(id));
+  document.getElementById('emergencyBanner').style.display = hasEmergency ? '' : 'none';
+}
+
+// ═══════════════════════════════════════════════
+// PRIORITY
+// ═══════════════════════════════════════════════
+function selectPriority(pri) {
+  selectedPri = pri;
+  ['emergency','urgent','routine'].forEach(p => {
+    document.getElementById('pr-' + p)?.classList.toggle('selected', p === pri);
+  });
+  document.getElementById('emergencyNotice').style.display = pri === 'emergency' ? '' : 'none';
+}
+
+// ═══════════════════════════════════════════════
+// PHOTO UPLOAD
+// ═══════════════════════════════════════════════
+function handlePhotoUpload(event) {
+  const files = Array.from(event.target.files);
+  files.forEach(file => {
+    if (file.size > 10 * 1024 * 1024) { showToast('File too large (max 10MB)', 'err'); return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+      uploadedPhotos.push({ dataUrl: e.target.result, name: file.name });
+      renderPhotoPreviews();
+    };
+    reader.readAsDataURL(file);
+  });
+  event.target.value = '';
+}
+
+function renderPhotoPreviews() {
+  const container = document.getElementById('photoPreviews');
+  container.innerHTML = uploadedPhotos.map((p, i) => `
+    <div class="photo-thumb">
+      <img src="${p.dataUrl}" alt="${p.name}" onclick="openLightbox('${p.dataUrl}')">
+      <button class="del-photo" onclick="removePhoto(${i})">✕</button>
+    </div>`).join('');
+}
+
+function removePhoto(idx) {
+  uploadedPhotos.splice(idx, 1);
+  renderPhotoPreviews();
+}
+
+function openLightbox(src) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+
+// ═══════════════════════════════════════════════
+// SUBMIT REQUEST
+// ═══════════════════════════════════════════════
+function submitRequest() {
+  if (selectedCats.size === 0) {
+    showToast('Please select at least one maintenance category', 'err'); return;
+  }
+  if (!selectedPri) {
+    showToast('Please select an urgency level', 'err'); return;
+  }
+  const desc = document.getElementById('maintDesc').value.trim();
+  if (!desc) {
+    showToast('Please describe the issue', 'err'); return;
+  }
+
+  const catLabels = [...selectedCats].map(id => {
+    const c = CATEGORIES.find(x => x.id === id);
+    return c ? `${c.icon} ${c.label}` : id;
+  });
+
+  const reqs = S.get(KEY_TREQS, []);
+  const id = 'MR-' + String(reqs.length + 1).padStart(4, '0');
+
+  const req = {
+    id,
+    tenantId: currentTenant.id,
+    tenantName: currentTenant.firstName + ' ' + currentTenant.lastName,
+    property: currentTenant.property,
+    categories: [...selectedCats],
+    categoryLabels: catLabels,
+    priority: selectedPri,
+    description: desc,
+    contact: document.getElementById('maintContact').value,
+    reachBy: document.getElementById('maintReachBy').value,
+    notes: document.getElementById('maintNotes').value.trim(),
+    make: document.getElementById('maintMake').value.trim(),
+    model: document.getElementById('maintModel').value.trim(),
+    serial: document.getElementById('maintSerial').value.trim(),
+    age: document.getElementById('maintAge').value,
+    location: document.getElementById('maintLocation').value.trim(),
+    photos: uploadedPhotos.slice(),
+    status: 'submitted',
+    submittedAt: new Date().toISOString(),
+    pmResponse: null,
+    updatedAt: null,
+  };
+
+  reqs.unshift(req);
+  S.set(KEY_TREQS, reqs);
+
+  // Show success
+  document.getElementById('submitSection').style.display = 'none';
+  document.querySelectorAll('.maint-step').forEach(s => s.style.display = 'none');
+  const ss = document.getElementById('successScreen');
+  ss.style.display = 'flex';
+  document.getElementById('successRef').textContent = id;
+
+  updateBadges();
+  showToast('Maintenance request ' + id + ' submitted', 'ok');
+}
+
+function resetForm() {
+  selectedCats.clear();
+  selectedPri   = '';
+  uploadedPhotos = [];
+
+  document.querySelectorAll('.cat-tile').forEach(t => t.classList.remove('selected'));
+  document.getElementById('selectedChips').innerHTML = '<span class="chip-placeholder">No categories selected yet — tap the tiles above</span>';
+  ['emergency','urgent','routine'].forEach(p => document.getElementById('pr-' + p)?.classList.remove('selected'));
+  document.getElementById('maintDesc').value    = '';
+  document.getElementById('maintNotes').value   = '';
+  document.getElementById('maintContact').value = '';
+  document.getElementById('maintReachBy').value = '';
+  document.getElementById('maintMake').value    = '';
+  document.getElementById('maintModel').value   = '';
+  document.getElementById('maintSerial').value  = '';
+  document.getElementById('maintAge').value     = '';
+  document.getElementById('maintLocation').value = '';
+  document.getElementById('photoPreviews').innerHTML = '';
+  document.getElementById('emergencyBanner').style.display = 'none';
+  document.getElementById('emergencyNotice').style.display = 'none';
+
+  document.getElementById('successScreen').style.display = 'none';
+  document.querySelectorAll('.maint-step').forEach(s => s.style.display = '');
+  document.getElementById('submitSection').style.display = '';
+}
+
+// ═══════════════════════════════════════════════
+// RENDER REQUESTS
+// ═══════════════════════════════════════════════
+function setReqFilter(f) {
+  reqFilter = f;
+  renderRequests();
+}
+
+function renderRequests() {
+  if (!currentTenant) return;
+  let reqs = S.get(KEY_TREQS, []).filter(r => r.tenantId === currentTenant.id);
+
+  if (reqFilter !== 'all') reqs = reqs.filter(r => r.status === reqFilter);
+
+  const container = document.getElementById('requestsList');
+  if (!container) return;
+
+  const all = S.get(KEY_TREQS, []).filter(r => r.tenantId === currentTenant.id);
+  if (all.length === 0) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><h3>No requests yet</h3><p>When you submit a maintenance request, it'll appear here so you can track its progress.</p></div>`;
+    return;
+  }
+  if (reqs.length === 0) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>No requests match</h3><p>Try a different filter.</p></div>`;
+    return;
+  }
+
+  const priLabels = { emergency: '🚨 Emergency', urgent: '⚠️ Urgent', routine: '🔧 Routine' };
+  const priPills  = { emergency: 'p-emergency',  urgent: 'p-urgent',  routine: 'p-routine' };
+  const stLabels  = { submitted: '🔵 Submitted', inprogress: '⚙️ In Progress', completed: '✅ Completed', cancelled: '✕ Cancelled' };
+  const stPills   = { submitted: 'p-submitted',  inprogress: 'p-inprogress',   completed: 'p-completed',  cancelled: 'p-cancelled' };
+  const stIcons   = { submitted: 'ri-submitted', inprogress: 'ri-inprogress',  completed: 'ri-completed', cancelled: 'ri-cancelled' };
+  const catIcons  = Object.fromEntries(CATEGORIES.map(c => [c.id, c.icon]));
+  const fmtDate   = iso => new Date(iso).toLocaleDateString('en-AU', { day:'2-digit', month:'short', year:'numeric' });
+  const fmtTime   = iso => new Date(iso).toLocaleString('en-AU', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+
+  container.innerHTML = reqs.map(req => {
+    const firstCatId = req.categories?.[0];
+    const icon       = firstCatId ? catIcons[firstCatId] || '🔧' : '🔧';
+    const stPill     = stPills[req.status] || 'p-submitted';
+    const stLabel    = stLabels[req.status] || req.status;
+    const priPill    = priPills[req.priority] || 'p-routine';
+    const priLabel   = priLabels[req.priority] || req.priority;
+
+    const pmResponseHtml = req.pmResponse ? `
+      <div class="pm-response">
+        <div class="pm-response-icon">💬</div>
+        <div>
+          <div class="pm-response-label">Property Manager Response</div>
+          <div class="pm-response-body">${esc(req.pmResponse.message)}</div>
+          <div class="pm-response-time">${fmtTime(req.pmResponse.time)}</div>
+        </div>
+      </div>` : '';
+
+    const photosHtml = req.photos?.length ? `
+      <div class="req-photos">
+        ${req.photos.map(p => `<div class="req-photo-thumb"><img src="${p.dataUrl}" onclick="openLightbox('${p.dataUrl}')" loading="lazy"></div>`).join('')}
+      </div>` : '';
+
+    return `<div class="req-card st-${req.status}">
+      <div class="req-inner">
+        <div class="req-icon ${stIcons[req.status] || 'ri-submitted'}">${icon}</div>
+        <div>
+          <div class="req-id">${req.id} · ${fmtDate(req.submittedAt)}</div>
+          <div class="req-title">${esc(req.description.substring(0, 80))}${req.description.length > 80 ? '…' : ''}</div>
+          <div class="req-cats">${(req.categoryLabels || []).join(' · ')}</div>
+          <div class="req-meta">
+            <span class="pill ${priPill}" style="font-size:0.6rem;">${priLabel}</span>
+            ${req.contact ? `<span>⏰ <strong>${esc(req.contact)}</strong></span>` : ''}
+            ${req.location ? `<span>📍 <strong>${esc(req.location)}</strong></span>` : ''}
+            ${req.notes ? `<span>📝 ${esc(req.notes)}</span>` : ''}
+          </div>
+          ${(req.make || req.model || req.serial || req.age) ? `
+          <div style="margin-top:8px;padding:8px 12px;background:var(--sky-pale);border-radius:7px;border:1px solid rgba(15,76,129,0.1);display:flex;flex-wrap:wrap;gap:12px;font-size:0.71rem;">
+            <span style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);width:100%;margin-bottom:-4px;">🏷️ Equipment Details</span>
+            ${req.make   ? `<span><span style="color:var(--muted);">Make:</span> <strong>${esc(req.make)}</strong></span>` : ''}
+            ${req.model  ? `<span><span style="color:var(--muted);">Model:</span> <strong>${esc(req.model)}</strong></span>` : ''}
+            ${req.serial ? `<span><span style="color:var(--muted);">Serial:</span> <strong>${esc(req.serial)}</strong></span>` : ''}
+            ${req.age    ? `<span><span style="color:var(--muted);">Age:</span> <strong>${esc(req.age)}</strong></span>` : ''}
+          </div>` : ''}
+        </div>
+        <div class="req-right">
+          <span class="pill ${stPill}">${stLabel}</span>
+          ${req.updatedAt ? `<span style="font-size:0.65rem;color:var(--muted);">Updated ${fmtDate(req.updatedAt)}</span>` : ''}
+        </div>
+      </div>
+      ${photosHtml}
+      ${pmResponseHtml}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════
+function renderDashboard() {
+  if (!currentTenant) return;
+  const reqs    = S.get(KEY_TREQS, []).filter(r => r.tenantId === currentTenant.id);
+  const open    = reqs.filter(r => r.status === 'submitted' || r.status === 'inprogress').length;
+  const done    = reqs.filter(r => r.status === 'completed').length;
+  const sub     = reqs.filter(r => r.status === 'submitted').length;
+  const ip      = reqs.filter(r => r.status === 'inprogress').length;
+
+  document.getElementById('dashTotal').textContent  = reqs.length;
+  document.getElementById('dashOpen').textContent   = open;
+  document.getElementById('dashDone').textContent   = done;
+  document.getElementById('dcSubmitted').textContent = sub;
+  document.getElementById('dcInProgress').textContent = ip;
+  document.getElementById('dcCompleted').textContent = done;
+
+  // Recent activity
+  const recent = reqs.slice(0, 3);
+  const raEl   = document.getElementById('dashRecentActivity');
+  if (!raEl) return;
+
+  if (recent.length === 0) {
+    raEl.innerHTML = `<div style="text-align:center;padding:32px;color:var(--muted);font-size:0.82rem;">No activity yet — submit your first maintenance request above!</div>`;
+    return;
+  }
+
+  const stLabels = { submitted:'Submitted', inprogress:'In Progress', completed:'Completed', cancelled:'Cancelled' };
+  const stColors = { submitted:'var(--sky)', inprogress:'var(--amber)', completed:'var(--teal)', cancelled:'var(--muted)' };
+  const fmtDate  = iso => new Date(iso).toLocaleDateString('en-AU', { day:'2-digit', month:'short' });
+
+  raEl.innerHTML = recent.map(r => `
+    <div class="req-card st-${r.status}" style="margin-bottom:8px;">
+      <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;">
+        <span style="font-size:1.4rem;">${CATEGORIES.find(c=>c.id===r.categories?.[0])?.icon||'🔧'}</span>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.82rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(r.description.substring(0,60))}…</div>
+          <div style="font-size:0.7rem;color:var(--muted);margin-top:2px;">${r.id} · ${fmtDate(r.submittedAt)}</div>
+        </div>
+        <span class="pill p-${r.status}" style="flex-shrink:0;">${stLabels[r.status]||r.status}</span>
+      </div>
+    </div>`).join('');
+}
+
+function updateBadges() {
+  if (!currentTenant) return;
+  const reqs = S.get(KEY_TREQS, []).filter(r => r.tenantId === currentTenant.id);
+  const open = reqs.filter(r => r.status === 'submitted' || r.status === 'inprogress').length;
+  const badge = document.getElementById('requestsBadge');
+  badge.textContent = open;
+  badge.classList.toggle('show', open > 0);
+}
+
+// ═══════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
+
+function showToast(msg, type = 'ok') {
+  const icons = { ok: '✅', err: '❌' };
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${msg}</span>`;
+  document.getElementById('toastWrap').appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.4s'; }, 3200);
+  setTimeout(() => el.remove(), 3700);
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+seedDemo();
+checkSession();
+</script>
+</body>
+</html>

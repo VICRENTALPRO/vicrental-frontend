@@ -1,0 +1,4500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VicRental Pro — Victoria Rental Compliance Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════ */
+:root {
+  --navy:       #0c1b35;
+  --navy-mid:   #152645;
+  --navy-soft:  #1e3460;
+  --gold:       #c9973a;
+  --gold-light: #e8b84b;
+  --gold-pale:  #fdf5e0;
+  --gold-dim:   rgba(201,151,58,0.18);
+  --cream:      #faf7f2;
+  --warm:       #f4efe6;
+  --white:      #ffffff;
+  --red:        #c0392b;
+  --red-pale:   #fdecea;
+  --red-dim:    rgba(192,57,43,0.15);
+  --green:      #1a7a4a;
+  --green-pale: #e8f5ee;
+  --green-dim:  rgba(26,122,74,0.15);
+  --amber:      #b56e00;
+  --amber-pale: #fff4e0;
+  --amber-dim:  rgba(181,110,0,0.15);
+  --blue:       #1a6bb5;
+  --blue-pale:  #e8f0fd;
+  --slate:      #5a6a8a;
+  --border:     #e4ddd0;
+  --border-dark: rgba(255,255,255,0.08);
+  --text:       #1a1a2e;
+  --muted:      #7a8099;
+  --radius:     12px;
+  --sidebar-w:  230px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════ */
+.app { display: flex; height: 100vh; overflow: hidden; }
+
+/* ═══════════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════════ */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--navy);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow-y: auto;
+  position: relative;
+  z-index: 100;
+}
+
+.sidebar-brand {
+  padding: 22px 18px 18px;
+  border-bottom: 1px solid var(--border-dark);
+}
+
+.brand-emblem {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.brand-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.1rem;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.brand-sub {
+  font-size: 0.62rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.sidebar-nav { flex: 1; padding: 14px 10px; }
+
+.nav-section {
+  font-size: 0.58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.3);
+  padding: 0 8px;
+  margin: 14px 0 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.55);
+  transition: all 0.15s;
+  margin-bottom: 2px;
+  position: relative;
+}
+
+.nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+.nav-item.active { background: var(--gold-dim); color: var(--gold-light); }
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 6px; bottom: 6px;
+  width: 3px;
+  background: var(--gold);
+  border-radius: 0 2px 2px 0;
+}
+
+.nav-icon { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
+
+.nav-badge {
+  margin-left: auto;
+  background: var(--red);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.nav-badge.amber { background: var(--amber); color: #fff; }
+.nav-badge.green { background: var(--green); }
+
+.sidebar-footer {
+  padding: 14px;
+  border-top: 1px solid var(--border-dark);
+}
+
+.sidebar-prop-count {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border-dark);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.5);
+}
+
+.sidebar-prop-count strong { color: var(--gold-light); font-size: 1rem; font-family: 'DM Serif Display', serif; }
+
+/* ═══════════════════════════════════════════════
+   MAIN AREA
+═══════════════════════════════════════════════ */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ── Topbar ── */
+.topbar {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.topbar-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.2rem;
+  color: var(--navy);
+  flex: 1;
+}
+
+.topbar-subtitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--muted);
+  display: block;
+  margin-top: 1px;
+}
+
+.topbar-actions { display: flex; gap: 8px; align-items: center; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: var(--navy);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(201,151,58,0.35); }
+
+.btn-secondary {
+  background: var(--white);
+  color: var(--navy);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { background: var(--warm); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { background: var(--warm); color: var(--text); }
+
+.btn-danger {
+  background: var(--red-pale);
+  color: var(--red);
+  border: 1px solid #f5c6c2;
+}
+.btn-danger:hover { background: var(--red); color: #fff; }
+
+/* ── Page Content ── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px;
+}
+
+/* ── Pages ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ═══════════════════════════════════════════════
+   CARDS & PANELS
+═══════════════════════════════════════════════ */
+.panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.panel-header h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 0.95rem;
+  flex: 1;
+}
+
+.panel-header small { font-size: 0.72rem; color: var(--muted); }
+.panel-body { padding: 18px; }
+
+/* ─ KPI Grid ─ */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.kpi-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+
+.kpi-red::after { background: var(--red); }
+.kpi-amber::after { background: var(--amber); }
+.kpi-green::after { background: var(--green); }
+.kpi-blue::after { background: var(--blue); }
+.kpi-gold::after { background: var(--gold); }
+.kpi-slate::after { background: var(--slate); }
+
+.kpi-icon {
+  position: absolute;
+  right: 14px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.8rem;
+  opacity: 0.08;
+}
+
+.kpi-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.kpi-value {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2rem;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+
+.kpi-red .kpi-value { color: var(--red); }
+.kpi-amber .kpi-value { color: var(--amber); }
+.kpi-green .kpi-value { color: var(--green); }
+.kpi-blue .kpi-value { color: var(--blue); }
+.kpi-gold .kpi-value { color: var(--gold); }
+.kpi-slate .kpi-value { color: var(--slate); }
+
+.kpi-sub { font-size: 0.7rem; color: var(--muted); }
+
+/* ─ Status Pills ─ */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 9px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.pill-nc { background: var(--red-pale); color: var(--red); border: 1px solid #f5c6c2; }
+.pill-ip { background: var(--amber-pale); color: var(--amber); border: 1px solid #fde68a; }
+.pill-ok { background: var(--green-pale); color: var(--green); border: 1px solid #a7d8be; }
+.pill-pending { background: #f1f1f5; color: var(--muted); border: 1px solid #ddd; }
+.pill-open { background: var(--amber-pale); color: var(--amber); border: 1px solid #fde68a; }
+.pill-critical { background: var(--red-pale); color: var(--red); border: 1px solid #f5c6c2; }
+.pill-completed { background: var(--green-pale); color: var(--green); border: 1px solid #a7d8be; }
+.pill-cancelled { background: #f1f1f5; color: var(--muted); border: 1px solid #ddd; }
+.pill-high { background: var(--amber-pale); color: var(--amber); border: 1px solid #fde68a; }
+.pill-pass { background: var(--green-pale); color: var(--green); border: 1px solid #a7d8be; }
+.pill-fail { background: var(--red-pale); color: var(--red); border: 1px solid #f5c6c2; }
+.pill-na { background: #f1f1f5; color: var(--muted); border: 1px solid #ddd; }
+
+/* ─ Filter Pills ─ */
+.filter-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.filter-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.fp-all { border-color: var(--border); color: var(--muted); background: #fff; }
+.fp-all:hover, .fp-all.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+.fp-nc { border-color: #f5c6c2; color: var(--red); background: #fff; }
+.fp-nc:hover, .fp-nc.active { background: var(--red); color: #fff; border-color: var(--red); }
+.fp-ip { border-color: #fde68a; color: var(--amber); background: #fff; }
+.fp-ip:hover, .fp-ip.active { background: var(--amber); color: #fff; border-color: var(--amber); }
+.fp-ok { border-color: #a7d8be; color: var(--green); background: #fff; }
+.fp-ok:hover, .fp-ok.active { background: var(--green); color: #fff; border-color: var(--green); }
+.fp-critical { border-color: #f5c6c2; color: var(--red); background: #fff; }
+.fp-critical:hover, .fp-critical.active { background: var(--red); color: #fff; border-color: var(--red); }
+.fp-open { border-color: #fde68a; color: var(--amber); background: #fff; }
+.fp-open:hover, .fp-open.active { background: var(--amber); color: #fff; border-color: var(--amber); }
+.fp-completed { border-color: #a7d8be; color: var(--green); background: #fff; }
+.fp-completed:hover, .fp-completed.active { background: var(--green); color: #fff; border-color: var(--green); }
+.fp-cancelled { border-color: #ddd; color: var(--muted); background: #fff; }
+.fp-cancelled:hover, .fp-cancelled.active { background: var(--muted); color: #fff; border-color: var(--muted); }
+
+/* ─ Search ─ */
+.search-input {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-family: 'DM Sans', sans-serif;
+  flex: 1;
+  min-width: 200px;
+  transition: border-color 0.15s;
+}
+.search-input:focus { outline: none; border-color: var(--gold); }
+
+.filter-select {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+}
+.filter-select:focus { outline: none; }
+
+/* ─ Notice Banner ─ */
+.notice {
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  line-height: 1.7;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.notice-gold { background: var(--gold-pale); border: 1px solid #e8c86a; color: #6b4800; }
+.notice-red { background: var(--red-pale); border: 1px solid #f5c6c2; color: var(--red); }
+.notice-green { background: var(--green-pale); border: 1px solid #a7d8be; color: var(--green); }
+
+/* ─ Empty State ─ */
+.empty {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--muted);
+}
+.empty-icon { font-size: 3rem; margin-bottom: 14px; }
+.empty h3 { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--text); margin-bottom: 8px; }
+.empty p { font-size: 0.83rem; line-height: 1.6; max-width: 340px; margin: 0 auto; }
+
+/* ─ Activity ─ */
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.78rem;
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.activity-time { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+
+/* ═══════════════════════════════════════════════
+   DASHBOARD PAGE
+═══════════════════════════════════════════════ */
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 16px;
+}
+
+.cat-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8rem;
+}
+.cat-row:last-child { border-bottom: none; }
+.cat-bar { flex: 1; height: 6px; background: var(--warm); border-radius: 3px; overflow: hidden; }
+.cat-fill { height: 100%; background: var(--red); border-radius: 3px; transition: width 0.4s; }
+.cat-count { font-size: 0.72rem; font-weight: 700; color: var(--muted); min-width: 20px; text-align: right; }
+
+/* ═══════════════════════════════════════════════
+   OWNER PORTAL PAGE
+═══════════════════════════════════════════════ */
+.prop-group {
+  margin-bottom: 24px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.prop-group-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--navy);
+}
+
+.prop-group-header h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 0.95rem;
+  color: #fff;
+  flex: 1;
+}
+
+.prop-group-header small { font-size: 0.7rem; color: rgba(255,255,255,0.45); }
+
+.issue-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 14px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--white);
+  transition: background 0.12s;
+  align-items: start;
+}
+.issue-card:last-child { border-bottom: none; }
+.issue-card:hover { background: var(--warm); }
+
+.issue-icon {
+  width: 42px; height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.issue-icon.nc { background: var(--red-pale); border: 1px solid #f5c6c2; }
+.issue-icon.ip { background: var(--amber-pale); border: 1px solid #fde68a; }
+.issue-icon.ok { background: var(--green-pale); border: 1px solid #a7d8be; }
+
+.issue-cat {
+  font-size: 0.63rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 3px;
+}
+.issue-cat.nc { color: var(--red); }
+.issue-cat.ip { color: var(--amber); }
+.issue-cat.ok { color: var(--green); }
+
+.issue-title { font-size: 0.9rem; font-weight: 600; line-height: 1.4; margin-bottom: 4px; }
+.issue-action { font-size: 0.76rem; color: var(--muted); line-height: 1.5; margin-bottom: 7px; }
+
+.issue-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+.issue-meta strong { color: var(--text); }
+
+.issue-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+.legal-tag {
+  font-size: 0.6rem;
+  background: var(--navy);
+  color: rgba(255,255,255,0.6);
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+}
+
+/* ═══════════════════════════════════════════════
+   WORK ORDERS PAGE
+═══════════════════════════════════════════════ */
+.wo-list { display: flex; flex-direction: column; gap: 8px; }
+
+.wo-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: start;
+}
+
+.wo-card:hover { border-color: var(--gold); background: var(--gold-pale); }
+.wo-card.priority-critical { border-left-color: var(--red); }
+.wo-card.priority-high { border-left-color: var(--amber); }
+.wo-card.status-completed { border-left-color: var(--green); opacity: 0.75; }
+.wo-card.status-cancelled { border-left-color: var(--muted); opacity: 0.5; }
+
+.wo-id { font-size: 0.65rem; font-weight: 700; color: var(--muted); margin-bottom: 3px; font-family: monospace; }
+.wo-title { font-size: 0.88rem; font-weight: 600; line-height: 1.4; margin-bottom: 4px; }
+.wo-property { font-size: 0.74rem; color: var(--muted); margin-bottom: 7px; }
+.wo-meta { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.7rem; color: var(--muted); }
+.wo-meta strong { color: var(--text); }
+
+.wo-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+
+/* ═══════════════════════════════════════════════
+   WORK ORDER DETAIL PANEL
+═══════════════════════════════════════════════ */
+.detail-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(12,27,53,0.45);
+  z-index: 200;
+  display: none;
+  backdrop-filter: blur(2px);
+}
+.detail-overlay.open { display: block; }
+
+.detail-panel {
+  position: fixed;
+  right: 0; top: 0; bottom: 0;
+  width: 480px;
+  background: var(--white);
+  border-left: 1px solid var(--border);
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+.detail-panel.open { transform: translateX(0); }
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--navy);
+  flex-shrink: 0;
+}
+
+.detail-header h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1rem;
+  color: #fff;
+  flex: 1;
+}
+
+.btn-close {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: rgba(255,255,255,0.7);
+  width: 30px; height: 30px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.btn-close:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+.detail-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.detail-section {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-section-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.detail-field {
+  margin-bottom: 12px;
+}
+.detail-field:last-child { margin-bottom: 0; }
+
+.detail-field label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.detail-field input,
+.detail-field select,
+.detail-field textarea {
+  width: 100%;
+  background: var(--warm);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 8px 12px;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-family: 'DM Sans', sans-serif;
+  transition: border-color 0.15s;
+}
+.detail-field input:focus,
+.detail-field select:focus,
+.detail-field textarea:focus { outline: none; border-color: var(--gold); background: var(--white); }
+.detail-field textarea { resize: vertical; min-height: 70px; }
+
+.static-val {
+  font-size: 0.82rem;
+  color: var(--text);
+  padding: 8px 12px;
+  background: var(--warm);
+  border-radius: 7px;
+  line-height: 1.5;
+  border: 1px solid var(--border);
+}
+
+.timeline { display: flex; flex-direction: column; gap: 10px; }
+.timeline-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 0.78rem;
+}
+.timeline-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.timeline-time { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+
+.evidence-gate {
+  border: 1.5px dashed #fde68a;
+  border-radius: 10px;
+  padding: 14px;
+  background: var(--amber-pale);
+}
+.evidence-upload-zone {
+  border: 1.5px dashed var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--white);
+  margin-top: 10px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.evidence-upload-zone:hover { border-color: var(--gold); background: var(--gold-pale); }
+.evidence-upload-zone input[type="file"] { display: none; }
+
+.evidence-thumbs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.evidence-thumb {
+  width: 72px; height: 72px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  position: relative;
+}
+.evidence-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.evidence-thumb-del {
+  position: absolute; top: 2px; right: 2px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 18px; height: 18px;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.photo-thumb {
+  width: 72px; height: 72px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  position: relative;
+}
+.photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.photo-stamp {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: rgba(0,0,0,0.65);
+  color: rgba(255,255,255,0.9);
+  font-size: 7px;
+  padding: 2px 4px;
+  line-height: 1.4;
+  display: none;
+}
+.photo-thumb:hover .photo-stamp { display: block; }
+
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--warm);
+  flex-shrink: 0;
+}
+
+.btn-action {
+  flex: 1;
+  min-width: 120px;
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+}
+.btn-save { background: var(--navy); color: #fff; }
+.btn-save:hover { background: var(--navy-soft); }
+.btn-inprogress { background: var(--amber-pale); color: var(--amber); border: 1px solid #fde68a; }
+.btn-inprogress:hover { background: var(--amber); color: #fff; }
+.btn-complete { background: var(--green-pale); color: var(--green); border: 1px solid #a7d8be; }
+.btn-complete:hover { background: var(--green); color: #fff; }
+.btn-complete.locked { background: #f1f1f5; color: var(--muted); border-color: #ddd; cursor: not-allowed; }
+.btn-cancel-wo { background: var(--red-pale); color: var(--red); border: 1px solid #f5c6c2; }
+.btn-cancel-wo:hover { background: var(--red); color: #fff; }
+
+/* ═══════════════════════════════════════════════
+   INSPECTION CHECKLIST PAGE
+═══════════════════════════════════════════════ */
+.checklist-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.checklist-score {
+  background: var(--navy);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  grid-column: 1 / -1;
+}
+
+.score-value {
+  font-family: 'DM Serif Display', serif;
+  font-size: 3rem;
+  color: var(--gold-light);
+  line-height: 1;
+}
+
+.score-meta { flex: 1; }
+.score-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 4px;
+}
+.score-grade {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.score-bar {
+  height: 6px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  max-width: 300px;
+}
+.score-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light)); border-radius: 3px; transition: width 0.5s; }
+.score-counts { display: flex; gap: 16px; font-size: 0.72rem; }
+.score-counts span { color: rgba(255,255,255,0.55); }
+.score-counts strong { color: #fff; }
+
+.cat-accordion {
+  margin-bottom: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.cat-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  background: var(--white);
+  cursor: pointer;
+  transition: background 0.12s;
+  user-select: none;
+}
+.cat-head:hover { background: var(--warm); }
+
+.cat-icon { font-size: 1.2rem; flex-shrink: 0; }
+
+.cat-info { flex: 1; min-width: 0; }
+.cat-title { font-size: 0.88rem; font-weight: 600; }
+.cat-sub { font-size: 0.7rem; color: var(--muted); }
+
+.cat-progress {
+  font-size: 0.7rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.cat-chevron {
+  font-size: 0.7rem;
+  color: var(--muted);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.cat-body { display: none; }
+.cat-accordion.open .cat-body { display: block; }
+.cat-accordion.open .cat-chevron { transform: rotate(180deg); }
+
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--white);
+  transition: background 0.12s;
+}
+.check-item:hover { background: var(--warm); }
+
+.check-item-body { flex: 1; min-width: 0; }
+.check-label { font-size: 0.84rem; font-weight: 500; line-height: 1.4; margin-bottom: 3px; }
+.check-sub { font-size: 0.72rem; color: var(--muted); line-height: 1.5; }
+
+.check-controls { display: flex; gap: 6px; align-items: center; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+
+.check-btn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1.5px solid;
+  transition: all 0.12s;
+  font-family: 'DM Sans', sans-serif;
+  white-space: nowrap;
+}
+
+.check-btn-pass {
+  border-color: #a7d8be;
+  color: var(--green);
+  background: #fff;
+}
+.check-btn-pass:hover, .check-btn-pass.active {
+  background: var(--green);
+  color: #fff;
+  border-color: var(--green);
+}
+
+.check-btn-fail {
+  border-color: #f5c6c2;
+  color: var(--red);
+  background: #fff;
+}
+.check-btn-fail:hover, .check-btn-fail.active {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--red);
+}
+
+.check-btn-na {
+  border-color: #ddd;
+  color: var(--muted);
+  background: #fff;
+}
+.check-btn-na:hover, .check-btn-na.active {
+  background: var(--muted);
+  color: #fff;
+  border-color: var(--muted);
+}
+
+.upload-btn {
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--muted);
+  transition: all 0.12s;
+  font-family: 'DM Sans', sans-serif;
+}
+.upload-btn:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-pale); }
+
+.photo-row { display: flex; gap: 6px; flex-wrap: wrap; padding: 8px 16px 10px; background: var(--warm); border-top: 1px solid var(--border); }
+
+.urgent-actions {
+  background: var(--red-pale);
+  border: 1.5px solid #f5c6c2;
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.urgent-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px;
+  background: var(--red);
+  color: #fff;
+}
+
+.urgent-header h3 { font-family: 'DM Serif Display', serif; font-size: 0.95rem; flex: 1; }
+
+.urgent-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 16px;
+  border-bottom: 1px solid #f5c6c2;
+  font-size: 0.78rem;
+}
+.urgent-item:last-child { border-bottom: none; }
+.urgent-num { font-size: 0.7rem; font-weight: 700; color: var(--red); min-width: 20px; margin-top: 2px; }
+.urgent-action { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+
+/* ═══════════════════════════════════════════════
+   PROPERTIES PAGE
+═══════════════════════════════════════════════ */
+.props-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.prop-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+.prop-card:hover { border-color: var(--gold); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(201,151,58,0.12); }
+
+.prop-card-address { font-size: 0.9rem; font-weight: 600; margin-bottom: 4px; line-height: 1.4; }
+.prop-card-sub { font-size: 0.72rem; color: var(--muted); margin-bottom: 12px; }
+
+.prop-card-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.prop-stat { text-align: center; }
+.prop-stat-val { font-family: 'DM Serif Display', serif; font-size: 1.3rem; font-weight: 700; line-height: 1; margin-bottom: 2px; }
+.prop-stat-val.red { color: var(--red); }
+.prop-stat-val.amber { color: var(--amber); }
+.prop-stat-val.green { color: var(--green); }
+.prop-stat-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; }
+
+/* ═══════════════════════════════════════════════
+   REPORTS PAGE
+═══════════════════════════════════════════════ */
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.report-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+  transition: all 0.15s;
+}
+.report-card:hover { border-color: var(--gold); }
+
+.report-icon { font-size: 2.2rem; margin-bottom: 12px; }
+.report-card h4 { font-family: 'DM Serif Display', serif; font-size: 0.95rem; margin-bottom: 6px; }
+.report-card p { font-size: 0.75rem; color: var(--muted); line-height: 1.6; margin-bottom: 14px; }
+
+.report-table-wrap { overflow-x: auto; }
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+.report-table th {
+  padding: 9px 14px;
+  text-align: left;
+  background: var(--warm);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.report-table td {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.report-table tr:last-child td { border-bottom: none; }
+.report-table tr:hover td { background: var(--warm); }
+
+/* ═══════════════════════════════════════════════
+   MODALS
+═══════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(12,27,53,0.5);
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(3px);
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--white);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--navy);
+}
+
+.modal-header h3 { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: #fff; flex: 1; }
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--warm);
+  flex-shrink: 0;
+}
+
+/* ─ Toast ─ */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--navy);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: toastIn 0.25s ease;
+  max-width: 320px;
+}
+
+.toast.success { border-left: 3px solid var(--green); }
+.toast.error { border-left: 3px solid var(--red); }
+.toast.info { border-left: 3px solid var(--gold); }
+
+@keyframes toastIn {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ─ WO prompt modal ─ */
+.wo-prompt-prop {
+  background: var(--warm);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 0.82rem;
+  margin-bottom: 12px;
+}
+
+/* ─ Lightbox ─ */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.lightbox.open { display: flex; }
+.lightbox-inner { position: relative; max-width: 90vw; max-height: 90vh; }
+.lightbox-inner img { max-width: 100%; max-height: 80vh; border-radius: 10px; }
+.lightbox-close {
+  position: absolute; top: -12px; right: -12px;
+  background: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 32px; height: 32px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.lightbox-meta {
+  background: rgba(0,0,0,0.7);
+  color: rgba(255,255,255,0.8);
+  border-radius: 0 0 10px 10px;
+  padding: 10px 14px;
+  font-size: 0.75rem;
+  line-height: 1.7;
+}
+
+/* ─ Disclaimer ─ */
+.disclaimer {
+  margin-top: 32px;
+  font-size: 0.7rem;
+  color: var(--muted);
+  line-height: 1.7;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+/* ═══════════════════════════════════════════════
+   DOCUMENT VAULT
+═══════════════════════════════════════════════ */
+.vault-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.vault-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+}
+.vault-card:hover { border-color: var(--gold); box-shadow: 0 3px 14px rgba(201,151,58,0.1); }
+
+.vault-card-preview {
+  height: 130px;
+  background: var(--warm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.vault-card-preview img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  position: absolute; inset: 0;
+}
+
+.vault-card-preview .vault-owner-badge {
+  position: absolute;
+  top: 8px; right: 8px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.vob-yes { background: var(--green-pale); color: var(--green); border: 1px solid #a7d8be; }
+.vob-no { background: #f1f1f5; color: var(--muted); border: 1px solid #ddd; }
+
+.vault-card-body { padding: 12px 14px; flex: 1; }
+.vault-card-cat {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.vault-card-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+.vault-card-prop {
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vault-card-meta {
+  font-size: 0.68rem;
+  color: var(--muted);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.vault-card-actions {
+  display: flex;
+  gap: 6px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--warm);
+}
+
+.vault-action-btn {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--navy);
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.12s;
+  text-align: center;
+}
+.vault-action-btn:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+.vault-action-btn.del { color: var(--red); border-color: #f5c6c2; background: var(--red-pale); }
+.vault-action-btn.del:hover { background: var(--red); color: #fff; }
+
+/* Upload zone hover */
+#vaultUploadZone:hover {
+  border-color: var(--gold);
+  background: var(--gold-pale);
+}
+
+/* Lightbox doc preview */
+.doc-lightbox {
+  position: fixed; inset: 0;
+  background: rgba(12,27,53,0.88);
+  z-index: 600;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  backdrop-filter: blur(4px);
+}
+.doc-lightbox.open { display: flex; }
+.doc-lightbox-inner {
+  background: var(--white);
+  border-radius: 14px;
+  overflow: hidden;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.3);
+}
+.doc-lightbox-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--navy);
+  flex-shrink: 0;
+}
+.doc-lightbox-header h3 { font-family: 'DM Serif Display', serif; font-size: 1rem; color: #fff; flex: 1; }
+.doc-lightbox-body {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--warm);
+  padding: 20px;
+  min-height: 300px;
+}
+.doc-lightbox-body img { max-width: 100%; max-height: 60vh; border-radius: 8px; }
+.doc-lightbox-footer { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; background: var(--warm); flex-shrink: 0; }
+
+@media (max-width: 600px) {
+  .vault-grid { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════════════════════════════════
+   QUOTES
+═══════════════════════════════════════════════ */
+.quote-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 10px;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+}
+.quote-card:hover { border-color: var(--gold); box-shadow: 0 2px 12px rgba(201,151,58,0.1); }
+.quote-card.qs-pending { border-left-color: #a78bfa; }
+.quote-card.qs-approved { border-left-color: var(--green); }
+.quote-card.qs-rejected { border-left-color: var(--red); }
+.quote-card.qs-expired { border-left-color: var(--muted); opacity: 0.75; }
+
+.quote-card-inner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  padding: 16px 18px;
+  align-items: start;
+}
+.quote-icon {
+  width: 48px; height: 48px;
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; flex-shrink: 0;
+  background: var(--gold-pale); border: 1px solid #e8c86a;
+}
+.quote-cat { font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--gold); margin-bottom:3px; }
+.quote-desc { font-size:0.92rem; font-weight:600; margin-bottom:4px; line-height:1.4; }
+.quote-property { font-size:0.75rem; color:var(--muted); margin-bottom:7px; }
+.quote-meta { display:flex; flex-wrap:wrap; gap:12px; font-size:0.71rem; color:var(--muted); align-items:center; }
+.quote-meta strong { color:var(--text); }
+.quote-amount { font-family:'DM Serif Display',serif; font-size:1.6rem; color:var(--navy); line-height:1; margin-bottom:6px; text-align:right; }
+.quote-amount span { font-family:'DM Sans',sans-serif; font-size:0.72rem; color:var(--muted); display:block; margin-bottom:2px; }
+.quote-right { display:flex; flex-direction:column; align-items:flex-end; gap:8px; min-width:160px; }
+.quote-actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+.quote-owner-response {
+  background: var(--warm); border-top: 1px solid var(--border);
+  padding: 11px 18px; font-size:0.78rem; display:flex; gap:10px; align-items:flex-start;
+}
+.qr-icon { font-size:1rem; flex-shrink:0; margin-top:1px; }
+.qr-approved { color: var(--green); }
+.qr-rejected { color: var(--red); }
+.qr-label { font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:2px; }
+.qr-comment { color:var(--text); }
+.qr-time { font-size:0.65rem; color:var(--muted); margin-top:2px; }
+.pill-qpending { background:#f0ebfc; color:#6040a8; border:1px solid #c8b8e8; }
+.pill-qapproved { background:var(--green-pale); color:var(--green); border:1px solid #a7d8be; }
+.pill-qrejected { background:var(--red-pale); color:var(--red); border:1px solid #f5c6c2; }
+.pill-qexpired { background:#f1f1f5; color:var(--muted); border:1px solid #ddd; }
+#qUploadZone:hover { border-color: var(--gold); background: var(--gold-pale); }
+@media (max-width: 700px) {
+  .quote-card-inner { grid-template-columns: auto 1fr; }
+  .quote-right { grid-column: 1/-1; flex-direction:row; flex-wrap:wrap; }
+}
+
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .dash-grid { grid-template-columns: 1fr; }
+  .checklist-header { grid-template-columns: 1fr; }
+  .issue-card { grid-template-columns: auto 1fr; }
+  .issue-right { grid-column: 1/-1; flex-direction: row; flex-wrap: wrap; }
+  .detail-panel { width: 100%; }
+}
+
+@media (max-width: 600px) {
+  .content { padding: 16px; }
+  .topbar { padding: 12px 16px; }
+}
+</style>
+<script>
+const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
+</script>
+</head>
+<body>
+
+<!-- ══════════════════════ PM LOGIN SCREEN ══════════════════════ -->
+<div id="pmLoginScreen" style="display:flex;min-height:100vh;background:linear-gradient(145deg,#0a3356,#0f4c81);align-items:center;justify-content:center;">
+  <div style="width:100%;max-width:420px;padding:20px;">
+    <div style="background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(15,76,129,0.25);">
+      <div style="background:linear-gradient(135deg,#0a3356,#0f4c81);padding:28px 32px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:#fff;font-weight:500;margin-bottom:4px;">🏠 VicRental Pro</div>
+        <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.1em;">Property Management Platform</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:#fff;font-weight:500;margin-top:16px;">Property Manager <em style="font-style:italic;font-weight:300;">Login</em></div>
+      </div>
+      <div style="padding:28px 32px;">
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#6b7d96;margin-bottom:5px;">Email Address</label>
+          <input type="email" id="pmLoginEmail" placeholder="you@vicrentalpro.com.au" style="width:100%;background:#f5f7fa;border:1.5px solid #dde4ed;border-radius:8px;padding:11px 14px;font-size:0.88rem;font-family:'DM Sans',sans-serif;color:#1e2d42;">
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="display:block;font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#6b7d96;margin-bottom:5px;">Password</label>
+          <input type="password" id="pmLoginPassword" placeholder="Your password" style="width:100%;background:#f5f7fa;border:1.5px solid #dde4ed;border-radius:8px;padding:11px 14px;font-size:0.88rem;font-family:'DM Sans',sans-serif;color:#1e2d42;" onkeydown="if(event.key==='Enter')doPMLogin()">
+        </div>
+        <div id="pmLoginError" style="display:none;background:#fdf0ec;border:1px solid rgba(212,76,45,0.25);color:#d44c2d;border-radius:8px;padding:9px 13px;font-size:0.78rem;margin-bottom:12px;"></div>
+        <button onclick="doPMLogin()" id="pmLoginBtn" style="width:100%;background:linear-gradient(135deg,#0a3356,#0f4c81);color:#fff;border:none;border-radius:8px;padding:13px;font-size:0.88rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Sign In →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function doPMLogin() {
+  const email    = document.getElementById('pmLoginEmail').value.trim();
+  const password = document.getElementById('pmLoginPassword').value;
+  const errEl    = document.getElementById('pmLoginError');
+  const btn      = document.getElementById('pmLoginBtn');
+  if (!email || !password) { errEl.textContent = 'Please enter your email and password.'; errEl.style.display = ''; return; }
+  btn.textContent = 'Signing in…'; btn.disabled = true;
+  fetch('https://vicrental-backend1-production.up.railway.app/api/auth/pm/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  })
+  .then(r => r.json())
+  .then(data => {
+    btn.textContent = 'Sign In →'; btn.disabled = false;
+    if (data.error) { errEl.textContent = 'Incorrect email or password.'; errEl.style.display = ''; return; }
+    localStorage.setItem('vr_token', data.token);
+    localStorage.setItem('vr_user', JSON.stringify(data.user));
+    errEl.style.display = 'none';
+    launchPMApp();
+  })
+  .catch(() => { btn.textContent = 'Sign In →'; btn.disabled = false; errEl.textContent = 'Connection error. Please try again.'; errEl.style.display = ''; });
+}
+
+function launchPMApp() {
+  document.getElementById('pmLoginScreen').style.display = 'none';
+  document.getElementById('pmAppScreen').style.display = 'block';
+  const user = (() => { try { return JSON.parse(localStorage.getItem('vr_user') || 'null'); } catch { return null; } })();
+  if (user) {
+    const nameEl = document.getElementById('topbarUserName');
+    if (nameEl) nameEl.textContent = user.name || user.email;
+  }
+  try { seedDemo(); } catch(e) { console.log('seedDemo skipped:', e.message); }
+  try { showPage('dashboard'); } catch(e) { console.log('showPage error:', e.message); }
+}
+
+// Check existing session on load
+window.addEventListener('DOMContentLoaded', function() {
+  const token = localStorage.getItem('vr_token');
+  const user  = (() => { try { return JSON.parse(localStorage.getItem('vr_user') || 'null'); } catch { return null; } })();
+  if (token && user && user.email) launchPMApp();
+});
+</script>
+
+<div id="pmAppScreen" style="display:none;">
+<div class="app">
+  <!-- ══════════════════════ SIDEBAR ══════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-emblem">🏠</div>
+      <div class="brand-name">VicRental Pro</div>
+      <div class="brand-sub">Compliance Platform</div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">Overview</div>
+      <div class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard')">
+        <span class="nav-icon">📊</span> Dashboard
+      </div>
+
+      <div class="nav-section">Management</div>
+      <div class="nav-item" id="nav-portal" onclick="showPage('portal')">
+        <span class="nav-icon">🏠</span> Owner Portal
+        <span class="nav-badge" id="navBadgePortal" style="display:none">0</span>
+      </div>
+      <div class="nav-item" id="nav-workorders" onclick="showPage('workorders')">
+        <span class="nav-icon">🔧</span> Work Orders
+        <span class="nav-badge amber" id="navBadgeWO" style="display:none">0</span>
+      </div>
+      <div class="nav-item" id="nav-properties" onclick="showPage('properties')">
+        <span class="nav-icon">📍</span> Properties
+      </div>
+
+      <div class="nav-section">Tools</div>
+      <div class="nav-item" id="nav-checklist" onclick="showPage('checklist')">
+        <span class="nav-icon">📋</span> Inspection Checklist
+      </div>
+      <div class="nav-item" id="nav-reports" onclick="showPage('reports')">
+        <span class="nav-icon">📄</span> Reports
+      </div>
+      <div class="nav-item" id="nav-vault" onclick="showPage('vault')">
+        <span class="nav-icon">🗄️</span> Document Vault
+      </div>
+      <div class="nav-item" id="nav-quotes" onclick="showPage('quotes')">
+        <span class="nav-icon">💰</span> Repair Quotes
+        <span class="nav-badge amber" id="navBadgeQuotes" style="display:none">0</span>
+      </div>
+      <div class="nav-item" id="nav-tenantreqs" onclick="showPage('tenantreqs')">
+        <span class="nav-icon">🏡</span> Tenant Requests
+        <span class="nav-badge amber" id="navBadgeTenantReqs" style="display:none">0</span>
+      </div>
+      <div class="nav-item" id="nav-activity" onclick="showPage('activity')">
+        <span class="nav-icon">⚡</span> Activity Log
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-prop-count">
+        <span style="font-size:1.2rem;">🏘️</span>
+        <div>
+          <div><strong id="sidebarPropCount">0</strong> <span>properties</span></div>
+          <div style="font-size:0.62rem;margin-top:1px;">with active compliance data</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══════════════════════ MAIN ══════════════════════ -->
+  <div class="main">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div style="flex:1">
+        <div class="topbar-title" id="pageTitle">Dashboard</div>
+        <span class="topbar-subtitle" id="pageSubtitle">Victoria Rental Minimum Standards · Residential Tenancies Act 1997</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-secondary" id="topbarExtraBtn" style="display:none" onclick="topbarExtraAction()">
+          <span id="topbarExtraBtnLabel">Action</span>
+        </button>
+        <button class="btn btn-primary" id="topbarMainBtn" onclick="topbarMainAction()">+ New Work Order</button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content" id="mainContent">
+
+      <!-- ═══ DASHBOARD ═══ -->
+      <div class="page active" id="page-dashboard">
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-red"><div class="kpi-label">Non-Compliant</div><div class="kpi-value" id="dashNC">0</div><div class="kpi-sub">Open issues</div><div class="kpi-icon">⚠️</div></div>
+          <div class="kpi-card kpi-amber"><div class="kpi-label">In Progress</div><div class="kpi-value" id="dashIP">0</div><div class="kpi-sub">Repairs underway</div><div class="kpi-icon">🔨</div></div>
+          <div class="kpi-card kpi-green"><div class="kpi-label">Resolved</div><div class="kpi-value" id="dashOK">0</div><div class="kpi-sub">Completed repairs</div><div class="kpi-icon">✅</div></div>
+          <div class="kpi-card kpi-gold"><div class="kpi-label">Overdue</div><div class="kpi-value" id="dashOverdue">0</div><div class="kpi-sub">Past due date</div><div class="kpi-icon">⏰</div></div>
+        </div>
+
+        <div class="dash-grid">
+          <div class="panel">
+            <div class="panel-header">
+              <h3>🔴 Critical & Open Work Orders</h3>
+              <small id="dashOpenLabel">0 open</small>
+            </div>
+            <div style="padding:14px;" id="dashWOList">
+              <div class="empty"><div class="empty-icon">✅</div><h3>All Clear</h3><p>No open work orders right now. Run a checklist inspection to get started.</p></div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div class="panel">
+              <div class="panel-header"><h3>Issues by Category</h3></div>
+              <div style="padding:14px;" id="dashCatBreakdown">
+                <div style="font-size:0.78rem;color:var(--muted);text-align:center;padding:12px 0;">No open issues</div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-header"><h3>⚡ Recent Activity</h3></div>
+              <div style="padding:0 14px 6px;" id="dashActivity">
+                <div class="activity-item" style="color:var(--muted);">No activity yet</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="disclaimer">
+          <strong>VicRental Pro</strong> — A unified Victoria Rental Minimum Standards compliance platform. Data is stored locally in your browser. For official guidance, visit <strong>Consumer Affairs Victoria</strong> (consumer.vic.gov.au).
+        </div>
+      </div>
+
+      <!-- ═══ OWNER PORTAL ═══ -->
+      <div class="page" id="page-portal">
+        <div class="notice notice-gold">
+          <span style="font-size:1.1rem;flex-shrink:0;">⚖️</span>
+          <div><strong>Victoria Rental Compliance — Owner View.</strong> Failed inspection items are shown here. Under the <em>Residential Tenancies Act 1997</em>, these standards must be met. Items remain Non-Compliant until a work order is completed with verified evidence.</div>
+        </div>
+
+        <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;">
+          <div class="kpi-card kpi-red"><div class="kpi-label">Non-Compliant</div><div class="kpi-value" id="pNC">0</div><div class="kpi-icon">⚠️</div></div>
+          <div class="kpi-card kpi-amber"><div class="kpi-label">In Progress</div><div class="kpi-value" id="pIP">0</div><div class="kpi-icon">🔨</div></div>
+          <div class="kpi-card kpi-green"><div class="kpi-label">Resolved</div><div class="kpi-value" id="pOK">0</div><div class="kpi-icon">✅</div></div>
+          <div class="kpi-card kpi-slate"><div class="kpi-label">Total Issues</div><div class="kpi-value" id="pTotal">0</div><div class="kpi-icon">📋</div></div>
+        </div>
+
+        <div class="filter-row" id="portalFilterRow">
+          <div class="filter-pill fp-all active" onclick="setPortalFilter('all')">All Issues</div>
+          <div class="filter-pill fp-nc" onclick="setPortalFilter('nc')">Non-Compliant</div>
+          <div class="filter-pill fp-ip" onclick="setPortalFilter('ip')">In Progress</div>
+          <div class="filter-pill fp-ok" onclick="setPortalFilter('ok')">Resolved</div>
+        </div>
+
+        <div id="portalContent"></div>
+      </div>
+
+      <!-- ═══ WORK ORDERS ═══ -->
+      <div class="page" id="page-workorders">
+        <div class="filter-row" style="margin-bottom:12px;">
+          <input type="text" class="search-input" placeholder="🔍 Search address, issue, trade, ID…" id="woSearch" oninput="renderWOs()">
+          <select class="filter-select" id="woSort" onchange="renderWOs()">
+            <option value="created_desc">Newest first</option>
+            <option value="created_asc">Oldest first</option>
+            <option value="due_asc">Due date ↑</option>
+            <option value="priority">By priority</option>
+          </select>
+        </div>
+        <div class="filter-row">
+          <div class="filter-pill fp-all active" id="wof-all" onclick="setWOFilter('all')">All</div>
+          <div class="filter-pill fp-open" id="wof-open" onclick="setWOFilter('open')">Open</div>
+          <div class="filter-pill fp-critical" id="wof-critical" onclick="setWOFilter('critical')">Critical</div>
+          <div class="filter-pill fp-completed" id="wof-completed" onclick="setWOFilter('completed')">Completed</div>
+          <div class="filter-pill fp-cancelled" id="wof-cancelled" onclick="setWOFilter('cancelled')">Cancelled</div>
+        </div>
+        <div class="wo-list" id="woList"></div>
+      </div>
+
+      <!-- ═══ PROPERTIES ═══ -->
+      <div class="page" id="page-properties">
+        <div id="propsGrid" class="props-grid"></div>
+      </div>
+
+      <!-- ═══ CHECKLIST ═══ -->
+      <div class="page" id="page-checklist">
+        <!-- Inspection Meta -->
+        <div class="panel" style="margin-bottom:18px;">
+          <div class="panel-header"><h3>📋 Inspection Details</h3></div>
+          <div class="panel-body" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;">
+            <div>
+              <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Property Address</label>
+              <input type="text" id="clPropAddress" placeholder="123 Example St, Richmond VIC 3121" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;" oninput="saveChecklistMeta()">
+            </div>
+            <div>
+              <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Inspector Name</label>
+              <input type="text" id="clInspector" placeholder="Inspector name" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;" oninput="saveChecklistMeta()">
+            </div>
+            <div>
+              <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Inspection Date</label>
+              <input type="date" id="clDate" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;" oninput="saveChecklistMeta()">
+            </div>
+            <div>
+              <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Owner Name</label>
+              <input type="text" id="clOwnerName" placeholder="Owner name" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;" oninput="saveChecklistMeta()">
+            </div>
+          </div>
+        </div>
+
+        <!-- Score Banner -->
+        <div class="checklist-score" id="clScoreBanner">
+          <div>
+            <div class="score-label">Compliance Score</div>
+            <div class="score-value" id="clScoreVal">—</div>
+          </div>
+          <div class="score-meta">
+            <div class="score-grade" id="clScoreGrade">No items assessed yet</div>
+            <div class="score-bar"><div class="score-fill" id="clScoreFill" style="width:0%"></div></div>
+            <div class="score-counts">
+              <span>Pass: <strong id="clPass">0</strong></span>
+              <span>Fail: <strong id="clFail">0</strong></span>
+              <span>N/A: <strong id="clNA">0</strong></span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <button class="btn btn-secondary" onclick="downloadInspectionReport()" style="font-size:0.75rem;">⬇ Download Report</button>
+            <button class="btn btn-danger" onclick="resetChecklist()" style="font-size:0.75rem;">↺ Reset Checklist</button>
+          </div>
+        </div>
+
+        <!-- Urgent Actions -->
+        <div id="clUrgentActions" style="display:none;margin-top:16px;"></div>
+
+        <!-- Category Accordions -->
+        <div id="clCategories" style="margin-top:16px;"></div>
+
+        <div class="disclaimer">
+          This checklist is a general guide based on Victoria's rental minimum standards under the <em>Residential Tenancies Act 1997</em> (effective 29 March 2021). Not legal advice. Visit Consumer Affairs Victoria for official guidance.
+        </div>
+      </div>
+
+      <!-- ═══ REPORTS ═══ -->
+      <div class="page" id="page-reports">
+        <div class="report-grid">
+          <div class="report-card"><div class="report-icon">📊</div><h4>Compliance Summary</h4><p>All properties with open failures, compliance scores, and outstanding work orders.</p><button class="btn btn-primary" onclick="exportComplianceSummary()">⬇ Download CSV</button></div>
+          <div class="report-card"><div class="report-icon">🔧</div><h4>Work Order Register</h4><p>Full register of all work orders including status, trade, due dates, and completion.</p><button class="btn btn-primary" onclick="exportWorkOrderCSV()">⬇ Download CSV</button></div>
+          <div class="report-card"><div class="report-icon">⏰</div><h4>Overdue Items</h4><p>All work orders past their due date across all properties for urgent follow-up.</p><button class="btn btn-primary" onclick="exportOverdueCSV()">⬇ Download CSV</button></div>
+          <div class="report-card"><div class="report-icon">🏠</div><h4>Property Risk Report</h4><p>Properties ranked by number of open critical issues — highest risk first.</p><button class="btn btn-primary" onclick="exportRiskCSV()">⬇ Download CSV</button></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><h3>📋 All Work Orders — Table View</h3></div>
+          <div class="report-table-wrap panel-body" style="padding:0;">
+            <table class="report-table">
+              <thead>
+                <tr>
+                  <th>ID</th><th>Property</th><th>Issue</th><th>Category</th>
+                  <th>Trade</th><th>Priority</th><th>Status</th><th>Due Date</th><th>Assigned To</th>
+                </tr>
+              </thead>
+              <tbody id="reportTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ QUOTES ═══ -->
+      <div class="page" id="page-quotes">
+
+        <!-- Upload New Quote -->
+        <div class="panel" style="margin-bottom:20px;">
+          <div class="panel-header">
+            <h3>💰 Upload Repair Quote</h3>
+            <small>Quotes are sent to the owner for approval before work proceeds</small>
+          </div>
+          <div class="panel-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+              <div>
+                <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Property Address *</label>
+                <input type="text" id="qProperty" placeholder="42 Sample Street, Richmond VIC 3121" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+              </div>
+              <div>
+                <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Owner Name *</label>
+                <input type="text" id="qOwnerName" placeholder="Property owner's name" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+              </div>
+              <div>
+                <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Repair Description *</label>
+                <input type="text" id="qDescription" placeholder="e.g. Replace smoke alarms on all storeys" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+              </div>
+              <div>
+                <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Contractor / Trade</label>
+                <input type="text" id="qContractor" placeholder="e.g. Melbourne Electrical Pty Ltd" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+              </div>
+              <div>
+                <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Quote Amount (AUD) *</label>
+                <input type="text" id="qAmount" placeholder="e.g. 450.00" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+              </div>
+              <div>
+                <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Quote Expiry Date</label>
+                <input type="date" id="qExpiry" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+              </div>
+              <div>
+                <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Category</label>
+                <select id="qCategory" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;background:var(--white);">
+                  <option>Smoke Alarms</option><option>Heating/Cooling</option><option>Plumbing</option>
+                  <option>Electrical</option><option>Locks &amp; Security</option><option>Mould &amp; Dampness</option>
+                  <option>Structural</option><option>General Maintenance</option><option>Appliances</option><option>Other</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Link to Work Order (optional)</label>
+                <select id="qLinkWO" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;background:var(--white);" id="qLinkWO">
+                  <option value="">— No linked work order —</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Notes for Owner</label>
+              <textarea id="qNotes" rows="2" placeholder="Any context or recommendations for the owner…" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;resize:vertical;margin-bottom:12px;"></textarea>
+            </div>
+            <div id="qUploadZone" onclick="document.getElementById('qFileInput').click()" style="border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all 0.15s;background:var(--warm);margin-bottom:12px;">
+              <div style="font-size:1.6rem;margin-bottom:6px;">📎</div>
+              <div style="font-size:0.82rem;font-weight:600;color:var(--navy);margin-bottom:3px;" id="qFileLabel">Attach quote document (optional)</div>
+              <div style="font-size:0.7rem;color:var(--muted);">PDF, JPG, PNG — max 10MB</div>
+              <input type="file" id="qFileInput" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="handleQFileSelect(event)">
+            </div>
+            <div style="text-align:right;">
+              <button class="btn btn-primary" onclick="submitQuote()" style="min-width:180px;">📤 Send Quote to Owner</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quotes List -->
+        <div class="filter-row">
+          <input type="text" class="search-input" placeholder="🔍 Search quotes…" id="quotesSearch" oninput="renderQuotes()" style="max-width:260px;">
+          <select class="filter-select" id="quotesPropFilter" onchange="renderQuotes()">
+            <option value="all">All properties</option>
+          </select>
+          <div class="filter-pill fp-all active" id="qf-all" onclick="setQuoteFilter('all')">All</div>
+          <div class="filter-pill" id="qf-pending" onclick="setQuoteFilter('pending')" style="border-color:#c8b8e8;color:#6040a8;background:#fff;">Pending</div>
+          <div class="filter-pill fp-ok" id="qf-approved" onclick="setQuoteFilter('approved')">Approved</div>
+          <div class="filter-pill fp-nc" id="qf-rejected" onclick="setQuoteFilter('rejected')">Rejected</div>
+          <div class="filter-pill fp-ip" id="qf-expired" onclick="setQuoteFilter('expired')">Expired</div>
+        </div>
+
+        <div id="quotesList" style="margin-top:4px;"></div>
+      </div>
+
+      <!-- ═══ TENANT REQUESTS ═══ -->
+      <div class="page" id="page-tenantreqs">
+        <div class="filter-row" style="margin-bottom:16px;">
+          <input type="text" class="search-input" placeholder="🔍 Search tenant requests…" id="trSearch" oninput="renderTenantReqs()" style="max-width:280px;">
+          <select class="filter-select" id="trPropFilter" onchange="renderTenantReqs()">
+            <option value="all">All properties</option>
+          </select>
+          <select class="filter-select" id="trPriFilter" onchange="renderTenantReqs()">
+            <option value="all">All priorities</option>
+            <option value="emergency">🚨 Emergency</option>
+            <option value="urgent">⚠️ Urgent</option>
+            <option value="routine">🔧 Routine</option>
+          </select>
+          <div class="filter-pill fp-all active" id="trf-all"       onclick="setTRFilter('all')">All</div>
+          <div class="filter-pill fp-nc"  id="trf-submitted"  onclick="setTRFilter('submitted')">New</div>
+          <div class="filter-pill fp-ip"  id="trf-inprogress" onclick="setTRFilter('inprogress')">In Progress</div>
+          <div class="filter-pill fp-ok"  id="trf-completed"  onclick="setTRFilter('completed')">Completed</div>
+        </div>
+        <div id="tenantReqsList"></div>
+      </div>
+        <div class="panel" style="max-width:680px;">
+          <div class="panel-header">
+            <h3>⚡ Full Activity Log</h3>
+            <button class="btn btn-ghost" onclick="clearActivity()" style="font-size:0.72rem;padding:5px 10px;">Clear Log</button>
+          </div>
+          <div style="padding:0 14px 8px;" id="activityFull">
+            <div class="activity-item" style="color:var(--muted);">No activity recorded yet.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ DOCUMENT VAULT ═══ -->
+      <div class="page" id="page-vault">
+        <!-- Upload Bar -->
+        <div class="panel" style="margin-bottom:20px;">
+          <div class="panel-header">
+            <h3>🗄️ Document Vault</h3>
+            <small id="vaultDocCount">0 documents</small>
+          </div>
+          <div class="panel-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;margin-bottom:14px;">
+              <div>
+                <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Document Name *</label>
+                <input type="text" id="vaultDocName" placeholder="e.g. Compliance Certificate — 42 Sample St" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+              </div>
+              <div>
+                <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Category</label>
+                <select id="vaultDocCategory" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;background:var(--white);color:var(--text);">
+                  <option value="Compliance Certificate">Compliance Certificate</option>
+                  <option value="Invoice">Invoice / Receipt</option>
+                  <option value="Inspection Report">Inspection Report</option>
+                  <option value="Lease Agreement">Lease Agreement</option>
+                  <option value="Insurance">Insurance Document</option>
+                  <option value="Council Notice">Council / Authority Notice</option>
+                  <option value="Correspondence">Correspondence</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Property (optional)</label>
+                <input type="text" id="vaultDocProperty" placeholder="Link to a property address" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+              </div>
+              <div>
+                <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Visible to Owner?</label>
+                <select id="vaultDocOwnerVisible" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;background:var(--white);color:var(--text);">
+                  <option value="yes">Yes — owner can view</option>
+                  <option value="no">No — internal only</option>
+                </select>
+              </div>
+            </div>
+            <div id="vaultUploadZone" onclick="document.getElementById('vaultFileInput').click()" style="border:2px dashed var(--border);border-radius:10px;padding:24px;text-align:center;cursor:pointer;transition:all 0.15s;background:var(--warm);">
+              <div style="font-size:1.8rem;margin-bottom:8px;">📎</div>
+              <div style="font-size:0.85rem;font-weight:600;color:var(--navy);margin-bottom:4px;">Click to upload document</div>
+              <div style="font-size:0.72rem;color:var(--muted);">PDF, JPG, PNG, DOCX — max 10MB per file</div>
+              <input type="file" id="vaultFileInput" accept=".pdf,.jpg,.jpeg,.png,.docx,.doc" multiple style="display:none;" onchange="handleVaultUpload(event)">
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter & Search -->
+        <div class="filter-row" style="margin-bottom:12px;">
+          <input type="text" class="search-input" placeholder="🔍 Search documents…" id="vaultSearch" oninput="renderVault()" style="max-width:280px;">
+          <select class="filter-select" id="vaultCatFilter" onchange="renderVault()">
+            <option value="all">All categories</option>
+            <option value="Compliance Certificate">Compliance Certificates</option>
+            <option value="Invoice">Invoices</option>
+            <option value="Inspection Report">Inspection Reports</option>
+            <option value="Lease Agreement">Lease Agreements</option>
+            <option value="Insurance">Insurance</option>
+            <option value="Council Notice">Council Notices</option>
+            <option value="Correspondence">Correspondence</option>
+            <option value="Other">Other</option>
+          </select>
+          <select class="filter-select" id="vaultOwnerFilter" onchange="renderVault()">
+            <option value="all">All visibility</option>
+            <option value="yes">Owner-visible</option>
+            <option value="no">Internal only</option>
+          </select>
+          <div class="filter-pill fp-all active" id="vf-all" onclick="setVaultFilter('all')">All</div>
+          <div class="filter-pill fp-ok" id="vf-recent" onclick="setVaultFilter('recent')">Recent</div>
+        </div>
+
+        <div id="vaultGrid"></div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ══════════════════════ DETAIL PANEL ══════════════════════ -->
+<div class="detail-overlay" id="detailOverlay" onclick="closeDetail()"></div>
+<div class="detail-panel" id="detailPanel">
+  <div class="detail-header">
+    <div>
+      <h3 id="detailWOId">Work Order</h3>
+      <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);margin-top:2px;" id="detailPropSub"></div>
+    </div>
+    <span class="pill" id="detailStatusPill" style="background:rgba(255,255,255,0.1);color:#fff;border-color:rgba(255,255,255,0.2);">Open</span>
+    <button class="btn-close" onclick="closeDetail()">✕</button>
+  </div>
+  <div class="detail-body">
+    <div class="detail-section">
+      <div class="detail-section-label">Issue Details</div>
+      <div class="detail-field"><label>Property</label><div class="static-val" id="detailProperty">—</div></div>
+      <div class="detail-field"><label>Category</label><div class="static-val" id="detailCategory">—</div></div>
+      <div class="detail-field"><label>Issue</label><div class="static-val" id="detailIssue">—</div></div>
+      <div class="detail-field"><label>Legal Reference</label><div class="static-val" id="detailLegal">—</div></div>
+      <div class="detail-field"><label>Required Action</label><div class="static-val" id="detailAction" style="color:var(--muted);font-style:italic;">—</div></div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-label">Work Order Info</div>
+      <div class="detail-field"><label>Priority</label><div class="static-val" id="detailPriority">—</div></div>
+      <div class="detail-field"><label>Trade Required</label><div class="static-val" id="detailTrade">—</div></div>
+      <div class="detail-field">
+        <label>Assigned To</label>
+        <input type="text" id="detailAssigned" placeholder="Contractor / tradesperson name" oninput="markDirty()">
+      </div>
+      <div class="detail-field">
+        <label>Due Date</label>
+        <input type="date" id="detailDue" oninput="markDirty()">
+      </div>
+      <div class="detail-field">
+        <label>Invoice / Cost (AUD)</label>
+        <input type="text" id="detailInvoice" placeholder="e.g. $350.00" oninput="markDirty()">
+      </div>
+      <div class="detail-field">
+        <label>Notes</label>
+        <textarea id="detailNotes" rows="3" placeholder="Add notes, access arrangements, etc." oninput="markDirty()"></textarea>
+      </div>
+    </div>
+
+    <div class="detail-section" id="detailPhotoSect">
+      <div class="detail-section-label">Inspection Photos</div>
+      <div class="photo-grid" id="detailPhotos"></div>
+      <div style="margin-top:6px;font-size:0.72rem;color:var(--muted);" id="detailPhotosEmpty">No photos attached.</div>
+    </div>
+
+    <div class="detail-section" id="evidenceSect">
+      <div class="detail-section-label">Completion Evidence <span style="color:var(--red);font-size:0.68rem;">(Required to close)</span></div>
+      <div class="evidence-gate">
+        <div style="font-size:0.78rem;font-weight:600;margin-bottom:6px;">📎 Invoice / Compliance Certificate Required</div>
+        <div style="font-size:0.73rem;color:var(--amber);line-height:1.6;" id="evidenceNotice">Upload invoice or compliance certificate before marking complete.</div>
+        <div class="evidence-upload-zone" onclick="document.getElementById('evidenceInput').click()">
+          📤 Click to upload invoice photo or compliance certificate<br>
+          <span style="font-size:0.68rem;color:var(--muted);">JPG, PNG, PDF — max 10MB</span>
+          <input type="file" id="evidenceInput" accept="image/*" multiple onchange="handleEvidenceUpload(event)">
+        </div>
+        <div class="evidence-thumbs" id="evidenceThumbs"></div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-label">Timeline</div>
+      <div class="timeline" id="detailTimeline"></div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-label">Inspector Details</div>
+      <div class="detail-field"><label>Inspector</label><div class="static-val" id="detailInspector">—</div></div>
+      <div class="detail-field"><label>Created</label><div class="static-val" id="detailCreated">—</div></div>
+    </div>
+  </div>
+  <div class="detail-actions">
+    <button class="btn-action btn-save" onclick="saveDetail()">💾 Save</button>
+    <button class="btn-action btn-inprogress" onclick="setWOStatus('inprogress')">🔨 In Progress</button>
+    <button class="btn-action btn-complete locked" id="btnComplete" onclick="attemptComplete()">🔒 Mark Complete</button>
+    <button class="btn-action btn-cancel-wo" onclick="setWOStatus('cancelled')">✗ Cancel</button>
+  </div>
+</div>
+
+<!-- ══════════════════════ NEW WO MODAL ══════════════════════ -->
+<div class="modal-overlay" id="newWOModal" onclick="if(event.target===this)closeNewWOModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <span style="font-size:1.3rem;">🔧</span>
+      <h3>Create Work Order</h3>
+      <button class="btn-close" onclick="closeNewWOModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="detail-field"><label>Property Address *</label><input type="text" id="nwoProperty" placeholder="123 Example St, Melbourne VIC 3000" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;"></div>
+      <div class="detail-field"><label>Issue Description *</label><input type="text" id="nwoIssue" placeholder="Describe the maintenance issue" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;"></div>
+      <div class="detail-field"><label>Category</label>
+        <select id="nwoCategory" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+          <option>General Maintenance</option><option>Plumbing</option><option>Electrical</option>
+          <option>Heating/Cooling</option><option>Structural</option><option>Locks &amp; Security</option>
+          <option>Smoke Alarms</option><option>Mould &amp; Dampness</option><option>Appliances</option>
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="detail-field"><label>Priority</label>
+          <select id="nwoPriority" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+            <option value="high">High</option><option value="critical">Critical</option>
+          </select>
+        </div>
+        <div class="detail-field"><label>Due Date</label><input type="date" id="nwoDue" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;"></div>
+      </div>
+      <div class="detail-field"><label>Trade Required</label><input type="text" id="nwoTrade" placeholder="e.g. Plumber, Electrician" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;"></div>
+      <div class="detail-field"><label>Assigned To</label><input type="text" id="nwoAssigned" placeholder="Contractor name" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;"></div>
+      <div class="detail-field"><label>Notes</label><textarea id="nwoNotes" rows="2" placeholder="Additional details…" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;resize:vertical;"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeNewWOModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNewWO()">Create Work Order</button>
+    </div>
+  </div>
+</div>
+
+<!-- WO Prompt modal (for checklist fail → create WO) -->
+<div class="modal-overlay" id="woPromptModal" onclick="if(event.target===this)skipWOPrompt()">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <span style="font-size:1.3rem;">🚨</span>
+      <h3>Create Work Order?</h3>
+      <button class="btn-close" onclick="skipWOPrompt()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="wo-prompt-prop" id="woPromptInfo"></div>
+      <p style="font-size:0.82rem;color:var(--muted);line-height:1.6;margin-bottom:12px;">A failed compliance item has been detected. Create a work order so it can be tracked, assigned, and resolved — and automatically notify the Owner Portal.</p>
+      <div class="detail-field">
+        <label>Owner Name (for portal notification)</label>
+        <input type="text" id="woPromptOwner" placeholder="Property owner's name" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+      </div>
+      <div class="detail-field">
+        <label>Due Date</label>
+        <input type="date" id="woPromptDue" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="skipWOPrompt()">Skip — don't create WO</button>
+      <button class="btn btn-primary" onclick="confirmCreateWO()">✓ Create Work Order</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <img id="lightboxImg" src="" alt="">
+    <div class="lightbox-meta" id="lightboxMeta"></div>
+  </div>
+</div>
+
+<!-- Doc Lightbox -->
+<div class="doc-lightbox" id="docLightbox" onclick="if(event.target===this)closeDocLightbox()">
+  <div class="doc-lightbox-inner">
+    <div class="doc-lightbox-header">
+      <h3 id="docLightboxTitle">Document</h3>
+      <span class="pill" id="docLightboxCat" style="background:var(--gold-dim);color:var(--gold);border-color:var(--gold);"></span>
+      <button class="btn-close" onclick="closeDocLightbox()">✕</button>
+    </div>
+    <div class="doc-lightbox-body" id="docLightboxBody">
+      <div style="text-align:center;color:var(--muted);">Loading…</div>
+    </div>
+    <div class="doc-lightbox-footer">
+      <button class="btn btn-secondary" onclick="closeDocLightbox()">Close</button>
+      <a class="btn btn-primary" id="docLightboxDownload" download>⬇ Download</a>
+    </div>
+  </div>
+</div>
+
+<!-- Toasts -->
+<div class="toast-container" id="toastContainer"></div>
+
+</div><!-- /pmAppScreen -->
+<script>
+console.log('VicRental PM v3 loaded');
+// ═══════════════════════════════════════════════
+// STORAGE HELPERS
+// ═══════════════════════════════════════════════
+const S = {
+  get: (k, def=[]) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch(e) { return def; } },
+  set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} },
+  del: (k) => localStorage.removeItem(k),
+};
+
+const KEY_WO    = 'vicrental_workorders';
+const KEY_PORT  = 'vicrental_portal';
+const KEY_ACT   = 'vicrental_activity';
+const KEY_CL    = 'vicrental_checklist';
+const KEY_PHOTOS= 'vicrental_photos';
+const KEY_VAULT  = 'vicrental_vault';
+const KEY_QUOTES = 'vicrental_quotes';
+const KEY_TREQS  = 'vicrental_tenant_requests';
+
+// ═══════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════
+function toast(msg, type='info', duration=3500) {
+  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.style.opacity = '0', duration);
+  setTimeout(() => el.remove(), duration + 400);
+}
+
+// ═══════════════════════════════════════════════
+// ACTIVITY LOG
+// ═══════════════════════════════════════════════
+function logActivity(msg, color='#64748b') {
+  const log = S.get(KEY_ACT, []);
+  log.unshift({ msg, color, time: new Date().toISOString() });
+  S.set(KEY_ACT, log.slice(0, 100));
+}
+
+function clearActivity() {
+  if (!confirm('Clear all activity log entries?')) return;
+  S.del(KEY_ACT);
+  renderActivityPage();
+  toast('Activity log cleared', 'info');
+}
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+const PAGE_CONFIG = {
+  dashboard:  { title: 'Dashboard',         sub: 'Overview of all compliance activity', mainBtn: '+ New Work Order', extraBtn: null },
+  portal:     { title: 'Owner Portal',       sub: 'Compliance issues notified to property owner', mainBtn: '+ New Work Order', extraBtn: '🗑 Clear Portal Data' },
+  workorders: { title: 'Work Orders',        sub: 'Manage maintenance requests & compliance repairs', mainBtn: '+ New Work Order', extraBtn: null },
+  properties: { title: 'Properties',         sub: 'All properties with active compliance data', mainBtn: '+ New Work Order', extraBtn: null },
+  checklist:  { title: 'Inspection Checklist', sub: 'Victoria Rental Minimum Standards · Residential Tenancies Act 1997', mainBtn: '⬇ Download Report', extraBtn: '↺ Reset Checklist' },
+  reports:    { title: 'Reports & Exports',  sub: 'Download compliance and maintenance data', mainBtn: '+ New Work Order', extraBtn: null },
+  vault:      { title: 'Document Vault',     sub: 'Store and share compliance documents, invoices & certificates', mainBtn: '⬆ Upload Document', extraBtn: null },
+  quotes:     { title: 'Repair Quotes',      sub: 'Upload quotes for owner approval before scheduling repairs', mainBtn: '+ New Quote', extraBtn: null },
+  tenantreqs: { title: 'Tenant Requests',    sub: 'Maintenance requests submitted by tenants via the Tenant Portal', mainBtn: '+ New Work Order', extraBtn: null },
+  activity:   { title: 'Activity Log',       sub: 'Full audit trail of all changes', mainBtn: '+ New Work Order', extraBtn: null },
+};
+
+let currentPage = 'dashboard';
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  const nav = document.getElementById('nav-' + id);
+  if (nav) nav.classList.add('active');
+
+  currentPage = id;
+  const cfg = PAGE_CONFIG[id] || {};
+  document.getElementById('pageTitle').textContent = cfg.title || id;
+  document.getElementById('pageSubtitle').textContent = cfg.sub || '';
+  document.getElementById('topbarMainBtn').textContent = cfg.mainBtn || '+ New Work Order';
+
+  const extraBtn = document.getElementById('topbarExtraBtn');
+  if (cfg.extraBtn) {
+    extraBtn.style.display = '';
+    document.getElementById('topbarExtraBtnLabel').textContent = cfg.extraBtn;
+  } else {
+    extraBtn.style.display = 'none';
+  }
+
+  closeDetail();
+
+  // Render page
+  if (id === 'dashboard') renderDashboard();
+  else if (id === 'portal') renderPortal();
+  else if (id === 'workorders') renderWOs();
+  else if (id === 'properties') renderProperties();
+  else if (id === 'reports') renderReports();
+  else if (id === 'activity') renderActivityPage();
+  else if (id === 'vault') renderVault();
+  else if (id === 'quotes')      { populateQuoteWODropdown(); renderQuotes(); }
+  else if (id === 'tenantreqs')  { renderTenantReqs(); }
+  else if (id === 'checklist') initChecklist();
+
+  updateSidebarBadges();
+}
+
+function topbarMainAction() {
+  if (currentPage === 'checklist') downloadInspectionReport();
+  else if (currentPage === 'vault') document.getElementById('vaultFileInput')?.click();
+  else if (currentPage === 'quotes') document.getElementById('qProperty')?.focus();
+  else openNewWOModal();
+}
+
+function topbarExtraAction() {
+  if (currentPage === 'portal') clearPortalData();
+  else if (currentPage === 'checklist') resetChecklist();
+}
+
+function updateSidebarBadges() {
+  const wos = S.get(KEY_WO, []);
+  const portal = S.get(KEY_PORT, []);
+  const openWOs = wos.filter(w => w.status === 'open' || w.status === 'inprogress').length;
+  const ncPortal = portal.filter(p => {
+    const wo = wos.find(w => w.id === p.id);
+    if (!wo) return true;
+    return wo.status !== 'completed' && wo.status !== 'cancelled';
+  }).length;
+
+  const woBadge = document.getElementById('navBadgeWO');
+  const portBadge = document.getElementById('navBadgePortal');
+  const propCount = [...new Set(wos.map(w => w.property))].length;
+
+  woBadge.textContent = openWOs;
+  woBadge.style.display = openWOs > 0 ? '' : 'none';
+  portBadge.textContent = ncPortal;
+  portBadge.style.display = ncPortal > 0 ? '' : 'none';
+  document.getElementById('sidebarPropCount').textContent = propCount;
+
+  // Quotes badge — count pending quotes awaiting owner approval
+  const now = new Date();
+  const pendingQuotes = S.get(KEY_QUOTES, []).filter(q =>
+    q.status === 'pending' && !(q.expiry && new Date(q.expiry) < now)
+  ).length;
+  const qBadge = document.getElementById('navBadgeQuotes');
+  if (qBadge) {
+    qBadge.textContent = pendingQuotes;
+    qBadge.style.display = pendingQuotes > 0 ? '' : 'none';
+  }
+  const trBadge = document.getElementById('navBadgeTenantReqs');
+  if (trBadge) {
+    const newTR = S.get(KEY_TREQS, []).filter(r => r.status === 'submitted').length;
+    trBadge.textContent = newTR;
+    trBadge.style.display = newTR > 0 ? '' : 'none';
+  }
+}
+// ═══════════════════════════════════════════════
+let woFilter = 'all';
+let currentDetailId = null;
+let detailDirty = false;
+
+function getWOs() { return S.get(KEY_WO, []); }
+function saveWOs(wos) { S.set(KEY_WO, wos); }
+
+function genWOId() {
+  const wos = getWOs();
+  const n = wos.length + 1;
+  return `WO-${String(n).padStart(4, '0')}`;
+}
+
+function setWOFilter(f) {
+  woFilter = f;
+  document.querySelectorAll('[id^="wof-"]').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById('wof-' + f);
+  if (el) el.classList.add('active');
+  renderWOs();
+}
+
+function renderWOs() {
+  const search = (document.getElementById('woSearch')?.value || '').toLowerCase();
+  const sort = document.getElementById('woSort')?.value || 'created_desc';
+  let wos = getWOs();
+  const now = new Date();
+
+  if (woFilter === 'open') wos = wos.filter(w => w.status === 'open' || w.status === 'inprogress');
+  else if (woFilter === 'critical') wos = wos.filter(w => w.priority === 'critical' && (w.status === 'open' || w.status === 'inprogress'));
+  else if (woFilter === 'completed') wos = wos.filter(w => w.status === 'completed');
+  else if (woFilter === 'cancelled') wos = wos.filter(w => w.status === 'cancelled');
+
+  if (search) {
+    wos = wos.filter(w =>
+      (w.property||'').toLowerCase().includes(search) ||
+      (w.issue||'').toLowerCase().includes(search) ||
+      (w.trade||'').toLowerCase().includes(search) ||
+      (w.id||'').toLowerCase().includes(search) ||
+      (w.assignedTo||'').toLowerCase().includes(search)
+    );
+  }
+
+  if (sort === 'created_desc') wos.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+  else if (sort === 'created_asc') wos.sort((a,b) => new Date(a.createdAt) - new Date(b.createdAt));
+  else if (sort === 'due_asc') wos.sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate));
+  else if (sort === 'priority') wos.sort((a,b) => (a.priority==='critical'?0:1) - (b.priority==='critical'?0:1));
+
+  const list = document.getElementById('woList');
+  if (!list) return;
+
+  if (wos.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><h3>No Work Orders</h3><p>No work orders match your filter. Create one with the button above or run a checklist inspection.</p></div>';
+    return;
+  }
+
+  list.innerHTML = wos.map(wo => {
+    const due = wo.dueDate ? new Date(wo.dueDate) : null;
+    const overdue = due && (wo.status === 'open' || wo.status === 'inprogress') && due < now;
+    const dueStr = due ? due.toLocaleDateString('en-AU', { day:'2-digit', month:'short', year:'numeric' }) : '—';
+
+    const statusLabel = { open:'📋 Open', inprogress:'🔨 In Progress', completed:'✅ Completed', cancelled:'✗ Cancelled' }[wo.status] || wo.status;
+    const statusPill = { open:'open', inprogress:'ip', completed:'completed', cancelled:'cancelled' }[wo.status] || 'pending';
+    const priPill = wo.priority === 'critical' ? 'critical' : 'high';
+
+    return `
+    <div class="wo-card priority-${wo.priority} status-${wo.status}" onclick="openDetail('${wo.id}')">
+      <div>
+        <div class="wo-id">${wo.id}</div>
+        <div class="wo-title">${wo.issue}</div>
+        <div class="wo-property">📍 ${wo.property}</div>
+        <div class="wo-meta">
+          <span>🔧 ${wo.trade || 'Trade TBD'}</span>
+          ${wo.assignedTo ? `<span>👤 <strong>${wo.assignedTo}</strong></span>` : ''}
+          <span>📅 Due: <strong ${overdue ? 'style="color:var(--red)"' : ''}>${dueStr}</strong>${overdue ? ' ⚠️' : ''}</span>
+        </div>
+      </div>
+      <div class="wo-right">
+        <span class="pill pill-${statusPill}">${statusLabel}</span>
+        <span class="pill pill-${priPill}">${wo.priority === 'critical' ? '🔴 Critical' : '🟡 High'}</span>
+        ${wo.legalRef ? `<span class="legal-tag">${wo.legalRef}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// WORK ORDER DETAIL
+// ═══════════════════════════════════════════════
+function openDetail(id) {
+  const wos = getWOs();
+  const wo = wos.find(w => w.id === id);
+  if (!wo) return;
+
+  currentDetailId = id;
+  detailDirty = false;
+
+  document.getElementById('detailWOId').textContent = wo.id;
+  document.getElementById('detailPropSub').textContent = wo.property;
+  document.getElementById('detailProperty').textContent = wo.property;
+  document.getElementById('detailCategory').textContent = `${wo.categoryIcon || ''} ${wo.category || '—'}`;
+  document.getElementById('detailIssue').textContent = wo.issue;
+  document.getElementById('detailLegal').textContent = wo.legalRef || 'N/A';
+  document.getElementById('detailAction').textContent = wo.action || '—';
+  document.getElementById('detailPriority').textContent = wo.priority === 'critical' ? '🔴 Critical' : '🟡 High';
+  document.getElementById('detailTrade').textContent = wo.trade || '—';
+  document.getElementById('detailAssigned').value = wo.assignedTo || '';
+  document.getElementById('detailDue').value = wo.dueDate || '';
+  document.getElementById('detailInvoice').value = wo.invoice || '';
+  document.getElementById('detailNotes').value = wo.notes || '';
+  document.getElementById('detailInspector').textContent = wo.inspector || '—';
+  document.getElementById('detailCreated').textContent = wo.createdAt ? new Date(wo.createdAt).toLocaleString('en-AU') : '—';
+
+  // Status pill
+  const statusLabels = { open:'📋 Open', inprogress:'🔨 In Progress', completed:'✅ Completed', cancelled:'✗ Cancelled' };
+  const statusClasses = { open:'pill-open', inprogress:'pill-ip', completed:'pill-completed', cancelled:'pill-cancelled' };
+  const sp = document.getElementById('detailStatusPill');
+  sp.textContent = statusLabels[wo.status] || wo.status;
+  sp.className = `pill ${statusClasses[wo.status] || 'pill-pending'}`;
+
+  // Photos
+  const photos = wo.photos || [];
+  const photoGrid = document.getElementById('detailPhotos');
+  const photoEmpty = document.getElementById('detailPhotosEmpty');
+  photoGrid.innerHTML = photos.map(p =>
+    `<div class="photo-thumb" onclick="openLightbox(${JSON.stringify(p).replace(/"/g,'&quot;')})">
+      <img src="${p.dataUrl}" alt="">
+      <div class="photo-stamp">${p.datetime}</div>
+    </div>`
+  ).join('');
+  photoEmpty.style.display = photos.length > 0 ? 'none' : '';
+
+  // Evidence
+  renderEvidenceThumbs(wo);
+
+  // Complete button lock
+  const evidenceDocs = wo.evidenceDocs || [];
+  const btnComplete = document.getElementById('btnComplete');
+  if (evidenceDocs.length > 0) {
+    btnComplete.classList.remove('locked');
+    btnComplete.textContent = '✅ Mark Completed';
+  } else {
+    btnComplete.classList.add('locked');
+    btnComplete.textContent = '🔒 Mark Complete';
+  }
+
+  // Timeline
+  renderTimeline(wo);
+
+  // Evidence section visibility
+  const evidSect = document.getElementById('evidenceSect');
+  evidSect.style.display = (wo.status === 'completed' || wo.status === 'cancelled') ? 'none' : '';
+
+  document.getElementById('detailOverlay').classList.add('open');
+  document.getElementById('detailPanel').classList.add('open');
+}
+
+function closeDetail() {
+  if (detailDirty) {
+    if (!confirm('You have unsaved changes. Discard them?')) return;
+  }
+  document.getElementById('detailOverlay').classList.remove('open');
+  document.getElementById('detailPanel').classList.remove('open');
+  currentDetailId = null;
+  detailDirty = false;
+}
+
+function markDirty() { detailDirty = true; }
+
+function renderTimeline(wo) {
+  const items = wo.timeline || [];
+  const colors = { created: '#3b82f6', inprogress: '#f59e0b', completed: '#10b981', cancelled: '#94a3b8', saved: '#c9973a', evidence: '#8b5cf6' };
+  const container = document.getElementById('detailTimeline');
+  if (items.length === 0) {
+    container.innerHTML = '<div style="font-size:0.78rem;color:var(--muted);">No timeline entries yet.</div>';
+    return;
+  }
+  container.innerHTML = [...items].reverse().map(item =>
+    `<div class="timeline-item">
+      <div class="timeline-dot" style="background:${colors[item.type]||'#94a3b8'}"></div>
+      <div>
+        <div style="font-size:0.78rem;">${item.msg}</div>
+        <div class="timeline-time">${new Date(item.time).toLocaleString('en-AU')}</div>
+      </div>
+    </div>`
+  ).join('');
+}
+
+function saveDetail() {
+  if (!currentDetailId) return;
+  const wos = getWOs();
+  const idx = wos.findIndex(w => w.id === currentDetailId);
+  if (idx < 0) return;
+
+  wos[idx].assignedTo = document.getElementById('detailAssigned').value;
+  wos[idx].dueDate = document.getElementById('detailDue').value;
+  wos[idx].invoice = document.getElementById('detailInvoice').value;
+  wos[idx].notes = document.getElementById('detailNotes').value;
+
+  const tl = wos[idx].timeline || [];
+  tl.push({ type: 'saved', msg: `Work order updated`, time: new Date().toISOString() });
+  wos[idx].timeline = tl;
+
+  saveWOs(wos);
+  detailDirty = false;
+  logActivity(`Work order ${currentDetailId} updated`, '#c9973a');
+  toast('Changes saved', 'success');
+  renderTimeline(wos[idx]);
+  if (currentPage === 'dashboard') renderDashboard();
+  else if (currentPage === 'workorders') renderWOs();
+  updateSidebarBadges();
+}
+
+function setWOStatus(status) {
+  if (!currentDetailId) return;
+  const wos = getWOs();
+  const idx = wos.findIndex(w => w.id === currentDetailId);
+  if (idx < 0) return;
+
+  const oldStatus = wos[idx].status;
+  wos[idx].status = status;
+
+  const tl = wos[idx].timeline || [];
+  const labels = { inprogress: 'In Progress', completed: 'Completed', cancelled: 'Cancelled', open: 'Open' };
+  tl.push({ type: status, msg: `Status changed to ${labels[status] || status}`, time: new Date().toISOString() });
+  wos[idx].timeline = tl;
+
+  saveWOs(wos);
+  syncPortalFromWO(wos[idx]);
+  logActivity(`Work order ${currentDetailId} → ${labels[status]}`, status === 'completed' ? '#1a7a4a' : status === 'cancelled' ? '#94a3b8' : '#f59e0b');
+  toast(`Status updated to ${labels[status]}`, 'success');
+  openDetail(currentDetailId);
+  if (currentPage === 'dashboard') renderDashboard();
+  else if (currentPage === 'workorders') renderWOs();
+  updateSidebarBadges();
+}
+
+function attemptComplete() {
+  const wos = getWOs();
+  const wo = wos.find(w => w.id === currentDetailId);
+  if (!wo) return;
+  if (!wo.evidenceDocs || wo.evidenceDocs.length === 0) {
+    toast('Upload evidence (invoice or compliance certificate) before completing', 'error');
+    document.getElementById('evidenceNotice').style.color = 'var(--red)';
+    document.getElementById('evidenceNotice').textContent = '⚠️ Please upload evidence above before marking as complete.';
+    return;
+  }
+  setWOStatus('completed');
+}
+
+// Evidence upload
+function handleEvidenceUpload(event) {
+  const files = Array.from(event.target.files);
+  if (!currentDetailId || files.length === 0) return;
+  const wos = getWOs();
+  const idx = wos.findIndex(w => w.id === currentDetailId);
+  if (idx < 0) return;
+
+  let processed = 0;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const doc = { id: Date.now() + processed, dataUrl: e.target.result, name: file.name, uploadedAt: new Date().toISOString() };
+      if (!wos[idx].evidenceDocs) wos[idx].evidenceDocs = [];
+      wos[idx].evidenceDocs.push(doc);
+      const tl = wos[idx].timeline || [];
+      tl.push({ type: 'evidence', msg: `Evidence uploaded: ${file.name}`, time: new Date().toISOString() });
+      wos[idx].timeline = tl;
+      saveWOs(wos);
+      renderEvidenceThumbs(wos[idx]);
+      const btnComplete = document.getElementById('btnComplete');
+      btnComplete.classList.remove('locked');
+      btnComplete.textContent = '✅ Mark Completed';
+      document.getElementById('evidenceNotice').style.color = 'var(--green)';
+      document.getElementById('evidenceNotice').textContent = '✅ Evidence uploaded. You can now mark this work order as complete.';
+      processed++;
+      toast('Evidence uploaded', 'success');
+      logActivity(`Evidence uploaded for ${currentDetailId}`, '#8b5cf6');
+    };
+    reader.readAsDataURL(file);
+  });
+  event.target.value = '';
+}
+
+function renderEvidenceThumbs(wo) {
+  const docs = wo.evidenceDocs || [];
+  const container = document.getElementById('evidenceThumbs');
+  if (!container) return;
+  container.innerHTML = docs.map(doc =>
+    `<div class="evidence-thumb">
+      <img src="${doc.dataUrl}" alt="${doc.name}">
+      <button class="evidence-thumb-del" onclick="deleteEvidence('${doc.id}')">✕</button>
+    </div>`
+  ).join('');
+}
+
+function deleteEvidence(docId) {
+  if (!currentDetailId) return;
+  const wos = getWOs();
+  const idx = wos.findIndex(w => w.id === currentDetailId);
+  if (idx < 0) return;
+  wos[idx].evidenceDocs = (wos[idx].evidenceDocs || []).filter(d => String(d.id) !== String(docId));
+  saveWOs(wos);
+  renderEvidenceThumbs(wos[idx]);
+  if (wos[idx].evidenceDocs.length === 0) {
+    document.getElementById('btnComplete').classList.add('locked');
+    document.getElementById('btnComplete').textContent = '🔒 Mark Complete';
+  }
+}
+
+// ─ New WO Modal ─
+function openNewWOModal() {
+  document.getElementById('nwoProperty').value = '';
+  document.getElementById('nwoIssue').value = '';
+  document.getElementById('nwoTrade').value = '';
+  document.getElementById('nwoAssigned').value = '';
+  document.getElementById('nwoNotes').value = '';
+  document.getElementById('nwoDue').value = '';
+  document.getElementById('newWOModal').classList.add('open');
+}
+
+function closeNewWOModal() { document.getElementById('newWOModal').classList.remove('open'); }
+
+function saveNewWO() {
+  const property = document.getElementById('nwoProperty').value.trim();
+  const issue = document.getElementById('nwoIssue').value.trim();
+  if (!property || !issue) { toast('Please fill in property address and issue description', 'error'); return; }
+
+  const wo = {
+    id: genWOId(),
+    property, issue,
+    category: document.getElementById('nwoCategory').value,
+    categoryIcon: '🔧',
+    priority: document.getElementById('nwoPriority').value,
+    trade: document.getElementById('nwoTrade').value.trim(),
+    assignedTo: document.getElementById('nwoAssigned').value.trim(),
+    dueDate: document.getElementById('nwoDue').value,
+    notes: document.getElementById('nwoNotes').value.trim(),
+    status: 'open',
+    createdAt: new Date().toISOString(),
+    timeline: [{ type: 'created', msg: 'Work order created manually', time: new Date().toISOString() }],
+    photos: [], evidenceDocs: []
+  };
+
+  const wos = getWOs();
+  wos.unshift(wo);
+  saveWOs(wos);
+  closeNewWOModal();
+  logActivity(`New work order ${wo.id} created for ${property}`, '#3b82f6');
+  toast(`Work order ${wo.id} created`, 'success');
+  if (currentPage === 'workorders') renderWOs();
+  else if (currentPage === 'dashboard') renderDashboard();
+  updateSidebarBadges();
+}
+
+// Sync portal when WO changes
+function syncPortalFromWO(wo) {
+  // Portal items are created by checklist — just badge updates needed
+  updateSidebarBadges();
+}
+
+// ═══════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════
+function renderDashboard() {
+  const wos = getWOs();
+  const portal = S.get(KEY_PORT, []);
+  const now = new Date();
+
+  // KPIs
+  const ncPortal = portal.filter(p => {
+    const wo = wos.find(w => w.id === p.id);
+    return !wo || (wo.status !== 'completed' && wo.status !== 'cancelled');
+  });
+  const ipPortal = portal.filter(p => {
+    const wo = wos.find(w => w.id === p.id);
+    return wo && wo.status === 'inprogress';
+  });
+  const okPortal = portal.filter(p => {
+    const wo = wos.find(w => w.id === p.id);
+    return wo && (wo.status === 'completed' || wo.status === 'cancelled');
+  });
+  const overdue = wos.filter(w => (w.status==='open'||w.status==='inprogress') && w.dueDate && new Date(w.dueDate) < now);
+
+  document.getElementById('dashNC').textContent = ncPortal.length;
+  document.getElementById('dashIP').textContent = ipPortal.length;
+  document.getElementById('dashOK').textContent = okPortal.length;
+  document.getElementById('dashOverdue').textContent = overdue.length;
+
+  // Open WOs list
+  const openWOs = wos.filter(w => w.status === 'open' || w.status === 'inprogress')
+    .sort((a,b) => (a.priority==='critical'?0:1)-(b.priority==='critical'?0:1));
+
+  const dashList = document.getElementById('dashWOList');
+  document.getElementById('dashOpenLabel').textContent = openWOs.length + ' open';
+
+  if (openWOs.length === 0) {
+    dashList.innerHTML = '<div class="empty"><div class="empty-icon">✅</div><h3>All Clear</h3><p>No open work orders. Run a checklist inspection to get started.</p></div>';
+  } else {
+    dashList.innerHTML = openWOs.slice(0, 8).map(wo => {
+      const due = wo.dueDate ? new Date(wo.dueDate) : null;
+      const isOverdue = due && due < now;
+      const dueStr = due ? due.toLocaleDateString('en-AU',{day:'2-digit',month:'short'}) : '—';
+      return `<div class="wo-card priority-${wo.priority} status-${wo.status}" onclick="openDetail('${wo.id}')" style="margin-bottom:8px;">
+        <div>
+          <div class="wo-id">${wo.id}</div>
+          <div class="wo-title">${wo.issue}</div>
+          <div class="wo-property">📍 ${wo.property}</div>
+          <div class="wo-meta"><span>📅 <strong ${isOverdue?'style="color:var(--red)"':''}>${dueStr}${isOverdue?' ⚠️':''}</strong></span><span>🔧 ${wo.trade||'TBD'}</span></div>
+        </div>
+        <div class="wo-right">
+          <span class="pill ${wo.status==='inprogress'?'pill-ip':'pill-open'}">${wo.status==='inprogress'?'🔨 In Progress':'📋 Open'}</span>
+          <span class="pill ${wo.priority==='critical'?'pill-critical':'pill-high'}">${wo.priority==='critical'?'🔴 Critical':'🟡 High'}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Category breakdown
+  const catCounts = {};
+  openWOs.forEach(wo => {
+    const k = wo.categoryIcon + '||' + (wo.category || 'General');
+    catCounts[k] = (catCounts[k]||0) + 1;
+  });
+  const maxCat = Math.max(...Object.values(catCounts), 1);
+  const catEl = document.getElementById('dashCatBreakdown');
+  if (Object.keys(catCounts).length === 0) {
+    catEl.innerHTML = '<div style="font-size:0.78rem;color:var(--muted);text-align:center;padding:12px 0;">No open issues</div>';
+  } else {
+    catEl.innerHTML = Object.entries(catCounts).sort((a,b)=>b[1]-a[1]).map(([k,count]) => {
+      const [icon, cat] = k.split('||');
+      return `<div class="cat-row">
+        <span style="font-size:1rem;">${icon||'📋'}</span>
+        <span style="font-size:0.78rem;flex:1;">${cat}</span>
+        <div class="cat-bar"><div class="cat-fill" style="width:${Math.round(count/maxCat*100)}%"></div></div>
+        <span class="cat-count">${count}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Activity
+  const log = S.get(KEY_ACT, []).slice(0, 6);
+  const actEl = document.getElementById('dashActivity');
+  if (log.length === 0) {
+    actEl.innerHTML = '<div class="activity-item" style="color:var(--muted);">No activity yet</div>';
+  } else {
+    actEl.innerHTML = log.map(a =>
+      `<div class="activity-item">
+        <div class="activity-dot" style="background:${a.color}"></div>
+        <div><div>${a.msg}</div><div class="activity-time">${new Date(a.time).toLocaleString('en-AU')}</div></div>
+      </div>`
+    ).join('');
+  }
+}
+
+// ═══════════════════════════════════════════════
+// OWNER PORTAL
+// ═══════════════════════════════════════════════
+let portalFilter = 'all';
+
+function setPortalFilter(f) {
+  portalFilter = f;
+  document.querySelectorAll('#portalFilterRow .filter-pill').forEach(p => p.classList.remove('active'));
+  const map = { all:'fp-all', nc:'fp-nc', ip:'fp-ip', ok:'fp-ok' };
+  const target = document.querySelector(`#portalFilterRow .${map[f]}`);
+  if (target) target.classList.add('active');
+  renderPortal();
+}
+
+function renderPortal() {
+  const items = S.get(KEY_PORT, []);
+  const wos = getWOs();
+
+  // Compute effective status
+  const withStatus = items.map(item => {
+    const wo = wos.find(w => w.id === item.id);
+    let es = 'nc';
+    if (wo) {
+      if (wo.status === 'completed' || wo.status === 'cancelled') es = 'ok';
+      else if (wo.status === 'inprogress') es = 'ip';
+    }
+    return { ...item, es, wo };
+  });
+
+  const nc = withStatus.filter(i => i.es === 'nc').length;
+  const ip = withStatus.filter(i => i.es === 'ip').length;
+  const ok = withStatus.filter(i => i.es === 'ok').length;
+  const total = withStatus.length;
+
+  document.getElementById('pNC').textContent = nc;
+  document.getElementById('pIP').textContent = ip;
+  document.getElementById('pOK').textContent = ok;
+  document.getElementById('pTotal').textContent = total;
+
+  let filtered = withStatus;
+  if (portalFilter === 'nc') filtered = withStatus.filter(i => i.es === 'nc');
+  else if (portalFilter === 'ip') filtered = withStatus.filter(i => i.es === 'ip');
+  else if (portalFilter === 'ok') filtered = withStatus.filter(i => i.es === 'ok');
+
+  const container = document.getElementById('portalContent');
+
+  if (total === 0) {
+    container.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><h3>No Inspection Data</h3><p>When a property manager marks an item as failed in the Inspection Checklist, it will appear here with a linked work order.</p></div>';
+    return;
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="empty"><div class="empty-icon">✅</div><h3>No items in this category</h3></div>';
+    return;
+  }
+
+  // Group by property
+  const groups = {};
+  filtered.forEach(item => {
+    if (!groups[item.property]) groups[item.property] = [];
+    groups[item.property].push(item);
+  });
+
+  const statusOrder = { nc: 0, ip: 1, ok: 2 };
+  container.innerHTML = Object.entries(groups).map(([prop, items]) => {
+    const pNC = items.filter(i=>i.es==='nc').length;
+    const pIP = items.filter(i=>i.es==='ip').length;
+    const pOK = items.filter(i=>i.es==='ok').length;
+    let propPill = pNC > 0
+      ? `<span class="pill pill-nc">⚠ ${pNC} Non-Compliant</span>`
+      : pIP > 0 ? `<span class="pill pill-ip">🔨 ${pIP} In Progress</span>`
+      : `<span class="pill pill-ok">✅ Compliant</span>`;
+
+    const sorted = [...items].sort((a,b) => (statusOrder[a.es]||0) - (statusOrder[b.es]||0));
+
+    const cards = sorted.map(item => {
+      const iconClass = item.es === 'ok' ? 'ok' : item.es === 'ip' ? 'ip' : 'nc';
+      const catClass = iconClass;
+      const dueStr = item.dueDate ? new Date(item.dueDate).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+      const notifiedStr = item.notifiedAt ? new Date(item.notifiedAt).toLocaleDateString('en-AU') : '—';
+      const statusPillHtml = item.es === 'ok' ? '<span class="pill pill-ok">✅ Resolved</span>' :
+                              item.es === 'ip' ? '<span class="pill pill-ip">🔨 In Progress</span>' :
+                              '<span class="pill pill-nc">✗ Non-Compliant</span>';
+      const evidBadge = item.es === 'ok' ? '<span class="pill pill-ok" style="font-size:0.6rem;">📎 Evidence on file</span>' : '<span class="pill pill-pending" style="font-size:0.6rem;">⏳ Evidence required</span>';
+
+      return `<div class="issue-card">
+        <div class="issue-icon ${iconClass}">${item.categoryIcon||'🔧'}</div>
+        <div>
+          <div class="issue-cat ${catClass}">${item.category}</div>
+          <div class="issue-title">${item.issue}</div>
+          <div class="issue-action">→ ${item.action}</div>
+          <div class="issue-meta">
+            <span>📅 Due: <strong>${dueStr}</strong></span>
+            <span>🔨 <strong>${item.trade}</strong></span>
+            <span>👤 Inspector: <strong>${item.inspector}</strong></span>
+            <span>📆 Notified: ${notifiedStr}</span>
+            ${item.legalRef ? `<span class="legal-tag">${item.legalRef}</span>` : ''}
+          </div>
+        </div>
+        <div class="issue-right">
+          ${statusPillHtml}
+          <span class="pill ${item.priority==='critical'?'pill-critical':'pill-high'}">${item.priority==='critical'?'🔴 Critical':'🟡 High'}</span>
+          ${evidBadge}
+          ${item.wo ? `<button class="btn btn-secondary" style="font-size:0.7rem;padding:5px 10px;" onclick="openDetail('${item.wo.id}')">🔧 View WO</button>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+    return `<div class="prop-group">
+      <div class="prop-group-header">
+        <div><h2>🏠 ${prop}</h2><small>${items.length} issue${items.length!==1?'s':''} · ${pNC} non-compliant · ${pIP} in progress · ${pOK} resolved</small></div>
+        ${propPill}
+      </div>
+      <div>${cards}</div>
+    </div>`;
+  }).join('');
+}
+
+function clearPortalData() {
+  if (!confirm('Clear all compliance portal data? This cannot be undone.')) return;
+  S.del(KEY_PORT);
+  renderPortal();
+  updateSidebarBadges();
+  toast('Portal data cleared', 'info');
+}
+
+// ═══════════════════════════════════════════════
+// PROPERTIES
+// ═══════════════════════════════════════════════
+function renderProperties() {
+  const wos = getWOs();
+  const grid = document.getElementById('propsGrid');
+  if (!grid) return;
+
+  const props = {};
+  wos.forEach(wo => {
+    if (!props[wo.property]) props[wo.property] = { nc: 0, ip: 0, ok: 0, total: 0 };
+    const s = props[wo.property];
+    s.total++;
+    if (wo.status === 'completed' || wo.status === 'cancelled') s.ok++;
+    else if (wo.status === 'inprogress') s.ip++;
+    else s.nc++;
+  });
+
+  if (Object.keys(props).length === 0) {
+    grid.innerHTML = '<div class="empty"><div class="empty-icon">🏘️</div><h3>No Properties</h3><p>Properties appear here once you create work orders or run checklist inspections.</p></div>';
+    return;
+  }
+
+  grid.innerHTML = Object.entries(props).sort((a,b) => b[1].nc - a[1].nc).map(([prop, s]) => {
+    const statusPill = s.nc > 0 ? `<span class="pill pill-nc">⚠ Non-Compliant</span>` :
+                       s.ip > 0 ? `<span class="pill pill-ip">🔨 In Progress</span>` :
+                                  `<span class="pill pill-ok">✅ Compliant</span>`;
+    return `<div class="prop-card" onclick="filterWOsByProp('${prop.replace(/'/g,"\\'")}')">
+      <div class="prop-card-address">${prop}</div>
+      <div class="prop-card-sub">${s.total} total work order${s.total!==1?'s':''} · Click to view</div>
+      <div class="prop-card-stats">
+        <div class="prop-stat"><div class="prop-stat-val red">${s.nc}</div><div class="prop-stat-label">Non-Comp.</div></div>
+        <div class="prop-stat"><div class="prop-stat-val amber">${s.ip}</div><div class="prop-stat-label">In Progress</div></div>
+        <div class="prop-stat"><div class="prop-stat-val green">${s.ok}</div><div class="prop-stat-label">Resolved</div></div>
+      </div>
+      ${statusPill}
+    </div>`;
+  }).join('');
+}
+
+function filterWOsByProp(prop) {
+  showPage('workorders');
+  setTimeout(() => {
+    const search = document.getElementById('woSearch');
+    if (search) { search.value = prop; renderWOs(); }
+  }, 100);
+}
+
+// ═══════════════════════════════════════════════
+// REPORTS
+// ═══════════════════════════════════════════════
+function renderReports() {
+  const wos = getWOs();
+  const tbody = document.getElementById('reportTableBody');
+  if (!tbody) return;
+
+  if (wos.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--muted);">No work orders yet.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = wos.map(wo => {
+    const statusLabel = { open:'📋 Open', inprogress:'🔨 In Progress', completed:'✅ Completed', cancelled:'✗ Cancelled' }[wo.status] || wo.status;
+    const dueStr = wo.dueDate ? new Date(wo.dueDate).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    return `<tr>
+      <td style="font-family:monospace;font-size:0.72rem;color:var(--muted);">${wo.id}</td>
+      <td>${wo.property}</td>
+      <td>${wo.issue}</td>
+      <td>${wo.categoryIcon||''} ${wo.category||'—'}</td>
+      <td>${wo.trade||'—'}</td>
+      <td><span class="pill ${wo.priority==='critical'?'pill-critical':'pill-high'}" style="font-size:0.62rem;">${wo.priority}</span></td>
+      <td><span class="pill pill-${wo.status==='inprogress'?'ip':wo.status==='completed'?'completed':wo.status==='cancelled'?'cancelled':'open'}" style="font-size:0.62rem;">${statusLabel}</span></td>
+      <td>${dueStr}</td>
+      <td>${wo.assignedTo||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function csvDownload(filename, rows) {
+  const csv = rows.map(r => r.map(c => `"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  a.click(); URL.revokeObjectURL(url);
+  toast(`Downloading ${filename}`, 'success');
+}
+
+function exportWorkOrderCSV() {
+  const wos = getWOs();
+  const rows = [['ID','Property','Issue','Category','Trade','Priority','Status','Due Date','Assigned To','Invoice','Notes']];
+  wos.forEach(wo => rows.push([wo.id,wo.property,wo.issue,wo.category,wo.trade,wo.priority,wo.status,wo.dueDate||'',wo.assignedTo||'',wo.invoice||'',wo.notes||'']));
+  csvDownload('work-orders.csv', rows);
+}
+
+function exportComplianceSummary() {
+  const wos = getWOs();
+  const props = {};
+  wos.forEach(wo => {
+    if (!props[wo.property]) props[wo.property] = { nc:0,ip:0,ok:0 };
+    if (wo.status==='completed'||wo.status==='cancelled') props[wo.property].ok++;
+    else if (wo.status==='inprogress') props[wo.property].ip++;
+    else props[wo.property].nc++;
+  });
+  const rows = [['Property','Non-Compliant','In Progress','Resolved','Overall Status']];
+  Object.entries(props).forEach(([p,s]) => rows.push([p,s.nc,s.ip,s.ok,s.nc>0?'Non-Compliant':s.ip>0?'In Progress':'Compliant']));
+  csvDownload('compliance-summary.csv', rows);
+}
+
+function exportOverdueCSV() {
+  const wos = getWOs();
+  const now = new Date();
+  const overdue = wos.filter(w => (w.status==='open'||w.status==='inprogress') && w.dueDate && new Date(w.dueDate) < now);
+  const rows = [['ID','Property','Issue','Priority','Due Date','Assigned To','Trade']];
+  overdue.forEach(wo => rows.push([wo.id,wo.property,wo.issue,wo.priority,wo.dueDate||'',wo.assignedTo||'',wo.trade||'']));
+  csvDownload('overdue-items.csv', rows);
+}
+
+function exportRiskCSV() {
+  const wos = getWOs();
+  const props = {};
+  wos.filter(w=>w.status==='open'||w.status==='inprogress').forEach(wo => {
+    if (!props[wo.property]) props[wo.property] = { critical:0, high:0 };
+    if (wo.priority==='critical') props[wo.property].critical++;
+    else props[wo.property].high++;
+  });
+  const rows = [['Property','Critical Issues','High Issues','Total Risk Score']];
+  Object.entries(props).sort((a,b)=>(b[1].critical*2+b[1].high)-(a[1].critical*2+a[1].high))
+    .forEach(([p,s]) => rows.push([p,s.critical,s.high,s.critical*2+s.high]));
+  csvDownload('property-risk-report.csv', rows);
+}
+
+// ═══════════════════════════════════════════════
+// ACTIVITY PAGE
+// ═══════════════════════════════════════════════
+function renderActivityPage() {
+  const log = S.get(KEY_ACT, []);
+  const container = document.getElementById('activityFull');
+  if (!container) return;
+  if (log.length === 0) {
+    container.innerHTML = '<div class="activity-item" style="color:var(--muted);">No activity recorded yet.</div>';
+    return;
+  }
+  container.innerHTML = log.map(a =>
+    `<div class="activity-item">
+      <div class="activity-dot" style="background:${a.color}"></div>
+      <div><div>${a.msg}</div><div class="activity-time">${new Date(a.time).toLocaleString('en-AU')}</div></div>
+    </div>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════
+// CHECKLIST
+// ═══════════════════════════════════════════════
+const CATEGORIES = [
+  { id:'locks', icon:'🔒', title:'Locks & Security', subtitle:'Entry doors, windows, and shared access security',
+    items:[
+      { id:'l1', label:'External entry doors have functioning deadlatch or deadlock', sub:'Deadlatch must be operable from inside without a key.', legal:'Reg 5A' },
+      { id:'l2', label:'All windows that can be opened have functioning latches/locks', sub:'Windows accessible from outside must have a lock or latch.', legal:'Reg 5B' },
+      { id:'l3', label:'Sliding doors have functioning lock or bar', sub:'Sliding external doors must have a working security device.', legal:'Reg 5B' },
+      { id:'l4', label:'Landlord has provided renter with keys/access devices for all locks', sub:'', legal:'s 65' },
+    ]},
+  { id:'lighting', icon:'💡', title:'Lighting', subtitle:'Adequate lighting in all habitable rooms',
+    items:[
+      { id:'li1', label:'All main rooms have a working light fitting or connection', sub:'Each room used for living must have a working light fitting.', legal:'Reg 5C' },
+      { id:'li2', label:'Bathroom, laundry, and toilet have working light', sub:'All wet areas and toilets must have functioning artificial light.', legal:'Reg 5C' },
+      { id:'li3', label:'External entrances and common areas are adequately lit', sub:'', legal:'Reg 5C' },
+    ]},
+  { id:'ventilation', icon:'💨', title:'Ventilation', subtitle:'Natural or mechanical ventilation in living spaces',
+    items:[
+      { id:'v1', label:'Each habitable room has a window or door opening to outside air', sub:'Adequate natural ventilation must be achievable in all living areas.', legal:'Reg 5D' },
+      { id:'v2', label:'Bathroom/toilet has external ventilation or mechanical exhaust fan', sub:'', legal:'Reg 5D' },
+      { id:'v3', label:'Kitchen has range hood, exhaust fan, or operable window', sub:'', legal:'Reg 5D' },
+    ]},
+  { id:'water', icon:'🚿', title:'Hot & Cold Water', subtitle:'Functioning water supply and hot water system',
+    items:[
+      { id:'w1', label:'Property has access to a functioning hot water system', sub:'', legal:'Reg 5E' },
+      { id:'w2', label:'Cold water supply is connected and functioning', sub:'', legal:'Reg 5E' },
+      { id:'w3', label:'Kitchen sink has adequate hot and cold water', sub:'', legal:'Reg 5E' },
+      { id:'w4', label:'Bathroom basin has hot and cold water', sub:'', legal:'Reg 5E' },
+      { id:'w5', label:'Shower or bath has hot and cold water', sub:'', legal:'Reg 5E' },
+    ]},
+  { id:'bathroom', icon:'🛁', title:'Bathroom & Toilet', subtitle:'Functional amenities with privacy',
+    items:[
+      { id:'b1', label:'Property has a working toilet connected to sewerage or septic', sub:'At least one functioning toilet must be present.', legal:'Reg 5F' },
+      { id:'b2', label:'Toilet has a door for privacy', sub:'', legal:'Reg 5F' },
+      { id:'b3', label:'Shower or bath is present and functional', sub:'', legal:'Reg 5F' },
+      { id:'b4', label:'Bathroom has functioning basin/sink', sub:'', legal:'Reg 5F' },
+    ]},
+  { id:'kitchen', icon:'🍳', title:'Kitchen', subtitle:'Minimum kitchen facilities',
+    items:[
+      { id:'k1', label:'Property has a functioning stove with at least 2 burners or cooktop elements', sub:'', legal:'Reg 5G' },
+      { id:'k2', label:'Functioning oven is present', sub:'', legal:'Reg 5G' },
+      { id:'k3', label:'Kitchen sink with hot and cold water', sub:'', legal:'Reg 5G' },
+      { id:'k4', label:'Adequate food preparation space (benchtop area)', sub:'', legal:'Reg 5G' },
+    ]},
+  { id:'laundry', icon:'🧺', title:'Laundry', subtitle:'Laundry connection or shared laundry',
+    items:[
+      { id:'la1', label:'Functioning washing machine connection (or access to shared laundry)', sub:'', legal:'Reg 5H' },
+    ]},
+  { id:'heating', icon:'🌡️', title:'Heating', subtitle:'Fixed heating in main living area',
+    items:[
+      { id:'h1', label:'Fixed heater present in main living area', sub:'An energy-efficient fixed heater must be present in the main living room.', legal:'Reg 5I' },
+      { id:'h2', label:'Heater is in good working order', sub:'', legal:'Reg 5I' },
+      { id:'h3', label:'Heater is not an unflued gas heater (banned from 29 Mar 2021)', sub:'Unflued gas heaters in bedrooms or main living areas are prohibited.', legal:'Reg 5I' },
+    ]},
+  { id:'mould', icon:'🌿', title:'Mould & Dampness', subtitle:'Property free from mould and dampness',
+    items:[
+      { id:'m1', label:'No visible mould on walls, ceilings, or floors', sub:'', legal:'Reg 5J' },
+      { id:'m2', label:'No signs of rising or penetrating damp', sub:'', legal:'Reg 5J' },
+      { id:'m3', label:'Roof, walls, and windows appear weatherproof', sub:'', legal:'Reg 5J' },
+    ]},
+  { id:'structure', icon:'🏗️', title:'Structural Safety', subtitle:'Property must be structurally sound and weatherproof',
+    items:[
+      { id:'st1', label:'Roof is intact and free of holes, gaps, or missing material', sub:'', legal:'Reg 5K' },
+      { id:'st2', label:'Walls are structurally sound with no major cracks or instability', sub:'', legal:'Reg 5K' },
+      { id:'st3', label:'Floors are safe — no dangerous boards, holes, or uneven surfaces', sub:'', legal:'Reg 5K' },
+      { id:'st4', label:'Ceilings are intact and show no signs of imminent collapse', sub:'', legal:'Reg 5K' },
+      { id:'st5', label:'All external windows and doors close properly', sub:'', legal:'Reg 5K' },
+    ]},
+  { id:'electrical', icon:'⚡', title:'Electrical Safety', subtitle:'Safe electrical installations',
+    items:[
+      { id:'e1', label:'No exposed wiring visible in living areas', sub:'', legal:'General safety' },
+      { id:'e2', label:'Power outlets are in good condition (no cracks, loose fittings, scorch marks)', sub:'', legal:'General safety' },
+      { id:'e3', label:'Switchboard is accessible and in good order', sub:'Circuit breakers or fuses present and labelled.', legal:'General safety' },
+      { id:'e4', label:'RCD (safety switch) installed for power circuits', sub:'Residual current device required for rental properties.', legal:'Electrical regs' },
+    ]},
+  { id:'smoke', icon:'🔴', title:'Smoke Alarms', subtitle:'Compliant smoke alarm installation',
+    items:[
+      { id:'sm1', label:'Working smoke alarm on every storey', sub:'At minimum one working alarm per level of the property.', legal:'Building Regs' },
+      { id:'sm2', label:'Smoke alarm within 1m of each bedroom door (or inside bedroom)', sub:'', legal:'Building Regs' },
+      { id:'sm3', label:'Smoke alarms are interconnected (if installed after Oct 2006)', sub:'', legal:'Building Regs' },
+      { id:'sm4', label:'Alarms have been tested and working', sub:'Test by pressing test button — alarm sounds clearly.', legal:'RTA s 244A' },
+    ]},
+  { id:'general', icon:'📋', title:'General Habitability', subtitle:'Reasonable state of repair and cleanliness',
+    items:[
+      { id:'g1', label:'Property is reasonably clean at start of tenancy', sub:'', legal:'s 65' },
+      { id:'g2', label:'All fixtures, fittings, and appliances provided are in working order', sub:'', legal:'s 65' },
+      { id:'g3', label:'No vermin infestation (rats, mice, cockroaches, etc.)', sub:'', legal:'s 65' },
+      { id:'g4', label:'Adequate rubbish and waste disposal facilities available', sub:'', legal:'General' },
+    ]},
+];
+
+const CRITICAL_ITEMS = new Set(['l1','b1','sm1','sm4','h1','w1','e4','st1','st2']);
+const URGENT_ACTIONS = {
+  l1:'Install or repair deadlatch/deadlock on all external entry doors.',
+  l2:'Fit functioning latches or locks to all accessible windows.',
+  b1:'Repair or connect toilet — property uninhabitable without functioning toilet.',
+  sm1:'Install working smoke alarms on every storey before occupancy.',
+  sm4:'Test and replace or repair all non-functioning smoke alarms.',
+  h1:'Install a fixed, energy-efficient heater in the main living area.',
+  w1:'Restore or install hot water system — essential service.',
+  e4:'Engage licensed electrician to install RCD on power circuits.',
+  m1:'Identify and remediate source of mould.',
+  st1:'Arrange urgent inspection of roof — potential structural safety risk.',
+  g2:'Repair or replace non-functioning fixtures, fittings and appliances.',
+};
+
+const TRADE_MAP = {
+  locks:'Locksmith', lighting:'Electrician', ventilation:'Plumber', water:'Plumber',
+  bathroom:'Plumber', kitchen:'Handyperson', laundry:'Plumber', heating:'HVAC Technician',
+  mould:'Remediation Specialist', structure:'Builder', electrical:'Electrician',
+  smoke:'Electrician', general:'Handyperson'
+};
+
+let clStatuses = {};
+let clPhotos = {};
+let clPendingItem = null;
+let clInited = false;
+
+function initChecklist() {
+  if (!clInited) {
+    // Load saved state
+    const saved = S.get(KEY_CL, {});
+    clStatuses = saved.statuses || {};
+    clPhotos = saved.photos || {};
+
+    const meta = saved.meta || {};
+    if (meta.address) document.getElementById('clPropAddress').value = meta.address;
+    if (meta.inspector) document.getElementById('clInspector').value = meta.inspector;
+    if (meta.date) document.getElementById('clDate').value = meta.date;
+    if (meta.ownerName) document.getElementById('clOwnerName').value = meta.ownerName;
+
+    renderCategories();
+    clInited = true;
+  }
+  updateScores();
+  // Set today's date if not set
+  if (!document.getElementById('clDate').value) {
+    document.getElementById('clDate').value = new Date().toISOString().split('T')[0];
+  }
+}
+
+function saveChecklistMeta() {
+  const saved = S.get(KEY_CL, {});
+  saved.meta = {
+    address: document.getElementById('clPropAddress').value,
+    inspector: document.getElementById('clInspector').value,
+    date: document.getElementById('clDate').value,
+    ownerName: document.getElementById('clOwnerName').value,
+  };
+  S.set(KEY_CL, saved);
+}
+
+function saveChecklistState() {
+  S.set(KEY_CL, {
+    statuses: clStatuses,
+    photos: clPhotos,
+    meta: {
+      address: document.getElementById('clPropAddress').value,
+      inspector: document.getElementById('clInspector').value,
+      date: document.getElementById('clDate').value,
+      ownerName: document.getElementById('clOwnerName').value,
+    }
+  });
+}
+
+function renderCategories() {
+  const container = document.getElementById('clCategories');
+  container.innerHTML = CATEGORIES.map((cat, ci) =>
+    `<div class="cat-accordion ${ci===0?'open':''}" id="cacc-${cat.id}">
+      <div class="cat-head" onclick="toggleCat('${cat.id}')">
+        <span class="cat-icon">${cat.icon}</span>
+        <div class="cat-info">
+          <div class="cat-title">${cat.title}</div>
+          <div class="cat-sub">${cat.subtitle}</div>
+        </div>
+        <div class="cat-progress" id="catprog-${cat.id}"></div>
+        <span class="cat-chevron">▼</span>
+      </div>
+      <div class="cat-body" id="catbody-${cat.id}">
+        ${cat.items.map(item => renderCheckItem(item, cat)).join('')}
+      </div>
+    </div>`
+  ).join('');
+  updateCatProgress();
+}
+
+function renderCheckItem(item, cat) {
+  const s = clStatuses[item.id] || '';
+  const photos = clPhotos[item.id] || [];
+  const photoHtml = photos.length > 0
+    ? `<div class="photo-row">
+        ${photos.map(p => `<div class="photo-thumb" onclick="openLightbox(${JSON.stringify(p).replace(/"/g,'&quot;')})"><img src="${p.dataUrl}" alt=""><div class="photo-stamp">${p.datetime}</div></div>`).join('')}
+       </div>`
+    : '';
+  return `<div class="check-item" id="ci-${item.id}">
+    <div class="check-item-body">
+      <div class="check-label">${item.label}${item.legal ? ` <span class="legal-tag">${item.legal}</span>` : ''}</div>
+      ${item.sub ? `<div class="check-sub">${item.sub}</div>` : ''}
+    </div>
+    <div class="check-controls">
+      <button class="check-btn check-btn-pass ${s==='pass'?'active':''}" onclick="setStatus('${item.id}','pass','${cat.id}')">✓ Pass</button>
+      <button class="check-btn check-btn-fail ${s==='fail'?'active':''}" onclick="setStatus('${item.id}','fail','${cat.id}')">✗ Fail</button>
+      <button class="check-btn check-btn-na ${s==='na'?'active':''}" onclick="setStatus('${item.id}','na','${cat.id}')">N/A</button>
+      <label class="upload-btn" title="Attach photo">
+        📷${photos.length>0?` (${photos.length})`:''}
+        <input type="file" accept="image/*" style="display:none;" onchange="handleCheckPhoto(event,'${item.id}','${item.label.substring(0,40)}','${cat.title}')">
+      </label>
+    </div>
+  </div>${photoHtml}`;
+}
+
+function toggleCat(id) {
+  document.getElementById('cacc-' + id).classList.toggle('open');
+}
+
+function setStatus(itemId, status, catId) {
+  const old = clStatuses[itemId];
+  if (old === status) { delete clStatuses[itemId]; }
+  else { clStatuses[itemId] = status; }
+  saveChecklistState();
+  updateScores();
+  updateCatProgress();
+
+  // Refresh just this item
+  const cat = CATEGORIES.find(c => c.id === catId);
+  const item = cat?.items.find(i => i.id === itemId);
+  if (item && cat) {
+    const el = document.getElementById('ci-' + itemId);
+    if (el) {
+      const newEl = document.createElement('div');
+      newEl.innerHTML = renderCheckItem(item, cat);
+      // Replace just the check-item div, keep photo row
+      const photoRow = el.nextElementSibling;
+      if (photoRow && photoRow.classList.contains('photo-row')) {
+        el.parentNode.removeChild(photoRow);
+      }
+      el.outerHTML = newEl.innerHTML;
+    }
+  }
+
+  // Trigger WO prompt on fail
+  const newStatus = clStatuses[itemId];
+  if (newStatus === 'fail') {
+    showWOPrompt(itemId);
+  }
+}
+
+function updateScores() {
+  const vals = Object.values(clStatuses);
+  const pass = vals.filter(v=>v==='pass').length;
+  const fail = vals.filter(v=>v==='fail').length;
+  const na = vals.filter(v=>v==='na').length;
+  const assessed = pass + fail;
+  const score = assessed > 0 ? Math.round(pass/assessed*100) : null;
+
+  document.getElementById('clPass').textContent = pass;
+  document.getElementById('clFail').textContent = fail;
+  document.getElementById('clNA').textContent = na;
+
+  if (score === null) {
+    document.getElementById('clScoreVal').textContent = '—';
+    document.getElementById('clScoreGrade').textContent = 'No items assessed yet';
+    document.getElementById('clScoreFill').style.width = '0%';
+  } else {
+    document.getElementById('clScoreVal').textContent = score + '%';
+    document.getElementById('clScoreFill').style.width = score + '%';
+    if (score === 100) { document.getElementById('clScoreGrade').textContent = '✅ Fully Compliant'; }
+    else if (score >= 80) { document.getElementById('clScoreGrade').textContent = '⚠ Mostly Compliant'; }
+    else if (score >= 50) { document.getElementById('clScoreGrade').textContent = '⚠ Partially Compliant'; }
+    else { document.getElementById('clScoreGrade').textContent = '❌ Non-Compliant'; }
+  }
+
+  // Urgent actions
+  const failed = [];
+  CATEGORIES.forEach(cat => cat.items.forEach(item => {
+    if (clStatuses[item.id] === 'fail') failed.push({ ...item, catTitle: cat.title });
+  }));
+
+  const urgentEl = document.getElementById('clUrgentActions');
+  if (failed.length === 0) {
+    urgentEl.style.display = 'none';
+  } else {
+    urgentEl.style.display = '';
+    urgentEl.innerHTML = `<div class="urgent-actions">
+      <div class="urgent-header">
+        <span style="font-size:1.2rem;">🚨</span>
+        <h3>Urgent Actions Required</h3>
+        <span class="pill" style="background:rgba(255,255,255,0.25);color:#fff;border-color:rgba(255,255,255,0.3);">${failed.length} item${failed.length!==1?'s':''}</span>
+      </div>
+      ${failed.map((item, i) => {
+        const isCrit = CRITICAL_ITEMS.has(item.id);
+        const action = URGENT_ACTIONS[item.id] || 'Arrange repair or replacement as soon as possible.';
+        return `<div class="urgent-item">
+          <span class="urgent-num">${i+1}</span>
+          <div>
+            <div style="font-size:0.63rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--red);margin-bottom:2px;">${item.catTitle}</div>
+            <div style="font-size:0.84rem;font-weight:500;">${item.label}</div>
+            <div class="urgent-action">→ ${action}</div>
+          </div>
+          <span class="pill ${isCrit?'pill-critical':'pill-high'}" style="flex-shrink:0;">${isCrit?'🔴 Critical':'🟡 High'}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+}
+
+function updateCatProgress() {
+  CATEGORIES.forEach(cat => {
+    const pass = cat.items.filter(i => clStatuses[i.id]==='pass').length;
+    const fail = cat.items.filter(i => clStatuses[i.id]==='fail').length;
+    const total = cat.items.length;
+    const el = document.getElementById('catprog-' + cat.id);
+    if (!el) return;
+    if (fail > 0) el.innerHTML = `<span class="pill pill-nc" style="font-size:0.6rem;">${fail} fail</span>`;
+    else if (pass === total) el.innerHTML = `<span class="pill pill-ok" style="font-size:0.6rem;">✅ All pass</span>`;
+    else if (pass > 0) el.innerHTML = `<span class="pill pill-pass" style="font-size:0.6rem;">${pass}/${total}</span>`;
+    else el.innerHTML = `<span style="font-size:0.68rem;color:var(--muted);">${total} items</span>`;
+  });
+}
+
+// Photo upload in checklist
+function handleCheckPhoto(event, itemId, label, catTitle) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const entry = {
+      id: Date.now(),
+      dataUrl: e.target.result,
+      datetime: new Date().toLocaleString('en-AU'),
+      label, catTitle
+    };
+    if (!clPhotos[itemId]) clPhotos[itemId] = [];
+    clPhotos[itemId].push(entry);
+    saveChecklistState();
+    // Re-render photo row
+    const ci = document.getElementById('ci-' + itemId);
+    if (!ci) return;
+    const nextEl = ci.nextElementSibling;
+    if (nextEl && nextEl.classList.contains('photo-row')) nextEl.remove();
+    const photoRow = document.createElement('div');
+    photoRow.className = 'photo-row';
+    photoRow.innerHTML = (clPhotos[itemId]||[]).map(p =>
+      `<div class="photo-thumb" onclick="openLightbox(${JSON.stringify(p).replace(/"/g,'&quot;')})"><img src="${p.dataUrl}" alt=""><div class="photo-stamp">${p.datetime}</div></div>`
+    ).join('');
+    ci.insertAdjacentElement('afterend', photoRow);
+    toast('Photo added', 'success');
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+// WO Prompt
+function showWOPrompt(itemId) {
+  // Find item
+  let foundItem = null, foundCat = null;
+  CATEGORIES.forEach(cat => {
+    const item = cat.items.find(i => i.id === itemId);
+    if (item) { foundItem = item; foundCat = cat; }
+  });
+  if (!foundItem) return;
+
+  clPendingItem = { item: foundItem, cat: foundCat };
+
+  const address = document.getElementById('clPropAddress').value.trim() || 'Address not specified';
+  document.getElementById('woPromptInfo').innerHTML = `
+    <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--red);margin-bottom:4px;">Failed Item</div>
+    <div style="font-size:0.88rem;font-weight:600;">${foundItem.label}</div>
+    <div style="font-size:0.75rem;color:var(--muted);margin-top:3px;">📍 ${address} · ${foundCat.title}</div>
+  `;
+
+  const dueDate = new Date();
+  dueDate.setDate(dueDate.getDate() + (CRITICAL_ITEMS.has(foundItem.id) ? 3 : 7));
+  document.getElementById('woPromptDue').value = dueDate.toISOString().split('T')[0];
+  document.getElementById('woPromptOwner').value = document.getElementById('clOwnerName').value || '';
+
+  document.getElementById('woPromptModal').classList.add('open');
+}
+
+function skipWOPrompt() {
+  document.getElementById('woPromptModal').classList.remove('open');
+  clPendingItem = null;
+}
+
+function confirmCreateWO() {
+  if (!clPendingItem) return;
+  const { item, cat } = clPendingItem;
+
+  const address = document.getElementById('clPropAddress').value.trim() || 'Address not specified';
+  const inspector = document.getElementById('clInspector').value.trim() || 'Inspector';
+  const ownerName = document.getElementById('woPromptOwner').value.trim() || 'Property Owner';
+  const dueDate = document.getElementById('woPromptDue').value;
+
+  const wo = {
+    id: genWOId(),
+    property: address,
+    issue: item.label,
+    category: cat.title,
+    categoryIcon: cat.icon,
+    priority: CRITICAL_ITEMS.has(item.id) ? 'critical' : 'high',
+    trade: TRADE_MAP[cat.id] || 'Handyperson',
+    legalRef: item.legal || '',
+    action: URGENT_ACTIONS[item.id] || 'Arrange repair or replacement.',
+    inspector,
+    dueDate,
+    ownerName,
+    status: 'open',
+    createdAt: new Date().toISOString(),
+    photos: (clPhotos[item.id] || []),
+    evidenceDocs: [],
+    timeline: [{ type: 'created', msg: `Created from inspection checklist — ${item.label}`, time: new Date().toISOString() }]
+  };
+
+  const wos = getWOs();
+  wos.unshift(wo);
+  saveWOs(wos);
+
+  // Add to portal
+  const portal = S.get(KEY_PORT, []);
+  if (!portal.find(p => p.id === wo.id)) {
+    portal.push({
+      id: wo.id,
+      property: address,
+      ownerName,
+      issue: item.label,
+      category: cat.title,
+      categoryIcon: cat.icon,
+      priority: wo.priority,
+      legalRef: item.legal || '',
+      action: wo.action,
+      trade: wo.trade,
+      inspector,
+      dueDate,
+      notifiedAt: new Date().toISOString(),
+    });
+    S.set(KEY_PORT, portal);
+  }
+
+  logActivity(`Work order ${wo.id} created for compliance failure: ${item.label}`, '#c0392b');
+  toast(`Work order ${wo.id} created & owner notified`, 'success');
+  updateSidebarBadges();
+  skipWOPrompt();
+}
+
+function resetChecklist() {
+  if (!confirm('Reset the checklist? All statuses, photos, and notes will be cleared.')) return;
+  clStatuses = {};
+  clPhotos = {};
+  clInited = false;
+  S.del(KEY_CL);
+  document.getElementById('clPropAddress').value = '';
+  document.getElementById('clInspector').value = '';
+  document.getElementById('clOwnerName').value = '';
+  document.getElementById('clDate').value = new Date().toISOString().split('T')[0];
+  initChecklist();
+  toast('Checklist reset', 'info');
+}
+
+// Lightbox
+function openLightbox(entry) {
+  let e = entry;
+  if (typeof entry === 'string') { try { e = JSON.parse(entry); } catch(ex) { return; } }
+  document.getElementById('lightboxImg').src = e.dataUrl || '';
+  document.getElementById('lightboxMeta').innerHTML = `
+    <strong>Item:</strong> ${e.label || 'Evidence'}<br>
+    <strong>Category:</strong> ${e.catTitle || '—'}<br>
+    <strong>Date &amp; Time:</strong> ${e.datetime || '—'}
+  `;
+  document.getElementById('lightbox').classList.add('open');
+}
+
+function closeLightbox(e) {
+  if (!e || e.target === document.getElementById('lightbox') || (e.currentTarget && e.currentTarget.classList.contains('lightbox-close'))) {
+    document.getElementById('lightbox').classList.remove('open');
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  document.querySelector('.lightbox-close')?.addEventListener('click', closeLightbox);
+});
+
+// ─ Inspection Report Download ─
+function downloadInspectionReport() {
+  const address = document.getElementById('clPropAddress').value || 'Address not specified';
+  const inspector = document.getElementById('clInspector').value || 'Not specified';
+  const dateVal = document.getElementById('clDate').value;
+  const date = dateVal ? new Date(dateVal).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'}) : 'Not specified';
+
+  const vals = Object.values(clStatuses);
+  const pass = vals.filter(v=>v==='pass').length;
+  const fail = vals.filter(v=>v==='fail').length;
+  const na = vals.filter(v=>v==='na').length;
+  const assessed = pass + fail;
+  const score = assessed > 0 ? Math.round(pass/assessed*100) : null;
+  const scoreText = score !== null ? score + '%' : 'N/A';
+
+  let gradeLabel = 'Awaiting Results', gradeColor = '#5a6a8a', gradeBg = '#eef0f5';
+  if (score !== null) {
+    if (score === 100) { gradeLabel = 'Fully Compliant'; gradeColor = '#1a7a4a'; gradeBg = '#e8f5ee'; }
+    else if (score >= 80) { gradeLabel = 'Mostly Compliant'; gradeColor = '#b56e00'; gradeBg = '#fff4e0'; }
+    else if (score >= 50) { gradeLabel = 'Partially Compliant'; gradeColor = '#b56e00'; gradeBg = '#fff4e0'; }
+    else { gradeLabel = 'Non-Compliant'; gradeColor = '#c0392b'; gradeBg = '#fdecea'; }
+  }
+
+  const failedItems = [];
+  CATEGORIES.forEach(cat => cat.items.forEach(item => {
+    if (clStatuses[item.id] === 'fail') failedItems.push({ ...item, catTitle: cat.title });
+  }));
+
+  let urgentHtml = '';
+  if (failedItems.length > 0) {
+    urgentHtml = `<div style="margin-bottom:28px;border:2px solid #c0392b;border-radius:12px;overflow:hidden;">
+      <div style="background:#c0392b;padding:12px 18px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:18px;">🚨</span>
+        <div style="font-size:16px;color:#fff;font-family:Georgia,serif;flex:1;">Urgent Actions Required</div>
+        <span style="background:rgba(255,255,255,0.25);color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:12px;">${failedItems.length} item${failedItems.length!==1?'s':''}</span>
+      </div>
+      <div style="background:#fff5f4;">
+        ${failedItems.map((item, i) => {
+          const isCrit = CRITICAL_ITEMS.has(item.id);
+          const action = URGENT_ACTIONS[item.id] || 'Arrange repair or replacement as soon as possible.';
+          return `<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 16px;border-bottom:1px solid #fcd8d4;">
+            <span style="font-size:12px;font-weight:700;color:#c0392b;min-width:20px;margin-top:2px;">${i+1}</span>
+            <div>
+              <div style="font-size:10px;font-weight:700;color:#c0392b;text-transform:uppercase;">${item.catTitle}</div>
+              <div style="font-size:13px;color:#1a1a2e;font-weight:500;margin:2px 0;">${item.label}</div>
+              <div style="font-size:11px;color:#7a8099;">→ ${action}</div>
+            </div>
+            <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:${isCrit?'#fdecea':'#fff4e0'};color:${isCrit?'#c0392b':'#b56e00'};flex-shrink:0;">${isCrit?'🔴 Critical':'🟡 High'}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+
+  const catResultsHtml = CATEGORIES.map(cat => {
+    const rows = cat.items.map(item => {
+      const s = clStatuses[item.id];
+      const sLabel = s==='pass'?'✓ Pass':s==='fail'?'✗ Fail':s==='na'?'N/A':'—';
+      const bg = s==='pass'?'#e8f5ee':s==='fail'?'#fdecea':s==='na'?'#eef0f5':'#fafaf7';
+      const col = s==='pass'?'#1a7a4a':s==='fail'?'#c0392b':s==='na'?'#5a6a8a':'#aaa';
+      const photos = clPhotos[item.id] || [];
+      const photosHtml = photos.length > 0
+        ? `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">${photos.map(p=>`<img src="${p.dataUrl}" style="width:80px;height:60px;object-fit:cover;border-radius:5px;border:1px solid #ddd;">`).join('')}</div>`
+        : '';
+      return `<tr><td style="padding:9px 12px;font-size:12.5px;color:#1a1a2e;line-height:1.4;">${item.label}${item.legal?`<br><span style="font-size:9px;background:#0c1b35;color:rgba(255,255,255,0.7);padding:1px 6px;border-radius:3px;">${item.legal}</span>`:''} ${photosHtml}</td><td style="padding:9px 12px;text-align:center;background:${bg};color:${col};font-weight:700;font-size:12px;white-space:nowrap;">${sLabel}</td></tr>`;
+    }).join('');
+    return `<div style="margin-bottom:20px;border:1px solid #ddd9cc;border-radius:10px;overflow:hidden;">
+      <div style="background:#0c1b35;padding:12px 16px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:16px;">${cat.icon}</span>
+        <div><div style="font-family:Georgia,serif;font-size:14px;color:#fff;">${cat.title}</div><div style="font-size:10px;color:rgba(255,255,255,0.6);">${cat.subtitle}</div></div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr style="background:#f5f2eb;"><th style="padding:6px 12px;text-align:left;font-size:10px;color:#7a8099;text-transform:uppercase;letter-spacing:0.05em;">Item</th><th style="padding:6px 12px;text-align:center;font-size:10px;color:#7a8099;text-transform:uppercase;width:70px;">Status</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  }).join('');
+
+  const generated = new Date().toLocaleString('en-AU',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+
+  const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Inspection Report — ${address}</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:'DM Sans',Georgia,sans-serif;background:#faf8f3;color:#1a1a2e;}@media print{body{background:#fff;}}</style>
+<scr` + `ipt>
+const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
+</scr` + `ipt>
+</head><body>
+<div style="background:linear-gradient(135deg,#0c1b35 0%,#1e3460 100%);padding:40px 48px 32px;color:#fff;">
+  <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;">
+    <div style="width:52px;height:52px;background:linear-gradient(135deg,#c9973a,#e8b84b);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;">🏠</div>
+    <div>
+      <div style="font-family:'DM Serif Display',Georgia,serif;font-size:22px;line-height:1.2;">Victoria Rental Minimum Standards</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;margin-top:3px;">Inspection Report — Residential Tenancies Act 1997</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:24px;">
+    <div><div style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Property Address</div><div style="font-size:14px;font-weight:600;">${address}</div></div>
+    <div><div style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Inspector</div><div style="font-size:14px;font-weight:600;">${inspector}</div></div>
+    <div><div style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Date</div><div style="font-size:14px;font-weight:600;">${date}</div></div>
+  </div>
+  <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:20px 24px;display:flex;align-items:center;gap:28px;flex-wrap:wrap;">
+    <div style="text-align:center;"><div style="font-family:'DM Serif Display',serif;font-size:40px;color:#e8b84b;line-height:1;">${scoreText}</div><div style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-top:3px;">Compliance Score</div></div>
+    <div style="flex:1;min-width:180px;">
+      <div style="display:inline-block;padding:4px 14px;border-radius:20px;background:${gradeBg};color:${gradeColor};font-size:12px;font-weight:700;text-transform:uppercase;margin-bottom:10px;">${gradeLabel}</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:5px;font-size:12px;"><span style="width:8px;height:8px;background:#4ade80;border-radius:50%;display:inline-block;"></span><span style="color:rgba(255,255,255,0.7);">Pass: <strong style="color:#fff;">${pass}</strong></span></div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:12px;"><span style="width:8px;height:8px;background:#f87171;border-radius:50%;display:inline-block;"></span><span style="color:rgba(255,255,255,0.7);">Fail: <strong style="color:#fff;">${fail}</strong></span></div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:12px;"><span style="width:8px;height:8px;background:#94a3b8;border-radius:50%;display:inline-block;"></span><span style="color:rgba(255,255,255,0.7);">N/A: <strong style="color:#fff;">${na}</strong></span></div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:12px;font-size:10px;color:rgba(255,255,255,0.35);">Generated: ${generated} via VicRental Pro</div>
+</div>
+<div style="max-width:860px;margin:0 auto;padding:36px 32px 60px;">
+  ${urgentHtml}
+  <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#0c1b35;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #ddd9cc;">Detailed Checklist Results</div>
+  ${catResultsHtml}
+  <div style="margin-top:32px;font-size:11px;color:#7a8099;line-height:1.8;border-top:1px solid #ddd9cc;padding-top:16px;">
+    <strong>Disclaimer:</strong> This report is a general guide based on Victoria's rental minimum standards under the <em>Residential Tenancies Act 1997</em> (as amended, effective 29 March 2021). It is not legal advice. Visit Consumer Affairs Victoria for official guidance.
+  </div>
+</div>
+</body></html>`;
+
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const safeAddr = address.replace(/[^a-z0-9]/gi,'_').substring(0,40);
+  a.download = `inspection-report-${safeAddr}-${dateVal||'undated'}.html`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Inspection report downloaded', 'success');
+}
+
+// ═══════════════════════════════════════════════
+// REPAIR QUOTES
+// ═══════════════════════════════════════════════
+const QUOTE_CAT_ICONS = {
+  'Smoke Alarms':'🔴','Heating/Cooling':'🌡️','Plumbing':'🚿','Electrical':'⚡',
+  'Locks & Security':'🔒','Mould & Dampness':'🌿','Structural':'🏗️',
+  'General Maintenance':'🔧','Appliances':'🍳','Other':'📋'
+};
+
+let quoteFilter = 'all';
+let qSelectedFile = null;
+
+function getQuotes() { return S.get(KEY_QUOTES, []); }
+function saveQuotes(q) { S.set(KEY_QUOTES, q); }
+
+function populateQuoteWODropdown() {
+  const sel = document.getElementById('qLinkWO');
+  if (!sel) return;
+  const wos = getWOs().filter(w => w.status === 'open' || w.status === 'inprogress');
+  sel.innerHTML = '<option value="">— No linked work order —</option>' +
+    wos.map(w => `<option value="${w.id}">${w.id} · ${w.issue.substring(0,50)}</option>`).join('');
+}
+
+function handleQFileSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 10 * 1024 * 1024) { toast('File too large — max 10MB', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    qSelectedFile = { name: file.name, type: file.type, size: file.size, dataUrl: e.target.result, isImage: file.type.startsWith('image/') };
+    document.getElementById('qFileLabel').textContent = `✅ ${file.name} attached`;
+    document.getElementById('qUploadZone').style.background = 'var(--green-pale)';
+    document.getElementById('qUploadZone').style.borderColor = 'var(--green)';
+  };
+  reader.readAsDataURL(file);
+}
+
+function submitQuote() {
+  const property  = document.getElementById('qProperty').value.trim();
+  const ownerName = document.getElementById('qOwnerName').value.trim();
+  const desc      = document.getElementById('qDescription').value.trim();
+  const amount    = document.getElementById('qAmount').value.trim();
+
+  if (!property || !ownerName || !desc || !amount) {
+    toast('Please fill in property, owner name, description and amount', 'error'); return;
+  }
+
+  const amountNum = parseFloat(amount.replace(/[^0-9.]/g, ''));
+  if (isNaN(amountNum)) { toast('Please enter a valid quote amount', 'error'); return; }
+
+  const quote = {
+    id: 'Q-' + String(getQuotes().length + 1).padStart(4, '0'),
+    property, ownerName, description: desc,
+    contractor: document.getElementById('qContractor').value.trim(),
+    amount: amountNum,
+    category: document.getElementById('qCategory').value,
+    expiry: document.getElementById('qExpiry').value,
+    notes: document.getElementById('qNotes').value.trim(),
+    linkedWO: document.getElementById('qLinkWO').value,
+    file: qSelectedFile || null,
+    status: 'pending',
+    createdAt: new Date().toISOString(),
+    ownerResponse: null,
+  };
+
+  const quotes = getQuotes();
+  quotes.unshift(quote);
+  saveQuotes(quotes);
+
+  // Reset form
+  ['qProperty','qOwnerName','qDescription','qContractor','qAmount','qExpiry','qNotes'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('qLinkWO').value = '';
+  document.getElementById('qFileInput').value = '';
+  document.getElementById('qFileLabel').textContent = 'Attach quote document (optional)';
+  document.getElementById('qUploadZone').style.background = '';
+  document.getElementById('qUploadZone').style.borderColor = '';
+  qSelectedFile = null;
+
+  logActivity(`Quote ${quote.id} sent to ${ownerName} for ${property}`, '#8b5cf6');
+  toast(`Quote ${quote.id} sent to owner for approval`, 'success');
+  updateSidebarBadges();
+  renderQuotes();
+  updatePropFilterDropdown();
+}
+
+function setQuoteFilter(f) {
+  quoteFilter = f;
+  ['all','pending','approved','rejected','expired'].forEach(x => {
+    const el = document.getElementById('qf-' + x);
+    if (el) el.classList.toggle('active', x === f);
+  });
+  // Sync active styles for non-standard pills
+  document.getElementById('qf-pending')?.classList.toggle('active', f === 'pending');
+  renderQuotes();
+}
+
+function updatePropFilterDropdown() {
+  const sel = document.getElementById('quotesPropFilter');
+  if (!sel) return;
+  const quotes = getQuotes();
+  const props = [...new Set(quotes.map(q => q.property))];
+  const current = sel.value;
+  sel.innerHTML = '<option value="all">All properties</option>' +
+    props.map(p => `<option value="${p}" ${p === current ? 'selected' : ''}>${p}</option>`).join('');
+}
+
+function renderQuotes() {
+  const search    = (document.getElementById('quotesSearch')?.value || '').toLowerCase();
+  const propFilter = document.getElementById('quotesPropFilter')?.value || 'all';
+  const now       = new Date();
+  let quotes      = getQuotes();
+
+  // Compute effective status (expired if past expiry and still pending)
+  quotes = quotes.map(q => {
+    let es = q.status;
+    if (es === 'pending' && q.expiry && new Date(q.expiry) < now) es = 'expired';
+    return { ...q, es };
+  });
+
+  if (quoteFilter !== 'all') quotes = quotes.filter(q => q.es === quoteFilter);
+  if (propFilter !== 'all') quotes = quotes.filter(q => q.property === propFilter);
+  if (search) quotes = quotes.filter(q =>
+    q.description.toLowerCase().includes(search) ||
+    q.property.toLowerCase().includes(search) ||
+    q.ownerName.toLowerCase().includes(search) ||
+    (q.contractor || '').toLowerCase().includes(search) ||
+    q.id.toLowerCase().includes(search)
+  );
+
+  updateSidebarBadges();
+  updatePropFilterDropdown();
+
+  const container = document.getElementById('quotesList');
+  if (!container) return;
+
+  const all = getQuotes();
+  if (all.length === 0) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">💰</div><h3>No quotes yet</h3><p>Upload a repair quote above and it will be sent to the owner for approval before scheduling work.</p></div>`;
+    return;
+  }
+  if (quotes.length === 0) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>No quotes match</h3><p>Try adjusting your filters.</p></div>`;
+    return;
+  }
+
+  const formatAmt  = (n) => `$${Number(n).toLocaleString('en-AU', {minimumFractionDigits:2,maximumFractionDigits:2})}`;
+  const formatDate = (iso) => iso ? new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+
+  container.innerHTML = quotes.map(q => {
+    const icon = QUOTE_CAT_ICONS[q.category] || '📋';
+    const pillClass = { pending:'pill-qpending', approved:'pill-qapproved', rejected:'pill-qrejected', expired:'pill-qexpired' }[q.es] || 'pill-qpending';
+    const pillLabel = { pending:'🔔 Awaiting Approval', approved:'✅ Approved', rejected:'✗ Rejected', expired:'⏰ Expired' }[q.es] || q.es;
+    const isExpired = q.expiry && new Date(q.expiry) < now;
+
+    let responseHtml = '';
+    if (q.ownerResponse) {
+      const r = q.ownerResponse;
+      const isApp = r.type === 'approve';
+      responseHtml = `<div class="quote-owner-response">
+        <div class="qr-icon ${isApp?'qr-approved':'qr-rejected'}">${isApp?'✅':'✗'}</div>
+        <div>
+          <div class="qr-label" style="color:${isApp?'var(--green)':'var(--red)'};">${isApp?'Approved':'Rejected'} by ${escHtmlVault(r.owner)}</div>
+          ${r.comment ? `<div class="qr-comment">"${escHtmlVault(r.comment)}"</div>` : ''}
+          <div class="qr-time">${new Date(r.time).toLocaleString('en-AU')}</div>
+        </div>
+      </div>`;
+    }
+
+    const expiryWarn = q.expiry && !isExpired && (new Date(q.expiry) - now) < 3*86400000
+      ? `<span class="pill pill-critical" style="font-size:0.6rem;">⚠ Expires ${formatDate(q.expiry)}</span>` : '';
+
+    return `<div class="quote-card qs-${q.es}">
+      <div class="quote-card-inner">
+        <div class="quote-icon">${icon}</div>
+        <div>
+          <div class="quote-cat">${q.category}</div>
+          <div class="quote-desc">${escHtmlVault(q.description)}</div>
+          <div class="quote-property">📍 ${escHtmlVault(q.property)} · 👤 ${escHtmlVault(q.ownerName)}</div>
+          <div class="quote-meta">
+            <span>🆔 <strong>${q.id}</strong></span>
+            ${q.contractor ? `<span>🏢 <strong>${escHtmlVault(q.contractor)}</strong></span>` : ''}
+            <span>📅 Sent: <strong>${formatDate(q.createdAt)}</strong></span>
+            ${q.expiry ? `<span>⏰ Expires: <strong ${isExpired?'style="color:var(--red)"':''}>${formatDate(q.expiry)}</strong></span>` : ''}
+            ${q.linkedWO ? `<span>🔧 WO: <strong>${escHtmlVault(q.linkedWO)}</strong></span>` : ''}
+            ${q.file ? `<span>📎 <strong>${escHtmlVault(q.file.name)}</strong></span>` : ''}
+          </div>
+          ${q.notes ? `<div style="margin-top:6px;font-size:0.74rem;color:var(--muted);font-style:italic;">"${escHtmlVault(q.notes)}"</div>` : ''}
+        </div>
+        <div class="quote-right">
+          <div class="quote-amount"><span>Quote Amount</span>${formatAmt(q.amount)}</div>
+          <span class="pill ${pillClass}">${pillLabel}</span>
+          ${expiryWarn}
+          <div class="quote-actions">
+            ${q.file ? `<button class="btn btn-secondary" style="font-size:0.72rem;padding:5px 10px;" onclick="previewQuoteDoc('${q.id}')">📎 View Doc</button>` : ''}
+            ${q.es === 'pending' || q.es === 'expired' ? `<button class="btn btn-danger" style="font-size:0.72rem;padding:5px 10px;" onclick="deleteQuote('${q.id}')">✕ Delete</button>` : ''}
+          </div>
+        </div>
+      </div>
+      ${responseHtml}
+    </div>`;
+  }).join('');
+}
+
+function previewQuoteDoc(quoteId) {
+  const q = getQuotes().find(x => x.id === quoteId);
+  if (!q?.file) return;
+  document.getElementById('docLightboxTitle').textContent = q.file.name;
+  document.getElementById('docLightboxCat').textContent = q.category;
+  const body = document.getElementById('docLightboxBody');
+  if (q.file.isImage) {
+    body.innerHTML = `<img src="${q.file.dataUrl}" alt="${q.file.name}" style="max-width:100%;max-height:60vh;border-radius:8px;">`;
+  } else {
+    body.innerHTML = `<div style="text-align:center;padding:32px;"><div style="font-size:4rem;margin-bottom:16px;">📄</div><div style="font-size:0.95rem;font-weight:600;margin-bottom:16px;">${escHtmlVault(q.file.name)}</div><a class="btn btn-primary" href="${q.file.dataUrl}" download="${q.file.name}">⬇ Download</a></div>`;
+  }
+  const dl = document.getElementById('docLightboxDownload');
+  dl.href = q.file.dataUrl; dl.download = q.file.name;
+  document.getElementById('docLightbox').classList.add('open');
+}
+
+function deleteQuote(quoteId) {
+  if (!confirm('Delete this quote? This cannot be undone.')) return;
+  const q = getQuotes().find(x => x.id === quoteId);
+  saveQuotes(getQuotes().filter(x => x.id !== quoteId));
+  toast('Quote deleted', 'info');
+  if (q) logActivity(`Quote ${q.id} deleted`, '#ef4444');
+  updateSidebarBadges();
+  renderQuotes();
+}
+
+// ═══════════════════════════════════════════════
+// DOCUMENT VAULT
+// ═══════════════════════════════════════════════
+let vaultFilter = 'all';
+
+const VAULT_ICONS = {
+  'Compliance Certificate': '📜',
+  'Invoice': '🧾',
+  'Inspection Report': '📋',
+  'Lease Agreement': '📄',
+  'Insurance': '🛡️',
+  'Council Notice': '🏛️',
+  'Correspondence': '✉️',
+  'Other': '📁',
+};
+
+function getVaultDocs() { return S.get(KEY_VAULT, []); }
+function saveVaultDocs(docs) { S.set(KEY_VAULT, docs); }
+
+function setVaultFilter(f) {
+  vaultFilter = f;
+  document.querySelectorAll('[id^="vf-"]').forEach(p => p.classList.remove('active'));
+  document.getElementById('vf-' + f)?.classList.add('active');
+  renderVault();
+}
+
+function handleVaultUpload(event) {
+  const files = Array.from(event.target.files);
+  if (!files.length) return;
+
+  const name = document.getElementById('vaultDocName').value.trim();
+  const category = document.getElementById('vaultDocCategory').value;
+  const property = document.getElementById('vaultDocProperty').value.trim();
+  const ownerVisible = document.getElementById('vaultDocOwnerVisible').value;
+
+  if (!name) { toast('Please enter a document name before uploading', 'error'); return; }
+
+  let processed = 0;
+  files.forEach((file, idx) => {
+    if (file.size > 10 * 1024 * 1024) { toast(`${file.name} is too large (max 10MB)`, 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const isImage = file.type.startsWith('image/');
+      const isPDF = file.type === 'application/pdf';
+      const docs = getVaultDocs();
+      const doc = {
+        id: Date.now() + idx,
+        name: files.length > 1 ? `${name} (${idx + 1})` : name,
+        category,
+        property: property || '',
+        ownerVisible,
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size,
+        isImage,
+        isPDF,
+        dataUrl: e.target.result,
+        uploadedAt: new Date().toISOString(),
+        uploadedBy: 'Property Manager',
+      };
+      docs.unshift(doc);
+      saveVaultDocs(docs);
+      processed++;
+      if (processed === files.length) {
+        toast(`${files.length} document${files.length > 1 ? 's' : ''} uploaded to vault`, 'success');
+        logActivity(`Document uploaded: ${name}`, '#8b5cf6');
+        renderVault();
+        // Clear form
+        document.getElementById('vaultDocName').value = '';
+        document.getElementById('vaultDocProperty').value = '';
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+  event.target.value = '';
+}
+
+function renderVault() {
+  const search = (document.getElementById('vaultSearch')?.value || '').toLowerCase();
+  const catFilter = document.getElementById('vaultCatFilter')?.value || 'all';
+  const ownerFilter = document.getElementById('vaultOwnerFilter')?.value || 'all';
+  let docs = getVaultDocs();
+
+  // Filters
+  if (catFilter !== 'all') docs = docs.filter(d => d.category === catFilter);
+  if (ownerFilter !== 'all') docs = docs.filter(d => d.ownerVisible === ownerFilter);
+  if (vaultFilter === 'recent') {
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    docs = docs.filter(d => new Date(d.uploadedAt).getTime() > cutoff);
+  }
+  if (search) {
+    docs = docs.filter(d =>
+      d.name.toLowerCase().includes(search) ||
+      d.category.toLowerCase().includes(search) ||
+      (d.property || '').toLowerCase().includes(search) ||
+      d.fileName.toLowerCase().includes(search)
+    );
+  }
+
+  // Update count
+  const allDocs = getVaultDocs();
+  document.getElementById('vaultDocCount').textContent = `${allDocs.length} document${allDocs.length !== 1 ? 's' : ''}`;
+
+  const grid = document.getElementById('vaultGrid');
+  if (!grid) return;
+
+  if (allDocs.length === 0) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">🗄️</div><h3>No documents yet</h3><p>Upload compliance certificates, invoices, inspection reports and other documents. Mark them as visible to owners to share via the Owner Portal.</p></div>`;
+    return;
+  }
+
+  if (docs.length === 0) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>No documents match</h3><p>Try adjusting your search or filters.</p></div>`;
+    return;
+  }
+
+  const formatSize = (bytes) => bytes < 1024 * 1024 ? `${(bytes/1024).toFixed(0)} KB` : `${(bytes/1024/1024).toFixed(1)} MB`;
+  const formatDate = (iso) => new Date(iso).toLocaleDateString('en-AU', { day:'2-digit', month:'short', year:'numeric' });
+
+  grid.innerHTML = `<div class="vault-grid">${docs.map(doc => {
+    const icon = VAULT_ICONS[doc.category] || '📁';
+    const previewContent = doc.isImage
+      ? `<img src="${doc.dataUrl}" alt="${doc.name}" loading="lazy">`
+      : `<span style="font-size:3rem;position:relative;z-index:1;">${icon}</span>`;
+
+    return `<div class="vault-card">
+      <div class="vault-card-preview" onclick="openDocPreview('${doc.id}')">
+        ${previewContent}
+        <span class="vault-owner-badge ${doc.ownerVisible === 'yes' ? 'vob-yes' : 'vob-no'}">${doc.ownerVisible === 'yes' ? '👁 Owner' : '🔒 Internal'}</span>
+      </div>
+      <div class="vault-card-body">
+        <div class="vault-card-cat">${doc.category}</div>
+        <div class="vault-card-name">${escHtmlVault(doc.name)}</div>
+        ${doc.property ? `<div class="vault-card-prop">📍 ${escHtmlVault(doc.property)}</div>` : ''}
+        <div class="vault-card-meta">
+          <span>${doc.fileName}</span>
+          <span>·</span>
+          <span>${formatSize(doc.fileSize)}</span>
+          <span>·</span>
+          <span>${formatDate(doc.uploadedAt)}</span>
+        </div>
+      </div>
+      <div class="vault-card-actions">
+        <button class="vault-action-btn" onclick="openDocPreview('${doc.id}')">👁 View</button>
+        <button class="vault-action-btn" onclick="downloadVaultDoc('${doc.id}')">⬇ Download</button>
+        <button class="vault-action-btn" onclick="toggleOwnerVis('${doc.id}')" title="${doc.ownerVisible === 'yes' ? 'Make internal only' : 'Share with owner'}">${doc.ownerVisible === 'yes' ? '🔒 Hide' : '👁 Share'}</button>
+        <button class="vault-action-btn del" onclick="deleteVaultDoc('${doc.id}')">✕</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function openDocPreview(docId) {
+  const docs = getVaultDocs();
+  const doc = docs.find(d => String(d.id) === String(docId));
+  if (!doc) return;
+
+  document.getElementById('docLightboxTitle').textContent = doc.name;
+  document.getElementById('docLightboxCat').textContent = doc.category;
+
+  const body = document.getElementById('docLightboxBody');
+  const dlLink = document.getElementById('docLightboxDownload');
+
+  if (doc.isImage) {
+    body.innerHTML = `<img src="${doc.dataUrl}" alt="${doc.name}" style="max-width:100%;max-height:60vh;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.15);">`;
+  } else if (doc.isPDF) {
+    body.innerHTML = `<div style="text-align:center;padding:32px;">
+      <div style="font-size:4rem;margin-bottom:16px;">📄</div>
+      <div style="font-size:1rem;font-weight:600;margin-bottom:6px;">${escHtmlVault(doc.fileName)}</div>
+      <div style="font-size:0.82rem;color:var(--muted);margin-bottom:20px;">PDF document — click Download to open</div>
+      <a class="btn btn-primary" href="${doc.dataUrl}" download="${doc.fileName}">⬇ Download PDF</a>
+    </div>`;
+  } else {
+    body.innerHTML = `<div style="text-align:center;padding:32px;">
+      <div style="font-size:4rem;margin-bottom:16px;">${VAULT_ICONS[doc.category] || '📁'}</div>
+      <div style="font-size:1rem;font-weight:600;margin-bottom:6px;">${escHtmlVault(doc.fileName)}</div>
+      <div style="font-size:0.82rem;color:var(--muted);margin-bottom:20px;">Click Download to save this file</div>
+      <a class="btn btn-primary" href="${doc.dataUrl}" download="${doc.fileName}">⬇ Download</a>
+    </div>`;
+  }
+
+  dlLink.href = doc.dataUrl;
+  dlLink.download = doc.fileName;
+  document.getElementById('docLightbox').classList.add('open');
+}
+
+function closeDocLightbox() {
+  document.getElementById('docLightbox').classList.remove('open');
+}
+
+function downloadVaultDoc(docId) {
+  const doc = getVaultDocs().find(d => String(d.id) === String(docId));
+  if (!doc) return;
+  const a = document.createElement('a');
+  a.href = doc.dataUrl;
+  a.download = doc.fileName;
+  a.click();
+  toast(`Downloading ${doc.fileName}`, 'success');
+}
+
+function toggleOwnerVis(docId) {
+  const docs = getVaultDocs();
+  const idx = docs.findIndex(d => String(d.id) === String(docId));
+  if (idx < 0) return;
+  docs[idx].ownerVisible = docs[idx].ownerVisible === 'yes' ? 'no' : 'yes';
+  saveVaultDocs(docs);
+  const vis = docs[idx].ownerVisible === 'yes';
+  toast(vis ? 'Document now visible to owner' : 'Document now internal only', 'success');
+  logActivity(`Document "${docs[idx].name}" ${vis ? 'shared with owner' : 'set to internal'}`, '#8b5cf6');
+  renderVault();
+}
+
+function deleteVaultDoc(docId) {
+  const docs = getVaultDocs();
+  const doc = docs.find(d => String(d.id) === String(docId));
+  if (!doc) return;
+  if (!confirm(`Delete "${doc.name}"? This cannot be undone.`)) return;
+  saveVaultDocs(docs.filter(d => String(d.id) !== String(docId)));
+  toast('Document deleted', 'info');
+  logActivity(`Document deleted: ${doc.name}`, '#ef4444');
+  renderVault();
+}
+
+function escHtmlVault(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+// ═══════════════════════════════════════════════
+// TENANT REQUESTS (PM View)
+// ═══════════════════════════════════════════════
+const TREQ_CAT_ICONS = {
+  appliances:'🍳', heating_cooling:'🌡️', hot_water:'🚿', electrical:'⚡',
+  plumbing:'🔧', roof_leak:'🏚️', fence_damage:'🪵', garages:'🚗',
+  locks_keys:'🔑', pool:'🏊', gardening:'🌿', electric_gates:'🚧',
+  windows_furnishings:'🪟', flooring:'🪵', pests:'🐛', rubbish:'🗑️', general:'🔨'
+};
+
+let trFilter = 'all';
+
+function setTRFilter(f) {
+  trFilter = f;
+  ['all','submitted','inprogress','completed'].forEach(x => {
+    const el = document.getElementById('trf-' + x);
+    if (el) el.classList.toggle('active', x === f);
+  });
+  renderTenantReqs();
+}
+
+function renderTenantReqs() {
+  const search  = (document.getElementById('trSearch')?.value || '').toLowerCase();
+  const propF   = document.getElementById('trPropFilter')?.value || 'all';
+  const priF    = document.getElementById('trPriFilter')?.value || 'all';
+
+  let reqs = S.get(KEY_TREQS, []);
+
+  // Populate property dropdown
+  const propSel = document.getElementById('trPropFilter');
+  if (propSel) {
+    const props = [...new Set(reqs.map(r => r.property).filter(Boolean))];
+    const cur = propSel.value;
+    propSel.innerHTML = '<option value="all">All properties</option>' +
+      props.map(p => `<option value="${p}" ${p===cur?'selected':''}>${p}</option>`).join('');
+  }
+
+  if (trFilter !== 'all')  reqs = reqs.filter(r => r.status === trFilter);
+  if (propF !== 'all')     reqs = reqs.filter(r => r.property === propF);
+  if (priF !== 'all')      reqs = reqs.filter(r => r.priority === priF);
+  if (search) reqs = reqs.filter(r =>
+    (r.tenantName||'').toLowerCase().includes(search) ||
+    (r.property||'').toLowerCase().includes(search) ||
+    (r.description||'').toLowerCase().includes(search) ||
+    (r.id||'').toLowerCase().includes(search) ||
+    (r.categoryLabels||[]).join(' ').toLowerCase().includes(search)
+  );
+
+  updateSidebarBadges();
+
+  const container = document.getElementById('tenantReqsList');
+  if (!container) return;
+
+  const all = S.get(KEY_TREQS, []);
+  if (all.length === 0) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">🏡</div><h3>No tenant requests yet</h3><p>When tenants submit maintenance requests via the Tenant Portal, they'll appear here for your review.</p></div>`;
+    return;
+  }
+  if (reqs.length === 0) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>No requests match</h3><p>Try adjusting your search or filters.</p></div>`;
+    return;
+  }
+
+  const priColors  = { emergency:'var(--red)', urgent:'var(--amber)', routine:'var(--green)' };
+  const priLabels  = { emergency:'🚨 Emergency', urgent:'⚠️ Urgent', routine:'🔧 Routine' };
+  const stColors   = { submitted:'var(--sky-lt,#2d7bc4)', inprogress:'var(--amber)', completed:'var(--green)', cancelled:'var(--muted)' };
+  const stLabels   = { submitted:'New', inprogress:'In Progress', completed:'Completed', cancelled:'Cancelled' };
+  const fmtDate    = iso => new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'});
+  const fmtTime    = iso => new Date(iso).toLocaleString('en-AU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+
+  container.innerHTML = reqs.map(req => {
+    const firstCat = req.categories?.[0];
+    const icon     = TREQ_CAT_ICONS[firstCat] || '🔧';
+    const priColor = priColors[req.priority] || 'var(--muted)';
+    const priLabel = priLabels[req.priority] || req.priority;
+    const stColor  = stColors[req.status] || 'var(--muted)';
+    const stLabel  = stLabels[req.status] || req.status;
+    const isNew    = req.status === 'submitted';
+
+    const photosHtml = req.photos?.length ? `
+      <div style="padding:0 14px 12px;display:flex;gap:6px;flex-wrap:wrap;">
+        ${req.photos.map(p => `<div style="width:56px;height:56px;border-radius:7px;overflow:hidden;cursor:pointer;" onclick="openTRPhoto('${p.dataUrl}')"><img src="${p.dataUrl}" style="width:100%;height:100%;object-fit:cover;"></div>`).join('')}
+      </div>` : '';
+
+    const responseHtml = req.pmResponse ? `
+      <div style="background:var(--sky-pale,#eef5fc);border-top:1px solid var(--border);padding:10px 14px;font-size:0.77rem;display:flex;gap:8px;">
+        <span>💬</span>
+        <div><strong>PM Response:</strong> ${escHtmlVault(req.pmResponse.message)} <span style="color:var(--muted);font-size:0.65rem;"> · ${fmtTime(req.pmResponse.time)}</span></div>
+      </div>` : '';
+
+    return `<div class="panel" style="margin-bottom:10px;border-left:3px solid ${priColor};padding:0;overflow:hidden;">
+      <div style="display:grid;grid-template-columns:auto 1fr auto;gap:14px;padding:15px 16px;align-items:start;">
+        <div style="width:46px;height:46px;border-radius:11px;background:#f5f7fa;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">${icon}</div>
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+            <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">${req.id}</span>
+            ${isNew ? '<span style="font-size:0.58rem;font-weight:700;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;padding:1px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:0.05em;">New</span>' : ''}
+          </div>
+          <div style="font-size:0.9rem;font-weight:600;margin-bottom:3px;line-height:1.35;">${escHtmlVault(req.description.substring(0,90))}${req.description.length>90?'…':''}</div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-bottom:6px;">${(req.categoryLabels||[]).join(' · ')}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;font-size:0.71rem;color:var(--muted);">
+            <span>👤 <strong>${escHtmlVault(req.tenantName||'')}</strong></span>
+            <span>📍 <strong>${escHtmlVault(req.property||'')}</strong></span>
+            <span>📅 ${fmtDate(req.submittedAt)}</span>
+            ${req.contact ? `<span>⏰ ${escHtmlVault(req.contact)}</span>` : ''}
+            ${req.photos?.length ? `<span>📎 ${req.photos.length} photo${req.photos.length>1?'s':''}</span>` : ''}
+          </div>
+          ${req.notes ? `<div style="margin-top:6px;font-size:0.73rem;color:var(--muted);font-style:italic;">📝 ${escHtmlVault(req.notes)}</div>` : ''}
+          ${(req.make || req.model || req.serial || req.age || req.location) ? `
+          <div style="margin-top:8px;padding:8px 12px;background:#f0f7ff;border-radius:7px;border:1px solid rgba(15,76,129,0.12);display:flex;flex-wrap:wrap;gap:10px;font-size:0.71rem;color:var(--muted);">
+            <span style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;width:100%;margin-bottom:-4px;">🏷️ Equipment Details</span>
+            ${req.make     ? `<span>Make: <strong style="color:var(--text);">${escHtmlVault(req.make)}</strong></span>` : ''}
+            ${req.model    ? `<span>Model: <strong style="color:var(--text);">${escHtmlVault(req.model)}</strong></span>` : ''}
+            ${req.serial   ? `<span>Serial: <strong style="color:var(--text);">${escHtmlVault(req.serial)}</strong></span>` : ''}
+            ${req.age      ? `<span>Age: <strong style="color:var(--text);">${escHtmlVault(req.age)}</strong></span>` : ''}
+            ${req.location ? `<span>Location: <strong style="color:var(--text);">${escHtmlVault(req.location)}</strong></span>` : ''}
+          </div>` : ''}
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;min-width:160px;">
+          <span class="pill" style="background:${priColor}20;color:${priColor};border:1px solid ${priColor}30;font-size:0.6rem;">${priLabel}</span>
+          <span class="pill" style="background:${stColor}15;color:${stColor};border:1px solid ${stColor}25;font-size:0.6rem;">${stLabel}</span>
+          <div style="display:flex;flex-direction:column;gap:5px;width:100%;">
+            ${req.status === 'submitted' ? `
+              <button class="btn btn-primary" style="font-size:0.72rem;padding:5px 10px;width:100%;" onclick="ackTenantReq('${req.id}')">✓ Acknowledge</button>
+              <button class="btn btn-secondary" style="font-size:0.72rem;padding:5px 10px;width:100%;" onclick="convertTenantReqToWO('${req.id}')">🔧 Create WO</button>
+            ` : ''}
+            ${req.status === 'inprogress' ? `
+              <button class="btn btn-primary" style="font-size:0.72rem;padding:5px 10px;width:100%;background:var(--green);" onclick="completeTenantReq('${req.id}')">✅ Mark Complete</button>
+            ` : ''}
+          </div>
+          ${!req.pmResponse && req.status !== 'completed' ? `
+            <button class="btn btn-ghost" style="font-size:0.68rem;padding:4px 8px;width:100%;" onclick="respondToTenantReq('${req.id}')">💬 Send Response</button>
+          ` : ''}
+        </div>
+      </div>
+      ${photosHtml}
+      ${responseHtml}
+    </div>`;
+  }).join('');
+}
+
+function ackTenantReq(id) {
+  const reqs = S.get(KEY_TREQS, []);
+  const idx  = reqs.findIndex(r => r.id === id);
+  if (idx < 0) return;
+  reqs[idx].status = 'inprogress';
+  reqs[idx].updatedAt = new Date().toISOString();
+  S.set(KEY_TREQS, reqs);
+  toast('Request acknowledged — status updated to In Progress', 'success');
+  logActivity(`Tenant request ${id} acknowledged`, '#0f4c81');
+  updateSidebarBadges();
+  renderTenantReqs();
+}
+
+function completeTenantReq(id) {
+  const reqs = S.get(KEY_TREQS, []);
+  const idx  = reqs.findIndex(r => r.id === id);
+  if (idx < 0) return;
+  reqs[idx].status = 'completed';
+  reqs[idx].updatedAt = new Date().toISOString();
+  S.set(KEY_TREQS, reqs);
+  toast('Request marked as completed', 'success');
+  logActivity(`Tenant request ${id} completed`, '#1d7a50');
+  updateSidebarBadges();
+  renderTenantReqs();
+}
+
+function convertTenantReqToWO(id) {
+  const reqs = S.get(KEY_TREQS, []);
+  const req  = reqs.find(r => r.id === id);
+  if (!req) return;
+
+  const priMap = { emergency: 'critical', urgent: 'high', routine: 'high' };
+  const catId  = req.categories?.[0] || 'general';
+  const label  = (req.categoryLabels?.[0] || 'General Maintenance').replace(/^[^\s]+ /, '');
+  const icon   = TREQ_CAT_ICONS[catId] || '🔧';
+
+  const wos = getWOs();
+  const wo = {
+    id: 'WO-' + String(wos.length + 1).padStart(4, '0'),
+    property: req.property || '',
+    issue: req.description.substring(0, 80),
+    category: label,
+    categoryIcon: icon,
+    priority: priMap[req.priority] || 'high',
+    trade: 'Handyperson',
+    legalRef: '',
+    action: req.description,
+    inspector: 'Tenant Report',
+    dueDate: new Date(Date.now() + (req.priority==='emergency'?86400000:req.priority==='urgent'?3*86400000:14*86400000)).toISOString().split('T')[0],
+    ownerName: '',
+    status: 'open',
+    assignedTo: '',
+    invoice: '',
+    notes: [
+      `Reported by tenant ${req.tenantName}.`,
+      req.contact ? `Contact preference: ${req.contact}.` : '',
+      req.location ? `Location: ${req.location}.` : '',
+      req.make   ? `Make: ${req.make}.` : '',
+      req.model  ? `Model: ${req.model}.` : '',
+      req.serial ? `Serial: ${req.serial}.` : '',
+      req.age    ? `Approx age: ${req.age}.` : '',
+      req.notes  ? req.notes : '',
+    ].filter(Boolean).join(' '),
+    createdAt: new Date().toISOString(),
+    photos: req.photos || [],
+    evidenceDocs: [],
+    timeline: [{ type:'open', msg:`Created from tenant request ${id} by ${req.tenantName}`, time:new Date().toISOString() }],
+    tenantReqId: id,
+  };
+
+  wos.unshift(wo);
+  saveWOs(wos);
+
+  // Update tenant request status
+  const idx = reqs.findIndex(r => r.id === id);
+  if (idx >= 0) { reqs[idx].status = 'inprogress'; reqs[idx].linkedWO = wo.id; reqs[idx].updatedAt = new Date().toISOString(); }
+  S.set(KEY_TREQS, reqs);
+
+  toast(`Work order ${wo.id} created from tenant request`, 'success');
+  logActivity(`WO ${wo.id} created from tenant request ${id}`, '#0f4c81');
+  updateSidebarBadges();
+  renderTenantReqs();
+}
+
+function respondToTenantReq(id) {
+  const msg = prompt('Enter a response message for the tenant (this will be visible in their portal):');
+  if (!msg || !msg.trim()) return;
+  const reqs = S.get(KEY_TREQS, []);
+  const idx  = reqs.findIndex(r => r.id === id);
+  if (idx < 0) return;
+  reqs[idx].pmResponse = { message: msg.trim(), time: new Date().toISOString() };
+  S.set(KEY_TREQS, reqs);
+  toast('Response sent to tenant', 'success');
+  logActivity(`PM responded to tenant request ${id}`, '#0f4c81');
+  renderTenantReqs();
+}
+
+function openTRPhoto(dataUrl) {
+  document.getElementById('docLightboxBody').innerHTML = `<img src="${dataUrl}" style="max-width:100%;max-height:60vh;border-radius:8px;">`;
+  document.getElementById('docLightboxTitle').textContent = 'Tenant Photo';
+  document.getElementById('docLightboxCat').textContent = '';
+  document.getElementById('docLightboxDownload').href = dataUrl;
+  document.getElementById('docLightboxDownload').download = 'tenant-photo.jpg';
+  document.getElementById('docLightbox').classList.add('open');
+}
+
+// ═══════════════════════════════════════════════
+// SEED DEMO DATA
+// ═══════════════════════════════════════════════
+function seedDemo() {
+  if (getWOs().length === 0 && S.get(KEY_PORT,[]).length === 0) {
+    const wos = [
+      { id:'WO-0001', property:'42 Sample Street, Richmond VIC 3121', ownerName:'Michael Chen', issue:'Working smoke alarm on every storey', category:'Smoke Alarms', categoryIcon:'🔴', priority:'critical', legalRef:'Building Regs', action:'Install working smoke alarms on every storey before occupancy.', trade:'Electrician', dueDate: new Date(Date.now()+86400000).toISOString().split('T')[0], inspector:'Jane Smith', status:'open', createdAt:new Date(Date.now()-86400000*2).toISOString(), photos:[], evidenceDocs:[], timeline:[{type:'created',msg:'Created from inspection — smoke alarm failure',time:new Date(Date.now()-86400000*2).toISOString()}] },
+      { id:'WO-0002', property:'42 Sample Street, Richmond VIC 3121', ownerName:'Michael Chen', issue:'Fixed heater present in main living area', category:'Heating', categoryIcon:'🌡️', priority:'critical', legalRef:'Reg 5I', action:'Install a fixed, energy-efficient heater in the main living area.', trade:'HVAC Technician', dueDate:new Date(Date.now()+86400000*2).toISOString().split('T')[0], inspector:'Jane Smith', status:'inprogress', createdAt:new Date(Date.now()-86400000*3).toISOString(), photos:[], evidenceDocs:[], assignedTo:'Melbourne HVAC Pty Ltd', timeline:[{type:'created',msg:'Created from inspection',time:new Date(Date.now()-86400000*3).toISOString()},{type:'inprogress',msg:'Status changed to In Progress',time:new Date(Date.now()-86400000).toISOString()}] },
+      { id:'WO-0003', property:'7 Demo Lane, Fitzroy VIC 3065', ownerName:'Michael Chen', issue:'External entry doors have functioning deadlatch or deadlock', category:'Locks & Security', categoryIcon:'🔒', priority:'critical', legalRef:'Reg 5A', action:'Install or repair deadlatch/deadlock on all external entry doors.', trade:'Locksmith', dueDate:new Date(Date.now()-86400000*2).toISOString().split('T')[0], inspector:'Mark Johnson', status:'completed', createdAt:new Date(Date.now()-86400000*5).toISOString(), photos:[], evidenceDocs:[{id:1,dataUrl:'',name:'invoice.jpg',uploadedAt:new Date().toISOString()}], assignedTo:'SecureLock Melbourne', timeline:[{type:'created',msg:'Created from inspection',time:new Date(Date.now()-86400000*5).toISOString()},{type:'completed',msg:'Status changed to Completed',time:new Date(Date.now()-86400000).toISOString()}] },
+      { id:'WO-0004', property:'7 Demo Lane, Fitzroy VIC 3065', ownerName:'Michael Chen', issue:'No visible mould on walls, ceilings, or floors', category:'Mould & Dampness', categoryIcon:'🌿', priority:'high', legalRef:'Reg 5J', action:'Identify and remediate source of mould.', trade:'Remediation Specialist', dueDate:new Date(Date.now()+86400000*7).toISOString().split('T')[0], inspector:'Mark Johnson', status:'open', createdAt:new Date(Date.now()-86400000).toISOString(), photos:[], evidenceDocs:[], timeline:[{type:'created',msg:'Created from inspection — mould found',time:new Date(Date.now()-86400000).toISOString()}] },
+    ];
+    saveWOs(wos);
+
+    const portal = wos.map(wo => ({
+      id: wo.id, property: wo.property, ownerName: wo.ownerName,
+      issue: wo.issue, category: wo.category, categoryIcon: wo.categoryIcon,
+      priority: wo.priority, legalRef: wo.legalRef, action: wo.action,
+      trade: wo.trade, inspector: wo.inspector, dueDate: wo.dueDate,
+      notifiedAt: wo.createdAt,
+    }));
+    S.set(KEY_PORT, portal);
+
+    logActivity('Demo data loaded — 4 work orders across 2 properties', '#3b82f6');
+  }
+}
+</script>
+</body>
+</html>
