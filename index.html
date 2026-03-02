@@ -4989,6 +4989,9 @@ async function loadOwners() {
     return;
   }
 
+  // Cache merged list for edit lookups
+  window._cachedOwners = merged;
+
   el.innerHTML = `
     <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
       <thead>
@@ -5001,7 +5004,7 @@ async function loadOwners() {
         </tr>
       </thead>
       <tbody>
-        ${merged.map(o => {
+        ${merged.map((o, oi) => {
           const name = o.name || o.username || '—';
           const ownerProps = managedProps.filter(p => p.owner && p.owner.toLowerCase() === name.toLowerCase());
           const propBadge = ownerProps.length
@@ -5019,7 +5022,7 @@ async function loadOwners() {
               <td style="padding:10px 12px;">${propBadge}</td>
               <td style="padding:10px 12px;color:var(--muted);">${o.createdAt ? new Date(o.createdAt).toLocaleDateString('en-AU') : '—'}</td>
               <td style="padding:10px 12px;text-align:right;">
-                <button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;" onclick='openEditOwner(${JSON.stringify({id: o.id||o.name, name: name, email: o.email||"", phone: o.phone||""})})'>✏️ Edit</button>
+                <button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;" onclick="openEditOwnerByIdx(${oi})">✏️ Edit</button>
                 ${o.source !== 'property' ? `<button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteOwner('${o.id || o.name}', '${name.replace(/'/g,"\\'")}')">🗑 Remove</button>` : ''}
               </td>
             </tr>`;
@@ -5162,6 +5165,9 @@ function renderTenantsList() {
     return;
   }
 
+  // Cache sorted tenants for edit lookups
+  window._cachedSortedTenants = tenants;
+
   el.innerHTML = `
     <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
       <thead>
@@ -5175,7 +5181,7 @@ function renderTenantsList() {
         </tr>
       </thead>
       <tbody>
-        ${tenants.map(t => {
+        ${tenants.map((t, ti) => {
           const sourceTag = t.source === 'import'
             ? `<span style="font-size:0.6rem;background:var(--blue-pale);color:var(--blue);padding:1px 6px;border-radius:4px;margin-left:6px;">from import</span>`
             : '';
@@ -5191,7 +5197,7 @@ function renderTenantsList() {
               <td style="padding:10px 12px;color:var(--muted);">${t.phone||'—'}</td>
               <td style="padding:10px 12px;color:var(--muted);">${t.createdAt ? new Date(t.createdAt).toLocaleDateString('en-AU') : '—'}</td>
               <td style="padding:10px 12px;text-align:right;">
-                <button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;" onclick='openEditTenant(${JSON.stringify({id:t.id||t.email, firstName:t.firstName||"", lastName:t.lastName||"", email:t.email||"", phone:t.phone||"", property:t.property||""})})'>✏️ Edit</button>
+                <button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;" onclick="openEditTenantByIdx(${ti})">✏️ Edit</button>
                 ${t.source !== 'import' ? `<button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteTenant('${(t.id||t.email).replace(/'/g,"\\'")}', '${(t.firstName||'')} ${(t.lastName||'')}')">🗑 Remove</button>` : ''}
               </td>
             </tr>`;
@@ -5220,6 +5226,16 @@ async function deleteTenant(id, name) {
 // ═══════════════════════════════════════════════
 // EDIT MODALS
 // ═══════════════════════════════════════════════
+
+function openEditOwnerByIdx(idx) {
+  const o = (window._cachedOwners || [])[idx];
+  if (o) openEditOwner(o);
+}
+
+function openEditTenantByIdx(idx) {
+  const t = (window._cachedSortedTenants || [])[idx];
+  if (t) openEditTenant(t);
+}
 
 // ── OWNER EDIT ──────────────────────────────
 let editOwnerData = null;
