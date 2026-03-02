@@ -4818,6 +4818,9 @@ async function loadOwners() {
     }
   });
 
+  // Sort alphabetically by name
+  merged.sort((a, b) => (a.name||a.username||'').localeCompare(b.name||b.username||''));
+
   if (!merged.length) {
     el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">No owners found. Add one above or import via CSV.</div>';
     return;
@@ -4839,7 +4842,10 @@ async function loadOwners() {
           const name = o.name || o.username || '—';
           const ownerProps = managedProps.filter(p => p.owner && p.owner.toLowerCase() === name.toLowerCase());
           const propBadge = ownerProps.length
-            ? `<span style="font-size:0.72rem;color:var(--navy);">📍 ${ownerProps.map(p => p.address).join('<br>')}</span>`
+            ? ownerProps.map(p => {
+                const safeAddr = p.address.replace(/'/g, "\\'");
+                return `<span onclick="goToProperty('${safeAddr}')" style="font-size:0.72rem;color:var(--blue);cursor:pointer;text-decoration:underline;text-underline-offset:2px;display:block;">📍 ${p.address}</span>`;
+              }).join('')
             : `<span style="color:var(--muted);font-size:0.72rem;">No properties</span>`;
           const contact = [o.email, o.phone].filter(Boolean).join(' · ') || '—';
           const sourceTag = o.source === 'property' ? `<span style="font-size:0.6rem;background:var(--blue-pale);color:var(--blue);padding:1px 6px;border-radius:4px;margin-left:6px;">from import</span>` : '';
@@ -4979,6 +4985,13 @@ function renderTenantsList() {
     (t.property||'').toLowerCase().includes(search)
   );
 
+  // Sort alphabetically by last name then first name
+  tenants = [...tenants].sort((a, b) => {
+    const aName = `${a.lastName||''} ${a.firstName||''}`.trim().toLowerCase();
+    const bName = `${b.lastName||''} ${b.firstName||''}`.trim().toLowerCase();
+    return aName.localeCompare(bName);
+  });
+
   if (!tenants.length) {
     el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">No tenants found. Add one above, import via CSV, or ask tenants to self-register at the Tenant Portal.</div>';
     return;
@@ -5001,15 +5014,19 @@ function renderTenantsList() {
           const sourceTag = t.source === 'import'
             ? `<span style="font-size:0.6rem;background:var(--blue-pale);color:var(--blue);padding:1px 6px;border-radius:4px;margin-left:6px;">from import</span>`
             : '';
+          const safeAddr = (t.property||'').replace(/'/g, "\\'");
+          const propLink = t.property
+            ? `<a onclick="goToProperty('${safeAddr}')" style="color:var(--blue);cursor:pointer;text-decoration:underline;text-underline-offset:2px;">📍 ${t.property}</a>`
+            : '—';
           return `
             <tr style="border-bottom:1px solid var(--border);">
               <td style="padding:10px 12px;font-weight:600;">🏡 ${t.firstName||''} ${t.lastName||''}${sourceTag}</td>
               <td style="padding:10px 12px;color:var(--muted);">${t.email||'—'}</td>
-              <td style="padding:10px 12px;">📍 ${t.property||'—'}</td>
+              <td style="padding:10px 12px;">${propLink}</td>
               <td style="padding:10px 12px;color:var(--muted);">${t.phone||'—'}</td>
               <td style="padding:10px 12px;color:var(--muted);">${t.createdAt ? new Date(t.createdAt).toLocaleDateString('en-AU') : '—'}</td>
               <td style="padding:10px 12px;text-align:right;">
-                ${t.source !== 'import' ? `<button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteTenant('${t.id||t.email}', '${t.firstName||''} ${t.lastName||''}')">🗑 Remove</button>` : ''}
+                ${t.source !== 'import' ? `<button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteTenant('${t.id||t.email}', '${(t.firstName||'')} ${(t.lastName||'')}')">🗑 Remove</button>` : ''}
               </td>
             </tr>`;
         }).join('')}
@@ -5105,6 +5122,95 @@ function renderManagedProps() {
   if (!el) return;
 
   const search = (document.getElementById('propSearch')?.value || '').toLowerCase();
+  let props = getManagedProps();
+
+  // Also surface properties that appear in work orders but haven't been added manually
+  const woProps = [...new Set(getWOs().map(w => w.property).filter(Boolean))];
+  woProps.forEach(addr => {
+    if (!props.find(p => p.address === addr)) {
+      props.push({ id: 'auto-' + addr, address: addr, owner: '—', tenant: '', createdAt: null, auto: true });
+    }
+  });
+
+  if (search) props = props.filter(p =>
+    p.address.toLowerCase().includes(search) || p.owner.toLowerCase().includes(search)
+  );
+
+  // Sort alphabetically by address
+  props.sort((a, b) => a.address.localeCompare(b.address));
+
+  if (!props.length) {
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">No properties yet. Add one above or import from CSV.</div>';
+    return;
+  }
+
+  const wos = getWOs();
+  el.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+      <thead>
+        <tr style="border-bottom:2px solid var(--border);">
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Address</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Owner</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Tenant</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Work Orders</th>
+          <th style="padding:8px 12px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${props.map(p => {
+          const propWOs = wos.filter(w => w.property === p.address);
+          const open = propWOs.filter(w => w.status === 'open' || w.status === 'inprogress').length;
+          const badge = open > 0
+            ? `<span style="background:var(--red);color:#fff;font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:10px;">${open} open</span>`
+            : `<span style="background:var(--green-pale);color:var(--green);font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:10px;">✓ clear</span>`;
+          const autoTag = p.auto
+            ? `<span style="font-size:0.6rem;background:var(--blue-pale);color:var(--blue);padding:1px 6px;border-radius:4px;margin-left:6px;">from WO</span>`
+            : '';
+          const ownerDetail = [p.ownerEmail, p.ownerPhone].filter(Boolean).join(' · ');
+          const tenantName  = p.tenant || '—';
+          const tenantDetail= [p.tenantEmail, p.tenantPhone].filter(Boolean).join(' · ');
+          const safeAddr = p.address.replace(/'/g, "\\'");
+          return `
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:10px 12px;">
+                <a onclick="goToProperty('${safeAddr}')" style="font-weight:700;color:var(--navy);cursor:pointer;text-decoration:underline;text-underline-offset:3px;">📍 ${p.address}</a>${autoTag}
+              </td>
+              <td style="padding:10px 12px;">
+                <div style="font-weight:600;">👤 ${p.owner}</div>
+                ${ownerDetail ? `<div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">${ownerDetail}</div>` : ''}
+              </td>
+              <td style="padding:10px 12px;">
+                <div>${tenantName}</div>
+                ${tenantDetail ? `<div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">${tenantDetail}</div>` : ''}
+              </td>
+              <td style="padding:10px 12px;">${badge} <span style="color:var(--muted);font-size:0.75rem;margin-left:4px;">${propWOs.length} total</span></td>
+              <td style="padding:10px 12px;text-align:right;">
+                ${!p.auto ? `<button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteProperty('${p.id}')">🗑 Remove</button>` : ''}
+              </td>
+            </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+}
+
+function goToProperty(address) {
+  // Switch to the Properties (work orders by property) tab and highlight the property
+  showPage('properties');
+  // Scroll to the property group after render
+  setTimeout(() => {
+    const groups = document.querySelectorAll('#propsGrid .prop-group-header h2');
+    for (const g of groups) {
+      if (g.textContent.includes(address)) {
+        g.closest('.prop-group').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        g.closest('.prop-group').style.outline = '2px solid var(--gold)';
+        g.closest('.prop-group').style.borderRadius = '10px';
+        setTimeout(() => g.closest('.prop-group').style.outline = '', 2000);
+        break;
+      }
+    }
+  }, 150);
+}
+
   let props = getManagedProps();
 
   // Also surface properties that appear in work orders but haven't been added manually
