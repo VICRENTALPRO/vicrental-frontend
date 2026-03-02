@@ -1757,6 +1757,22 @@ window.addEventListener('DOMContentLoaded', function() {
           <div class="kpi-card kpi-amber"><div class="kpi-label">In Progress</div><div class="kpi-value" id="dashIP">0</div><div class="kpi-sub">Repairs underway</div><div class="kpi-icon">🔨</div></div>
           <div class="kpi-card kpi-green"><div class="kpi-label">Resolved</div><div class="kpi-value" id="dashOK">0</div><div class="kpi-sub">Completed repairs</div><div class="kpi-icon">✅</div></div>
           <div class="kpi-card kpi-gold"><div class="kpi-label">Overdue</div><div class="kpi-value" id="dashOverdue">0</div><div class="kpi-sub">Past due date</div><div class="kpi-icon">⏰</div></div>
+          <div class="kpi-card" style="background:linear-gradient(135deg,#1d4f91,#2d6dbf);cursor:pointer;" onclick="showPage('tenantreqs')"><div class="kpi-label" style="color:rgba(255,255,255,0.7);">New Requests</div><div class="kpi-value" style="color:#fff;" id="dashNewTR">0</div><div class="kpi-sub" style="color:rgba(255,255,255,0.6);">Awaiting review</div><div class="kpi-icon">🏡</div></div>
+        </div>
+
+        <!-- Tenant Requests Panel -->
+        <div class="panel" style="margin-bottom:14px;" id="dashTRPanel">
+          <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;">
+            <h3>🏡 New Tenant Requests</h3>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <small id="dashTRLabel" style="color:var(--muted);"></small>
+              <button class="btn btn-ghost" style="font-size:0.72rem;padding:4px 10px;" onclick="loadTenantReqs();renderDashboard();">↺ Refresh</button>
+              <button class="btn btn-primary" style="font-size:0.72rem;padding:4px 12px;" onclick="showPage('tenantreqs')">View All →</button>
+            </div>
+          </div>
+          <div style="padding:14px;" id="dashTRList">
+            <div style="text-align:center;padding:20px;color:var(--muted);font-size:0.82rem;">No new requests</div>
+          </div>
         </div>
 
         <div class="dash-grid">
@@ -2762,7 +2778,7 @@ function showPage(id) {
   closeDetail();
 
   // Render page
-  if (id === 'dashboard') renderDashboard();
+  if (id === 'dashboard') { loadTenantReqs().then(() => renderDashboard()); renderDashboard(); }
   else if (id === 'portal') renderPortal();
   else if (id === 'workorders') renderWOs();
   else if (id === 'properties') renderProperties();
@@ -2774,7 +2790,7 @@ function showPage(id) {
   else if (id === 'import') renderImportPage();
   else if (id === 'vault') renderVault();
   else if (id === 'quotes')      { populateQuoteWODropdown(); renderQuotes(); }
-  else if (id === 'tenantreqs')  { renderTenantReqs(); }
+  else if (id === 'tenantreqs')  { loadTenantReqs(); }
   else if (id === 'checklist') initChecklist();
 
   updateSidebarBadges();
@@ -3248,6 +3264,38 @@ function renderDashboard() {
         </div>
       </div>`;
     }).join('');
+  }
+
+  // Tenant Requests on Dashboard
+  const allTR   = S.get(KEY_TREQS, []);
+  const newTR   = allTR.filter(r => r.status === 'submitted');
+  const dashTRList = document.getElementById('dashTRList');
+  const dashTRLabel = document.getElementById('dashTRLabel');
+  const dashNewTR  = document.getElementById('dashNewTR');
+  if (dashNewTR) dashNewTR.textContent = newTR.length;
+  if (dashTRLabel) dashTRLabel.textContent = newTR.length + ' awaiting review';
+  const priColors = { emergency:'var(--red)', urgent:'var(--amber)', routine:'var(--green)' };
+  const priLabels = { emergency:'🚨 Emergency', urgent:'⚠️ Urgent', routine:'🔧 Routine' };
+  if (dashTRList) {
+    if (newTR.length === 0) {
+      dashTRList.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.82rem;">No new tenant requests — all up to date ✅</div>';
+    } else {
+      dashTRList.innerHTML = newTR.slice(0, 5).map(req => `
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);" onclick="showPage('tenantreqs')" style="cursor:pointer;">
+          <div style="width:38px;height:38px;background:var(--navy);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">🏡</div>
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span style="font-size:0.78rem;font-weight:700;color:var(--navy);">${req.tenantName}</span>
+              <span style="font-size:0.68rem;background:var(--navy);color:#fff;padding:1px 7px;border-radius:10px;">${req.id}</span>
+              <span style="font-size:0.68rem;font-weight:700;color:${priColors[req.priority]||'var(--muted)'};">${priLabels[req.priority]||req.priority}</span>
+            </div>
+            <div style="font-size:0.75rem;color:var(--muted);margin-top:2px;">📍 ${req.property}</div>
+            <div style="font-size:0.78rem;color:var(--text);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${req.description}</div>
+          </div>
+          <div style="font-size:0.68rem;color:var(--muted);white-space:nowrap;">${new Date(req.submittedAt).toLocaleDateString('en-AU',{day:'2-digit',month:'short'})}</div>
+        </div>`).join('') +
+        (newTR.length > 5 ? `<div style="text-align:center;padding:10px;font-size:0.78rem;color:var(--blue);cursor:pointer;" onclick="showPage('tenantreqs')">View all ${newTR.length} requests →</div>` : '');
+    }
   }
 
   // Category breakdown
@@ -4777,6 +4825,36 @@ function setTRFilter(f) {
   renderTenantReqs();
 }
 
+async function loadTenantReqs() {
+  // Fetch from Railway backend and merge into localStorage
+  try {
+    const res = await fetch(`${BACKEND}/tenant-requests/all`, { headers: getAuthHeaders() });
+    if (res.ok) {
+      const data = await res.json();
+      const backendReqs = data.requests || data || [];
+      if (Array.isArray(backendReqs) && backendReqs.length > 0) {
+        const local = S.get(KEY_TREQS, []);
+        // Merge: add backend reqs not already in local, update status of existing
+        backendReqs.forEach(br => {
+          const li = local.findIndex(r => r.id === br.id);
+          if (li >= 0) {
+            // Update fields that PM may have changed
+            local[li].status     = br.status     || local[li].status;
+            local[li].pmResponse = br.pmResponse || local[li].pmResponse;
+            local[li].updatedAt  = br.updatedAt  || local[li].updatedAt;
+          } else {
+            local.unshift(br);  // New request from tenant portal
+          }
+        });
+        // Sort by submittedAt desc
+        local.sort((a,b) => new Date(b.submittedAt||0) - new Date(a.submittedAt||0));
+        S.set(KEY_TREQS, local);
+      }
+    }
+  } catch(e) { /* backend unavailable — use localStorage */ }
+  renderTenantReqs();
+}
+
 function renderTenantReqs() {
   const search  = (document.getElementById('trSearch')?.value || '').toLowerCase();
   const propF   = document.getElementById('trPropFilter')?.value || 'all';
@@ -4904,6 +4982,11 @@ function ackTenantReq(id) {
   reqs[idx].status = 'inprogress';
   reqs[idx].updatedAt = new Date().toISOString();
   S.set(KEY_TREQS, reqs);
+  // Sync status to backend so tenant portal sees it
+  fetch(`${BACKEND}/tenant-requests/${id}/status`, {
+    method: 'PATCH', headers: getAuthHeaders(),
+    body: JSON.stringify({ status: 'inprogress' })
+  }).catch(() => {});
   toast('Request acknowledged — status updated to In Progress', 'success');
   logActivity(`Tenant request ${id} acknowledged`, '#0f4c81');
   updateSidebarBadges();
@@ -4917,6 +5000,11 @@ function completeTenantReq(id) {
   reqs[idx].status = 'completed';
   reqs[idx].updatedAt = new Date().toISOString();
   S.set(KEY_TREQS, reqs);
+  // Sync status to backend so tenant portal sees it
+  fetch(`${BACKEND}/tenant-requests/${id}/status`, {
+    method: 'PATCH', headers: getAuthHeaders(),
+    body: JSON.stringify({ status: 'completed' })
+  }).catch(() => {});
   toast('Request marked as completed', 'success');
   logActivity(`Tenant request ${id} completed`, '#1d7a50');
   updateSidebarBadges();

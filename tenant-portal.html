@@ -914,7 +914,7 @@ const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
           <button class="btn-signin" onclick="doTenantLogin()">Sign In <span>→</span></button>
           <div class="login-hint" style="margin-top:16px;">
             <strong>Demo tenant:</strong><br>
-            Email: <strong>sarah.johnson@email.com</strong><br>
+            Email: <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="592a382b383177333631372a3637193c34383035773a3634">[email&#160;protected]</a></strong><br>
             Password: <strong>tenant123</strong>
           </div>
         </div>
@@ -1261,7 +1261,7 @@ const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
           <div class="notice-body">
             <strong>Office:</strong> (03) 9XXX XXXX · Mon–Fri, 9am–5pm<br>
             <strong>After-hours emergency:</strong> 1800 XXX XXX<br>
-            <strong>Email:</strong> maintenance@vicrental.com.au
+            <strong>Email:</strong> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ee838f87809a8b808f808d8bae98878d9c8b809a8f82c08d8183c08f9b">[email&#160;protected]</a>
           </div>
         </div>
       </div>
@@ -1318,7 +1318,7 @@ const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
 <!-- Toasts -->
 <div class="toast-wrap" id="toastWrap"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ═══════════════════════════════════════════════
 // STORAGE
 // ═══════════════════════════════════════════════
@@ -1650,6 +1650,16 @@ function submitRequest() {
   reqs.unshift(req);
   S.set(KEY_TREQS, reqs);
 
+  // ── Also POST to Railway backend so PM portal can see it ──
+  const token = localStorage.getItem('vr_token');
+  if (token) {
+    fetch('https://vicrental-backend1-production.up.railway.app/api/tenant-requests', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify(req)
+    }).catch(() => {/* non-fatal — stored locally */});
+  }
+
   // Show success
   document.getElementById('submitSection').style.display = 'none';
   document.querySelectorAll('.maint-step').forEach(s => s.style.display = 'none');
@@ -1696,6 +1706,41 @@ function setReqFilter(f) {
 }
 
 function renderRequests() {
+  if (!currentTenant) return;
+
+  // Try to sync status updates from backend
+  const token = localStorage.getItem('vr_token');
+  if (token) {
+    fetch('https://vicrental-backend1-production.up.railway.app/api/tenant-requests/mine', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (data && Array.isArray(data.requests || data)) {
+        const backendReqs = data.requests || data;
+        const local = S.get(KEY_TREQS, []);
+        // Merge: update status/pmResponse from backend into local
+        backendReqs.forEach(br => {
+          const li = local.findIndex(r => r.id === br.id);
+          if (li >= 0) {
+            local[li].status = br.status || local[li].status;
+            local[li].pmResponse = br.pmResponse || local[li].pmResponse;
+            local[li].updatedAt = br.updatedAt || local[li].updatedAt;
+          }
+        });
+        S.set(KEY_TREQS, local);
+        _renderRequestsFromLocal();
+      } else {
+        _renderRequestsFromLocal();
+      }
+    })
+    .catch(() => _renderRequestsFromLocal());
+  } else {
+    _renderRequestsFromLocal();
+  }
+}
+
+function _renderRequestsFromLocal() {
   if (!currentTenant) return;
   let reqs = S.get(KEY_TREQS, []).filter(r => r.tenantId === currentTenant.id);
 
@@ -1849,14 +1894,4 @@ function showToast(msg, type = 'ok') {
   el.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${msg}</span>`;
   document.getElementById('toastWrap').appendChild(el);
   setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.4s'; }, 3200);
-  setTimeout(() => el.remove(), 3700);
-}
-
-// ═══════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════
-seedDemo();
-checkSession();
-</script>
-</body>
-</html>
+  setTimeout(() => el.remove(
