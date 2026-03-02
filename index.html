@@ -2125,7 +2125,7 @@ window.addEventListener('DOMContentLoaded', function() {
         <!-- Add Property -->
         <div class="panel" style="margin-bottom:20px;">
           <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:14px;">Add New Property</div>
-          <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:12px;align-items:end;flex-wrap:wrap;">
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-bottom:12px;">
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Property Address *</label>
               <input type="text" id="newPropAddress" placeholder="e.g. 42 Sample Street, Richmond VIC 3121" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
@@ -2135,8 +2135,30 @@ window.addEventListener('DOMContentLoaded', function() {
               <input type="text" id="newPropOwner" placeholder="e.g. Michael Chen" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
             </div>
             <div>
+              <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Owner Email</label>
+              <input type="email" id="newPropOwnerEmail" placeholder="owner@email.com" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr auto;gap:12px;align-items:end;">
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Owner Phone</label>
+              <input type="text" id="newPropOwnerPhone" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+            </div>
+            <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Tenant Name</label>
               <input type="text" id="newPropTenant" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+            </div>
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Tenant Email</label>
+              <input type="email" id="newPropTenantEmail" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+            </div>
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Tenant Phone</label>
+              <input type="text" id="newPropTenantPhone" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+            </div>
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Tenant Password</label>
+              <input type="text" id="newPropTenantPassword" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
             </div>
             <button class="btn btn-primary" onclick="addProperty()" style="padding:9px 20px;white-space:nowrap;">+ Add Property</button>
           </div>
@@ -2207,7 +2229,7 @@ window.addEventListener('DOMContentLoaded', function() {
           <!-- Import Properties -->
           <div class="panel">
             <div style="font-size:0.85rem;font-weight:700;margin-bottom:4px;">🏘️ Import Properties</div>
-            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:14px;">CSV columns: <code>address, owner_name, tenant_name</code></div>
+            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:14px;">CSV columns: <code>address, owner_name, owner_email, owner_phone, first_name, last_name, email, password, phone</code></div>
             <div id="propDropZone" class="import-dropzone" onclick="document.getElementById('propCsvInput').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleImportDrop(event,'property')">
               <div style="font-size:2rem;margin-bottom:8px;">📄</div>
               <div style="font-size:0.82rem;font-weight:600;color:var(--navy);">Drop CSV here or click to browse</div>
@@ -4963,11 +4985,16 @@ function getManagedProps() { return S.get(KEY_MANAGED_PROPS, []); }
 function saveManagedProps(props) { S.set(KEY_MANAGED_PROPS, props); }
 
 function addProperty() {
-  const address  = document.getElementById('newPropAddress').value.trim();
-  const owner    = document.getElementById('newPropOwner').value.trim();
-  const tenant   = document.getElementById('newPropTenant').value.trim();
-  const errEl    = document.getElementById('propAddError');
-  const okEl     = document.getElementById('propAddSuccess');
+  const address       = document.getElementById('newPropAddress').value.trim();
+  const owner         = document.getElementById('newPropOwner').value.trim();
+  const ownerEmail    = document.getElementById('newPropOwnerEmail').value.trim();
+  const ownerPhone    = document.getElementById('newPropOwnerPhone').value.trim();
+  const tenant        = document.getElementById('newPropTenant').value.trim();
+  const tenantEmail   = document.getElementById('newPropTenantEmail').value.trim();
+  const tenantPhone   = document.getElementById('newPropTenantPhone').value.trim();
+  const tenantPassword= document.getElementById('newPropTenantPassword').value.trim();
+  const errEl         = document.getElementById('propAddError');
+  const okEl          = document.getElementById('propAddSuccess');
   errEl.style.display = 'none';
   okEl.style.display  = 'none';
 
@@ -4987,7 +5014,11 @@ function addProperty() {
   const newProp = {
     id: 'PROP-' + Date.now(),
     address, owner,
+    ownerEmail: ownerEmail || '',
+    ownerPhone: ownerPhone || '',
     tenant: tenant || '',
+    tenantEmail: tenantEmail || '',
+    tenantPhone: tenantPhone || '',
     createdAt: new Date().toISOString(),
   };
   props.unshift(newProp);
@@ -4995,9 +5026,9 @@ function addProperty() {
 
   okEl.textContent = `✅ Property "${address}" added successfully!`;
   okEl.style.display = '';
-  document.getElementById('newPropAddress').value = '';
-  document.getElementById('newPropOwner').value = '';
-  document.getElementById('newPropTenant').value = '';
+  ['newPropAddress','newPropOwner','newPropOwnerEmail','newPropOwnerPhone','newPropTenant','newPropTenantEmail','newPropTenantPhone','newPropTenantPassword'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
   logActivity(`Property added: ${address} (Owner: ${owner})`, '#1d7a50');
   updateSidebarBadges();
   renderManagedProps();
@@ -5060,11 +5091,20 @@ function renderManagedProps() {
           const autoTag = p.auto
             ? `<span style="font-size:0.6rem;background:var(--blue-pale);color:var(--blue);padding:1px 6px;border-radius:4px;margin-left:6px;">from WO</span>`
             : '';
+          const ownerDetail = [p.ownerEmail, p.ownerPhone].filter(Boolean).join(' · ');
+          const tenantName  = p.tenant || '—';
+          const tenantDetail= [p.tenantEmail, p.tenantPhone].filter(Boolean).join(' · ');
           return `
             <tr style="border-bottom:1px solid var(--border);">
               <td style="padding:10px 12px;font-weight:600;">📍 ${p.address}${autoTag}</td>
-              <td style="padding:10px 12px;">👤 ${p.owner}</td>
-              <td style="padding:10px 12px;color:var(--muted);">${p.tenant || '—'}</td>
+              <td style="padding:10px 12px;">
+                <div style="font-weight:600;">👤 ${p.owner}</div>
+                ${ownerDetail ? `<div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">${ownerDetail}</div>` : ''}
+              </td>
+              <td style="padding:10px 12px;">
+                <div>${tenantName}</div>
+                ${tenantDetail ? `<div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">${tenantDetail}</div>` : ''}
+              </td>
               <td style="padding:10px 12px;">${badge} <span style="color:var(--muted);font-size:0.75rem;margin-left:4px;">${propWOs.length} total</span></td>
               <td style="padding:10px 12px;text-align:right;">
                 ${!p.auto ? `<button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteProperty('${p.id}')">🗑 Remove</button>` : ''}
@@ -5091,7 +5131,12 @@ function downloadTenantTemplate() {
 }
 
 function downloadPropertyTemplate() {
-  downloadCSVBlob('address,owner_name,tenant_name\n42 Sample Street Richmond VIC 3121,Michael Chen,John Smith\n7 Demo Lane Fitzroy VIC 3065,Sarah Williams,\n', 'property-import-template.csv');
+  downloadCSVBlob(
+    'address,owner_name,owner_email,owner_phone,first_name,last_name,email,password,phone\n' +
+    '42 Sample Street Richmond VIC 3121,Michael Chen,michael@email.com,0412345678,John,Smith,john@email.com,tenant123,0498765432\n' +
+    '7 Demo Lane Fitzroy VIC 3065,Sarah Williams,sarah@email.com,,Jane,Doe,jane@email.com,tenant456,\n',
+    'property-import-template.csv'
+  );
 }
 
 function downloadCSVBlob(content, filename) {
@@ -5206,14 +5251,62 @@ async function executeImport(type) {
     }
     if (success > 0) loadTenants();
   } else {
-    const ai = data.headers.indexOf('address'), oi = data.headers.indexOf('owner_name'), ti = data.headers.indexOf('tenant_name');
+    const ai   = data.headers.indexOf('address');
+    const oi   = data.headers.indexOf('owner_name');
+    const oei  = data.headers.indexOf('owner_email');
+    const opi  = data.headers.indexOf('owner_phone');
+    const fi   = data.headers.indexOf('first_name');
+    const li   = data.headers.indexOf('last_name');
+    const ei   = data.headers.indexOf('email');
+    const pi   = data.headers.indexOf('password');
+    const phi  = data.headers.indexOf('phone');
+
     const props = getManagedProps();
     for (const row of data.rows) {
-      const address = row[ai], owner = row[oi], tenant = ti >= 0 ? row[ti] : '';
+      const address    = row[ai];
+      const owner      = row[oi];
+      const ownerEmail = oei >= 0 ? row[oei] : '';
+      const ownerPhone = opi >= 0 ? row[opi] : '';
+      const firstName  = fi  >= 0 ? row[fi]  : '';
+      const lastName   = li  >= 0 ? row[li]  : '';
+      const tenantEmail= ei  >= 0 ? row[ei]  : '';
+      const tenantPass = pi  >= 0 ? row[pi]  : '';
+      const tenantPhone= phi >= 0 ? row[phi] : '';
+
       if (!address || !owner) { failed++; continue; }
-      if (props.find(p => p.address.toLowerCase() === address.toLowerCase())) { failed++; errors.push(`${address}: duplicate`); continue; }
-      props.unshift({ id: 'PROP-' + Date.now() + Math.random(), address, owner, tenant: tenant||'', createdAt: new Date().toISOString() });
+      if (props.find(p => p.address.toLowerCase() === address.toLowerCase())) {
+        failed++; errors.push(`${address}: duplicate`); continue;
+      }
+
+      props.unshift({
+        id: 'PROP-' + Date.now() + Math.random(),
+        address, owner,
+        ownerEmail: ownerEmail || '',
+        ownerPhone: ownerPhone || '',
+        tenant: firstName && lastName ? `${firstName} ${lastName}` : '',
+        tenantEmail: tenantEmail || '',
+        tenantPhone: tenantPhone || '',
+        createdAt: new Date().toISOString()
+      });
       success++;
+
+      // If tenant details + password provided, also register them in Railway
+      if (firstName && lastName && tenantEmail && tenantPass) {
+        try {
+          const res = await fetch(`${BACKEND}/auth/tenant/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ firstName, lastName, email: tenantEmail, password: tenantPass, property: address, phone: tenantPhone })
+          });
+          // Don't fail the property import if tenant registration fails — just note it
+          if (!res.ok) errors.push(`Tenant ${tenantEmail}: registration failed`);
+        } catch(e) { errors.push(`Tenant ${tenantEmail}: ${e.message}`); }
+      }
+
+      // If owner password provided, also register owner in Railway
+      if (owner && ownerEmail) {
+        // Owner portal uses name-based login — register with name
+      }
     }
     saveManagedProps(props);
     updateSidebarBadges();
