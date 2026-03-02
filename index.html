@@ -3421,28 +3421,48 @@ function renderProperties() {
   const grid = document.getElementById('propsGrid');
   if (!grid) return;
 
-  const props = {};
+  // Build stats from work orders
+  const propStats = {};
   wos.forEach(wo => {
-    if (!props[wo.property]) props[wo.property] = { nc: 0, ip: 0, ok: 0, total: 0 };
-    const s = props[wo.property];
+    if (!propStats[wo.property]) propStats[wo.property] = { nc: 0, ip: 0, ok: 0, total: 0 };
+    const s = propStats[wo.property];
     s.total++;
     if (wo.status === 'completed' || wo.status === 'cancelled') s.ok++;
     else if (wo.status === 'inprogress') s.ip++;
     else s.nc++;
   });
 
-  if (Object.keys(props).length === 0) {
-    grid.innerHTML = '<div class="empty"><div class="empty-icon">🏘️</div><h3>No Properties</h3><p>Properties appear here once you create work orders or run checklist inspections.</p></div>';
+  // Also include managed properties even if they have no work orders
+  const managed = getManagedProps();
+  managed.forEach(p => {
+    if (!propStats[p.address]) propStats[p.address] = { nc: 0, ip: 0, ok: 0, total: 0 };
+    propStats[p.address].owner       = p.owner       || '';
+    propStats[p.address].ownerEmail  = p.ownerEmail  || '';
+    propStats[p.address].ownerPhone  = p.ownerPhone  || '';
+    propStats[p.address].tenant      = p.tenant      || '';
+    propStats[p.address].tenantEmail = p.tenantEmail || '';
+    propStats[p.address].tenantPhone = p.tenantPhone || '';
+  });
+
+  if (Object.keys(propStats).length === 0) {
+    grid.innerHTML = '<div class="empty"><div class="empty-icon">🏘️</div><h3>No Properties</h3><p>Properties appear here once you add them via Manage Properties or create work orders.</p></div>';
     return;
   }
 
-  grid.innerHTML = Object.entries(props).sort((a,b) => b[1].nc - a[1].nc).map(([prop, s]) => {
-    const statusPill = s.nc > 0 ? `<span class="pill pill-nc">⚠ Non-Compliant</span>` :
-                       s.ip > 0 ? `<span class="pill pill-ip">🔨 In Progress</span>` :
-                                  `<span class="pill pill-ok">✅ Compliant</span>`;
-    return `<div class="prop-card" onclick="filterWOsByProp('${prop.replace(/'/g,"\\'")}')">
-      <div class="prop-card-address">${prop}</div>
-      <div class="prop-card-sub">${s.total} total work order${s.total!==1?'s':''} · Click to view</div>
+  grid.innerHTML = Object.entries(propStats)
+    .sort((a, b) => b[1].nc !== a[1].nc ? b[1].nc - a[1].nc : a[0].localeCompare(b[0]))
+    .map(([prop, s]) => {
+      const statusPill = s.nc > 0 ? `<span class="pill pill-nc">⚠ Non-Compliant</span>` :
+                         s.ip > 0 ? `<span class="pill pill-ip">🔨 In Progress</span>` :
+                                    `<span class="pill pill-ok">✅ Compliant</span>`;
+      const safeId = 'propcard_' + prop.replace(/[^a-zA-Z0-9]/g, '_');
+      const ownerLine  = s.owner  ? `<div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">👤 ${s.owner}${s.ownerEmail  ? ' · ' + s.ownerEmail  : ''}${s.ownerPhone  ? ' · ' + s.ownerPhone  : ''}</div>` : '';
+      const tenantLine = s.tenant ? `<div style="font-size:0.72rem;color:var(--muted);">🏡 ${s.tenant}${s.tenantEmail ? ' · ' + s.tenantEmail : ''}${s.tenantPhone ? ' · ' + s.tenantPhone : ''}</div>` : '';
+      const subText = s.total > 0 ? `${s.total} work order${s.total!==1?'s':''} · Click to view` : 'No work orders yet';
+      return `<div class="prop-card" id="${safeId}" onclick="filterWOsByProp('${prop.replace(/'/g,"\\'")}')">
+      <div class="prop-card-address">📍 ${prop}</div>
+      <div class="prop-card-sub">${subText}</div>
+      ${ownerLine}${tenantLine}
       <div class="prop-card-stats">
         <div class="prop-stat"><div class="prop-stat-val red">${s.nc}</div><div class="prop-stat-label">Non-Comp.</div></div>
         <div class="prop-stat"><div class="prop-stat-val amber">${s.ip}</div><div class="prop-stat-label">In Progress</div></div>
@@ -3450,7 +3470,7 @@ function renderProperties() {
       </div>
       ${statusPill}
     </div>`;
-  }).join('');
+    }).join('');
 }
 
 function filterWOsByProp(prop) {
@@ -5595,19 +5615,15 @@ function renderManagedProps() {
 }
 
 function goToProperty(address) {
-  // Switch to the Properties (work orders by property) tab and highlight the property
   showPage('properties');
-  // Scroll to the property group after render
   setTimeout(() => {
-    const groups = document.querySelectorAll('#propsGrid .prop-group-header h2');
-    for (const g of groups) {
-      if (g.textContent.includes(address)) {
-        g.closest('.prop-group').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        g.closest('.prop-group').style.outline = '2px solid var(--gold)';
-        g.closest('.prop-group').style.borderRadius = '10px';
-        setTimeout(() => g.closest('.prop-group').style.outline = '', 2000);
-        break;
-      }
+    const safeId = 'propcard_' + address.replace(/[^a-zA-Z0-9]/g, '_');
+    const card = document.getElementById(safeId);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.style.outline = '3px solid var(--gold)';
+      card.style.boxShadow = '0 0 0 8px rgba(201,151,58,0.18)';
+      setTimeout(() => { card.style.outline = ''; card.style.boxShadow = ''; }, 2500);
     }
   }, 150);
 }
