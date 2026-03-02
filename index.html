@@ -3456,19 +3456,23 @@ function renderProperties() {
                          s.ip > 0 ? `<span class="pill pill-ip">🔨 In Progress</span>` :
                                     `<span class="pill pill-ok">✅ Compliant</span>`;
       const safeId = 'propcard_' + prop.replace(/[^a-zA-Z0-9]/g, '_');
-      const ownerLine  = s.owner  ? `<div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">👤 ${s.owner}${s.ownerEmail  ? ' · ' + s.ownerEmail  : ''}${s.ownerPhone  ? ' · ' + s.ownerPhone  : ''}</div>` : '';
-      const tenantLine = s.tenant ? `<div style="font-size:0.72rem;color:var(--muted);">🏡 ${s.tenant}${s.tenantEmail ? ' · ' + s.tenantEmail : ''}${s.tenantPhone ? ' · ' + s.tenantPhone : ''}</div>` : '';
+      const ownerLine  = s.owner  ? `<div style="margin-top:8px;"><div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:2px;">Owner</div><div style="font-size:0.8rem;font-weight:600;color:var(--navy);">${s.owner}</div></div>` : '';
+      const tenantLine = s.tenant ? `<div style="margin-top:6px;"><div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:2px;">Tenant</div><div style="font-size:0.8rem;font-weight:600;color:var(--navy);">${s.tenant}</div></div>` : '';
       const subText = s.total > 0 ? `${s.total} work order${s.total!==1?'s':''} · Click to view` : 'No work orders yet';
-      return `<div class="prop-card" id="${safeId}" onclick="filterWOsByProp('${prop.replace(/'/g,"\\'")}')">
-      <div class="prop-card-address">📍 ${prop}</div>
+      const safeProp = prop.replace(/'/g, "\\'");
+      return `<div class="prop-card" id="${safeId}" onclick="filterWOsByProp('${safeProp}')">
+      <div class="prop-card-address">${prop}</div>
       <div class="prop-card-sub">${subText}</div>
       ${ownerLine}${tenantLine}
-      <div class="prop-card-stats">
+      <div class="prop-card-stats" style="margin-top:10px;">
         <div class="prop-stat"><div class="prop-stat-val red">${s.nc}</div><div class="prop-stat-label">Non-Comp.</div></div>
         <div class="prop-stat"><div class="prop-stat-val amber">${s.ip}</div><div class="prop-stat-label">In Progress</div></div>
         <div class="prop-stat"><div class="prop-stat-val green">${s.ok}</div><div class="prop-stat-label">Resolved</div></div>
       </div>
-      ${statusPill}
+      <div style="display:flex;gap:8px;margin-top:12px;align-items:center;">
+        ${statusPill}
+        <button class="btn btn-ghost" style="font-size:0.68rem;padding:3px 10px;margin-left:auto;" onclick="event.stopPropagation();createInspectionChecklist('${safeProp}')">📋 Create Inspection</button>
+      </div>
     </div>`;
     }).join('');
 }
@@ -3479,6 +3483,26 @@ function filterWOsByProp(prop) {
     const search = document.getElementById('woSearch');
     if (search) { search.value = prop; renderWOs(); }
   }, 100);
+}
+
+function createInspectionChecklist(prop) {
+  // Navigate to checklist page and pre-select/pre-fill the property
+  showPage('checklist');
+  setTimeout(() => {
+    // Try to set property field if checklist has one
+    const propField = document.getElementById('checklistProperty') || document.getElementById('inspProp') || document.querySelector('#page-checklist input[type="text"]');
+    if (propField) {
+      propField.value = prop;
+      propField.dispatchEvent(new Event('input'));
+    }
+    // Also set the new inspection property dropdown if it exists
+    const propSelect = document.querySelector('#page-checklist select');
+    if (propSelect) {
+      for (const opt of propSelect.options) {
+        if (opt.value === prop || opt.text === prop) { propSelect.value = opt.value; break; }
+      }
+    }
+  }, 150);
 }
 
 // ═══════════════════════════════════════════════
