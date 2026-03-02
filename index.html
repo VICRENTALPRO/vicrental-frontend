@@ -4729,6 +4729,18 @@ function openTRPhoto(dataUrl) {
 // OWNER MANAGEMENT
 // ═══════════════════════════════════════════════
 const BACKEND = 'https://vicrental-backend1-production.up.railway.app/api';
+const KEY_LOCAL_OWNERS = 'vr_local_owners';
+
+function getLocalOwners() { return S.get(KEY_LOCAL_OWNERS, []); }
+function saveLocalOwners(owners) { S.set(KEY_LOCAL_OWNERS, owners); }
+
+function addLocalOwner(name, email, phone) {
+  const owners = getLocalOwners();
+  if (!owners.find(o => o.name.toLowerCase() === name.toLowerCase())) {
+    owners.unshift({ id: 'OWN-' + Date.now() + Math.random(), name, email: email||'', phone: phone||'', createdAt: new Date().toISOString(), source: 'local' });
+    saveLocalOwners(owners);
+  }
+}
 
 function getAuthHeaders() {
   const token = localStorage.getItem('vr_token');
@@ -4761,6 +4773,7 @@ async function addOwner() {
     okEl.style.display = '';
     document.getElementById('newOwnerName').value = '';
     document.getElementById('newOwnerPassword').value = '';
+    addLocalOwner(name, '', '');
     logActivity(`Owner account created: ${name}`, '#1d7a50');
     loadOwners();
   } catch (err) {
@@ -4774,51 +4787,75 @@ async function loadOwners() {
   if (!el) return;
   el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">Loading…</div>';
 
+  let backendOwners = [];
   try {
     const res = await fetch(`${BACKEND}/auth/owner/list`, { headers: getAuthHeaders() });
-    if (res.status === 404) {
-      // Endpoint may not exist — show manual instructions
-      el.innerHTML = `
-        <div style="padding:20px;background:var(--blue-pale);border-radius:8px;font-size:0.82rem;line-height:1.7;">
-          <strong>Owner list not available via API.</strong><br>
-          Currently registered owner: <strong>Michael Chen</strong> (password: <code>owner123</code>)<br><br>
-          To add more owners, use the form above. If the backend doesn't support owner registration yet, you can update the hardcoded owners in <code>owner-portal.html</code>.
-        </div>`;
-      return;
+    if (res.ok) {
+      const data = await res.json();
+      backendOwners = data.owners || data || [];
     }
-    const data = await res.json();
-    const owners = data.owners || data || [];
-    if (!owners.length) {
-      el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">No owners found.</div>';
-      return;
+  } catch(e) { /* backend unavailable — fall through to local */ }
+
+  // Merge with local owners (imported via CSV or added manually)
+  const localOwners = getLocalOwners();
+  const merged = [...backendOwners];
+  localOwners.forEach(lo => {
+    if (!merged.find(o => (o.name||o.username||'').toLowerCase() === lo.name.toLowerCase())) {
+      merged.push(lo);
+    } else {
+      // Enrich backend entry with local email/phone if missing
+      const existing = merged.find(o => (o.name||o.username||'').toLowerCase() === lo.name.toLowerCase());
+      if (!existing.email && lo.email) existing.email = lo.email;
+      if (!existing.phone && lo.phone) existing.phone = lo.phone;
     }
-    el.innerHTML = `
-      <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
-        <thead>
-          <tr style="border-bottom:2px solid var(--border);">
-            <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Name</th>
-            <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Created</th>
-            <th style="padding:8px 12px;"></th>
-          </tr>
-        </thead>
-        <tbody>
-          ${owners.map(o => `
+  });
+
+  // Also pick up owners from managed properties that aren't listed yet
+  const managedProps = getManagedProps();
+  managedProps.forEach(p => {
+    if (p.owner && p.owner !== '—' && !merged.find(o => (o.name||o.username||'').toLowerCase() === p.owner.toLowerCase())) {
+      merged.push({ id: 'auto-' + p.owner, name: p.owner, email: p.ownerEmail||'', phone: p.ownerPhone||'', createdAt: null, source: 'property' });
+    }
+  });
+
+  if (!merged.length) {
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">No owners found. Add one above or import via CSV.</div>';
+    return;
+  }
+
+  el.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+      <thead>
+        <tr style="border-bottom:2px solid var(--border);">
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Name</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Email / Phone</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Properties</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Added</th>
+          <th style="padding:8px 12px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${merged.map(o => {
+          const name = o.name || o.username || '—';
+          const ownerProps = managedProps.filter(p => p.owner && p.owner.toLowerCase() === name.toLowerCase());
+          const propBadge = ownerProps.length
+            ? `<span style="font-size:0.72rem;color:var(--navy);">📍 ${ownerProps.map(p => p.address).join('<br>')}</span>`
+            : `<span style="color:var(--muted);font-size:0.72rem;">No properties</span>`;
+          const contact = [o.email, o.phone].filter(Boolean).join(' · ') || '—';
+          const sourceTag = o.source === 'property' ? `<span style="font-size:0.6rem;background:var(--blue-pale);color:var(--blue);padding:1px 6px;border-radius:4px;margin-left:6px;">from import</span>` : '';
+          return `
             <tr style="border-bottom:1px solid var(--border);">
-              <td style="padding:10px 12px;font-weight:600;">👤 ${o.name || o.username || '—'}</td>
+              <td style="padding:10px 12px;font-weight:600;">👤 ${name}${sourceTag}</td>
+              <td style="padding:10px 12px;color:var(--muted);font-size:0.78rem;">${contact}</td>
+              <td style="padding:10px 12px;">${propBadge}</td>
               <td style="padding:10px 12px;color:var(--muted);">${o.createdAt ? new Date(o.createdAt).toLocaleDateString('en-AU') : '—'}</td>
               <td style="padding:10px 12px;text-align:right;">
-                <button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteOwner('${o.id || o.name}', '${o.name || o.username}')">🗑 Remove</button>
+                ${o.source !== 'property' ? `<button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteOwner('${o.id || o.name}', '${name}')">🗑 Remove</button>` : ''}
               </td>
-            </tr>`).join('')}
-        </tbody>
-      </table>`;
-  } catch (err) {
-    el.innerHTML = `
-      <div style="padding:16px;background:var(--red-pale);border-radius:8px;font-size:0.8rem;color:var(--red);">
-        Could not load owners from backend: ${err.message}<br><br>
-        <strong>Current hardcoded owner:</strong> Michael Chen / owner123
-      </div>`;
-  }
+            </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
 }
 
 async function deleteOwner(id, name) {
@@ -4883,6 +4920,7 @@ async function addTenant() {
     document.getElementById('newTenantPassword').value = '';
     logActivity(`Tenant account created: ${firstName} ${lastName} (${email}) — ${property}`, '#1d7a50');
     loadTenants();
+    renderManagedProps();
   } catch (err) {
     errEl.textContent = `Failed to add tenant: ${err.message}`;
     errEl.style.display = '';
@@ -4896,24 +4934,36 @@ async function loadTenants() {
   if (!el) return;
   el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">Loading…</div>';
 
+  let backendTenants = [];
   try {
     const res = await fetch(`${BACKEND}/auth/tenant/list`, { headers: getAuthHeaders() });
-    if (res.status === 404) {
-      // Endpoint may not exist yet — show helpful message
-      el.innerHTML = `
-        <div style="padding:16px;background:var(--blue-pale);border-radius:8px;font-size:0.82rem;line-height:1.7;color:var(--blue);">
-          <strong>Tenant list endpoint not available.</strong><br>
-          Tenants can self-register at the Tenant Portal, or you can pre-register them using the form above.<br>
-          Once registered, their accounts are stored in the Railway backend.
-        </div>`;
-      return;
+    if (res.ok) {
+      const data = await res.json();
+      backendTenants = data.tenants || data || [];
     }
-    const data = await res.json();
-    cachedTenants = data.tenants || data || [];
-    renderTenantsList();
-  } catch (err) {
-    el.innerHTML = `<div style="padding:16px;background:var(--red-pale);border-radius:8px;font-size:0.8rem;color:var(--red);">Could not load tenants: ${err.message}</div>`;
-  }
+  } catch(e) { /* fall through */ }
+
+  // Also pick up tenants from managed properties that were imported via CSV
+  const managedProps = getManagedProps();
+  const merged = [...backendTenants];
+  managedProps.forEach(p => {
+    if (p.tenantEmail && !merged.find(t => (t.email||'').toLowerCase() === p.tenantEmail.toLowerCase())) {
+      const nameParts = (p.tenant || '').split(' ');
+      merged.push({
+        id: 'auto-' + p.tenantEmail,
+        firstName: nameParts[0] || '',
+        lastName: nameParts.slice(1).join(' ') || '',
+        email: p.tenantEmail,
+        phone: p.tenantPhone || '',
+        property: p.address,
+        createdAt: p.createdAt,
+        source: 'import'
+      });
+    }
+  });
+
+  cachedTenants = merged;
+  renderTenantsList();
 }
 
 function renderTenantsList() {
@@ -4930,7 +4980,7 @@ function renderTenantsList() {
   );
 
   if (!tenants.length) {
-    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">No tenants found. Add one above or ask tenants to self-register at the Tenant Portal.</div>';
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">No tenants found. Add one above, import via CSV, or ask tenants to self-register at the Tenant Portal.</div>';
     return;
   }
 
@@ -4947,17 +4997,22 @@ function renderTenantsList() {
         </tr>
       </thead>
       <tbody>
-        ${tenants.map(t => `
-          <tr style="border-bottom:1px solid var(--border);">
-            <td style="padding:10px 12px;font-weight:600;">🏡 ${t.firstName||''} ${t.lastName||''}</td>
-            <td style="padding:10px 12px;color:var(--muted);">${t.email||'—'}</td>
-            <td style="padding:10px 12px;">📍 ${t.property||'—'}</td>
-            <td style="padding:10px 12px;color:var(--muted);">${t.phone||'—'}</td>
-            <td style="padding:10px 12px;color:var(--muted);">${t.createdAt ? new Date(t.createdAt).toLocaleDateString('en-AU') : '—'}</td>
-            <td style="padding:10px 12px;text-align:right;">
-              <button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteTenant('${t.id||t.email}', '${t.firstName||''} ${t.lastName||''}')">🗑 Remove</button>
-            </td>
-          </tr>`).join('')}
+        ${tenants.map(t => {
+          const sourceTag = t.source === 'import'
+            ? `<span style="font-size:0.6rem;background:var(--blue-pale);color:var(--blue);padding:1px 6px;border-radius:4px;margin-left:6px;">from import</span>`
+            : '';
+          return `
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:10px 12px;font-weight:600;">🏡 ${t.firstName||''} ${t.lastName||''}${sourceTag}</td>
+              <td style="padding:10px 12px;color:var(--muted);">${t.email||'—'}</td>
+              <td style="padding:10px 12px;">📍 ${t.property||'—'}</td>
+              <td style="padding:10px 12px;color:var(--muted);">${t.phone||'—'}</td>
+              <td style="padding:10px 12px;color:var(--muted);">${t.createdAt ? new Date(t.createdAt).toLocaleDateString('en-AU') : '—'}</td>
+              <td style="padding:10px 12px;text-align:right;">
+                ${t.source !== 'import' ? `<button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteTenant('${t.id||t.email}', '${t.firstName||''} ${t.lastName||''}')">🗑 Remove</button>` : ''}
+              </td>
+            </tr>`;
+        }).join('')}
       </tbody>
     </table>`;
 }
@@ -5290,6 +5345,9 @@ async function executeImport(type) {
       });
       success++;
 
+      // Save owner to local owners list
+      if (owner) addLocalOwner(owner, ownerEmail, ownerPhone);
+
       // If tenant details + password provided, also register them in Railway
       if (firstName && lastName && tenantEmail && tenantPass) {
         try {
@@ -5298,19 +5356,18 @@ async function executeImport(type) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ firstName, lastName, email: tenantEmail, password: tenantPass, property: address, phone: tenantPhone })
           });
-          // Don't fail the property import if tenant registration fails — just note it
           if (!res.ok) errors.push(`Tenant ${tenantEmail}: registration failed`);
         } catch(e) { errors.push(`Tenant ${tenantEmail}: ${e.message}`); }
-      }
-
-      // If owner password provided, also register owner in Railway
-      if (owner && ownerEmail) {
-        // Owner portal uses name-based login — register with name
       }
     }
     saveManagedProps(props);
     updateSidebarBadges();
-    if (success > 0) renderManagedProps();
+    if (success > 0) {
+      renderManagedProps();
+      // Refresh owners and tenants tabs so they show the imported data
+      loadOwners();
+      loadTenants();
+    }
   }
 
   btnEl.textContent = isOwner ? '⬆ Import Owners' : isTenant ? '⬆ Import Tenants' : '⬆ Import Properties';
