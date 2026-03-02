@@ -3439,9 +3439,13 @@ function renderProperties() {
     propStats[p.address].owner       = p.owner       || '';
     propStats[p.address].ownerEmail  = p.ownerEmail  || '';
     propStats[p.address].ownerPhone  = p.ownerPhone  || '';
-    propStats[p.address].tenant      = p.tenant      || '';
-    propStats[p.address].tenantEmail = p.tenantEmail || '';
-    propStats[p.address].tenantPhone = p.tenantPhone || '';
+    propStats[p.address].tenant           = p.tenant             || '';
+    propStats[p.address].tenantEmail      = p.tenantEmail        || '';
+    propStats[p.address].tenantPhone      = p.tenantPhone        || '';
+    propStats[p.address].lastInspDate     = p.lastInspectionDate || '';
+    propStats[p.address].lastInspScore    = p.lastInspectionScore != null ? p.lastInspectionScore : null;
+    propStats[p.address].lastInspGrade    = p.lastInspectionGrade|| '';
+    propStats[p.address].lastInspColor    = p.lastInspectionColor|| '';
   });
 
   if (Object.keys(propStats).length === 0) {
@@ -3460,10 +3464,18 @@ function renderProperties() {
       const tenantLine = s.tenant ? `<div style="margin-top:6px;"><div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:2px;">Tenant</div><div style="font-size:0.8rem;font-weight:600;color:var(--navy);">${s.tenant}</div></div>` : '';
       const subText = s.total > 0 ? `${s.total} work order${s.total!==1?'s':''} · Click to view` : 'No work orders yet';
       const safeProp = prop.replace(/'/g, "\\'");
+      const inspBadge = s.lastInspScore != null
+        ? `<div style="margin-top:8px;padding:6px 10px;background:#f5f2eb;border-radius:7px;display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);">Last Inspection</span>
+            <span style="font-size:0.75rem;font-weight:700;color:${s.lastInspColor||'#1a7a4a'};">${s.lastInspScore}% · ${s.lastInspGrade}</span>
+            <span style="font-size:0.65rem;color:var(--muted);">${s.lastInspDate ? new Date(s.lastInspDate).toLocaleDateString('en-AU') : ''}</span>
+           </div>`
+        : '';
       return `<div class="prop-card" id="${safeId}" onclick="filterWOsByProp('${safeProp}')">
       <div class="prop-card-address">${prop}</div>
       <div class="prop-card-sub">${subText}</div>
       ${ownerLine}${tenantLine}
+      ${inspBadge}
       <div class="prop-card-stats" style="margin-top:10px;">
         <div class="prop-stat"><div class="prop-stat-val red">${s.nc}</div><div class="prop-stat-label">Non-Comp.</div></div>
         <div class="prop-stat"><div class="prop-stat-val amber">${s.ip}</div><div class="prop-stat-label">In Progress</div></div>
@@ -3486,22 +3498,31 @@ function filterWOsByProp(prop) {
 }
 
 function createInspectionChecklist(prop) {
-  // Navigate to checklist page and pre-select/pre-fill the property
   showPage('checklist');
   setTimeout(() => {
-    // Try to set property field if checklist has one
-    const propField = document.getElementById('checklistProperty') || document.getElementById('inspProp') || document.querySelector('#page-checklist input[type="text"]');
+    // Fill property address
+    const propField = document.getElementById('clPropAddress');
     if (propField) {
       propField.value = prop;
       propField.dispatchEvent(new Event('input'));
     }
-    // Also set the new inspection property dropdown if it exists
-    const propSelect = document.querySelector('#page-checklist select');
-    if (propSelect) {
-      for (const opt of propSelect.options) {
-        if (opt.value === prop || opt.text === prop) { propSelect.value = opt.value; break; }
+    // Auto-fill owner name from managed properties
+    const managed = getManagedProps();
+    const match = managed.find(p => p.address.toLowerCase() === prop.toLowerCase());
+    if (match && match.owner && match.owner !== '—') {
+      const ownerField = document.getElementById('clOwnerName');
+      if (ownerField && !ownerField.value) {
+        ownerField.value = match.owner;
+        ownerField.dispatchEvent(new Event('input'));
       }
     }
+    // Set today's date if blank
+    const dateField = document.getElementById('clDate');
+    if (dateField && !dateField.value) {
+      dateField.value = new Date().toISOString().split('T')[0];
+      dateField.dispatchEvent(new Event('input'));
+    }
+    saveChecklistMeta();
   }, 150);
 }
 
@@ -4218,10 +4239,61 @@ const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
   const a = document.createElement('a');
   a.href = url;
   const safeAddr = address.replace(/[^a-z0-9]/gi,'_').substring(0,40);
-  a.download = `inspection-report-${safeAddr}-${dateVal||'undated'}.html`;
+  const filename = `inspection-report-${safeAddr}-${dateVal||'undated'}.html`;
+  a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
-  toast('Inspection report downloaded', 'success');
+
+  // ── Update property compliance status ──────────────────────
+  const props = getManagedProps();
+  const propIdx = props.findIndex(p => p.address.toLowerCase() === address.toLowerCase());
+  if (propIdx >= 0) {
+    props[propIdx].lastInspectionDate  = dateVal || new Date().toISOString().split('T')[0];
+    props[propIdx].lastInspectionScore = score;
+    props[propIdx].lastInspectionGrade = gradeLabel;
+    props[propIdx].lastInspectionColor = gradeColor;
+    saveManagedProps(props);
+    renderManagedProps();
+    renderProperties();
+  }
+
+  // ── Save report to Document Vault ──────────────────────────
+  const ownerName = document.getElementById('clOwnerName')?.value?.trim() || '';
+  // Convert HTML blob to dataUrl for vault storage
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const docs = getVaultDocs();
+    const docName = `Inspection Report — ${address} — ${date}`;
+    // Avoid duplicates (same address + date)
+    const alreadyExists = docs.find(d => d.name === docName);
+    if (!alreadyExists) {
+      docs.unshift({
+        id: Date.now(),
+        name: docName,
+        category: 'Inspection Report',
+        property: address,
+        ownerVisible: ownerName ? 'yes' : 'no',
+        ownerName: ownerName,
+        fileName: filename,
+        fileType: 'text/html',
+        fileSize: blob.size,
+        isImage: false,
+        isPDF: false,
+        dataUrl: e.target.result,
+        uploadedAt: new Date().toISOString(),
+        uploadedBy: 'Property Manager',
+        inspectionScore: score,
+        inspectionGrade: gradeLabel,
+      });
+      saveVaultDocs(docs);
+      logActivity(`Inspection report saved to vault: ${address} (${gradeLabel} ${scoreText})`, '#8b5cf6');
+      toast(`Report downloaded & saved to Document Vault (${gradeLabel} · ${scoreText})`, 'success');
+    } else {
+      toast('Inspection report downloaded', 'success');
+    }
+    if (typeof renderVault === 'function') renderVault();
+  };
+  reader.readAsDataURL(blob);
 }
 
 // ═══════════════════════════════════════════════
