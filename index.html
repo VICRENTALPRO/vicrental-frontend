@@ -2037,8 +2037,26 @@ window.addEventListener('DOMContentLoaded', function() {
 
       <!-- ═══ MANAGE OWNERS ═══ -->
       <div class="page" id="page-owners">
+
+        <!-- Owners List FIRST -->
         <div class="panel" style="margin-bottom:20px;">
-          <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:14px;">Add New Owner</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Owners — A to Z</div>
+            <div style="display:flex;gap:8px;">
+              <input type="text" id="ownerSearch" placeholder="🔍 Search owners…" oninput="filterOwners()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'DM Sans',sans-serif;font-size:0.8rem;width:220px;">
+              <button class="btn btn-ghost" onclick="loadOwners()" style="font-size:0.75rem;padding:5px 12px;">↺ Refresh</button>
+              <button class="btn btn-primary" onclick="toggleOwnerForm()" style="font-size:0.75rem;padding:5px 14px;">+ Add Owner</button>
+            </div>
+          </div>
+          <div id="ownersList"><div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">Loading owners…</div></div>
+        </div>
+
+        <!-- Add Owner Form — collapsible -->
+        <div class="panel" id="ownerAddForm" style="display:none;border:2px solid var(--gold);border-radius:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Add New Owner</div>
+            <button class="btn btn-ghost" onclick="toggleOwnerForm()" style="font-size:0.75rem;padding:4px 10px;">✕ Close</button>
+          </div>
           <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;">
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Owner Full Name *</label>
@@ -2056,21 +2074,30 @@ window.addEventListener('DOMContentLoaded', function() {
             ⚠️ Owners log in at the <strong>Owner Portal</strong> using their full name and the password you set here. Passwords are sent to your Railway backend and stored securely.
           </div>
         </div>
-
-        <div class="panel">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Existing Owners</div>
-            <button class="btn btn-ghost" onclick="loadOwners()" style="font-size:0.75rem;padding:5px 12px;">↺ Refresh</button>
-          </div>
-          <div id="ownersList"><div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">Loading owners…</div></div>
-        </div>
       </div>
 
       <!-- ═══ MANAGE TENANTS ═══ -->
       <div class="page" id="page-tenants">
-        <!-- Add Tenant -->
+
+        <!-- Tenant List FIRST -->
         <div class="panel" style="margin-bottom:20px;">
-          <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:14px;">Add New Tenant</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Registered Tenants — A to Z</div>
+            <div style="display:flex;gap:8px;">
+              <input type="text" id="tenantSearch" placeholder="🔍 Search name, email or property…" oninput="renderTenantsList()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'DM Sans',sans-serif;font-size:0.8rem;width:260px;">
+              <button class="btn btn-ghost" onclick="loadTenants()" style="font-size:0.75rem;padding:5px 12px;">↺ Refresh</button>
+              <button class="btn btn-primary" onclick="toggleTenantForm()" style="font-size:0.75rem;padding:5px 14px;">+ Add Tenant</button>
+            </div>
+          </div>
+          <div id="tenantsList"><div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">Loading tenants…</div></div>
+        </div>
+
+        <!-- Add Tenant Form — collapsible, hidden by default -->
+        <div class="panel" id="tenantAddForm" style="display:none;margin-bottom:20px;border:2px solid var(--gold);border-radius:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Add New Tenant</div>
+            <button class="btn btn-ghost" onclick="toggleTenantForm()" style="font-size:0.75rem;padding:4px 10px;">✕ Close</button>
+          </div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">First Name *</label>
@@ -2106,25 +2133,29 @@ window.addEventListener('DOMContentLoaded', function() {
             ⚠️ Tenants log in at the <strong>Tenant Portal</strong> using their email and the password you set here. They can also self-register directly at the tenant portal.
           </div>
         </div>
-
-        <!-- Tenant List -->
-        <div class="panel">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Registered Tenants</div>
-            <div style="display:flex;gap:8px;">
-              <input type="text" id="tenantSearch" placeholder="🔍 Search name, email or property…" oninput="renderTenantsList()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'DM Sans',sans-serif;font-size:0.8rem;width:260px;">
-              <button class="btn btn-ghost" onclick="loadTenants()" style="font-size:0.75rem;padding:5px 12px;">↺ Refresh</button>
-            </div>
-          </div>
-          <div id="tenantsList"><div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">Loading tenants…</div></div>
-        </div>
       </div>
 
       <!-- ═══ MANAGE PROPERTIES ═══ -->
       <div class="page" id="page-manageprops">
-        <!-- Add Property -->
+
+        <!-- Property List FIRST -->
         <div class="panel" style="margin-bottom:20px;">
-          <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:14px;">Add New Property</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Managed Properties — A to Z</div>
+            <div style="display:flex;gap:8px;">
+              <input type="text" id="propSearch" placeholder="🔍 Search address or owner…" oninput="renderManagedProps()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'DM Sans',sans-serif;font-size:0.8rem;width:220px;">
+              <button class="btn btn-primary" onclick="togglePropForm()" style="font-size:0.75rem;padding:5px 14px;">+ Add Property</button>
+            </div>
+          </div>
+          <div id="managedPropsList"></div>
+        </div>
+
+        <!-- Add Property Form — collapsible -->
+        <div class="panel" id="propAddForm" style="display:none;border:2px solid var(--gold);border-radius:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Add New Property</div>
+            <button class="btn btn-ghost" onclick="togglePropForm()" style="font-size:0.75rem;padding:4px 10px;">✕ Close</button>
+          </div>
           <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-bottom:12px;">
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Property Address *</label>
@@ -2164,17 +2195,6 @@ window.addEventListener('DOMContentLoaded', function() {
           </div>
           <div id="propAddError" style="display:none;margin-top:10px;color:var(--red);font-size:0.8rem;"></div>
           <div id="propAddSuccess" style="display:none;margin-top:10px;color:var(--green);font-size:0.8rem;font-weight:600;"></div>
-        </div>
-
-        <!-- Property List -->
-        <div class="panel">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Managed Properties</div>
-            <div style="display:flex;gap:8px;">
-              <input type="text" id="propSearch" placeholder="🔍 Search address or owner…" oninput="renderManagedProps()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'DM Sans',sans-serif;font-size:0.8rem;width:220px;">
-            </div>
-          </div>
-          <div id="managedPropsList"></div>
         </div>
       </div>
 
@@ -2623,8 +2643,9 @@ function topbarMainAction() {
   if (currentPage === 'checklist') downloadInspectionReport();
   else if (currentPage === 'vault') document.getElementById('vaultFileInput')?.click();
   else if (currentPage === 'quotes') document.getElementById('qProperty')?.focus();
-  else if (currentPage === 'manageprops') document.getElementById('newPropAddress')?.focus();
-  else if (currentPage === 'tenants') document.getElementById('newTenantFirst')?.focus();
+  else if (currentPage === 'manageprops') togglePropForm();
+  else if (currentPage === 'tenants') toggleTenantForm();
+  else if (currentPage === 'owners') toggleOwnerForm();
   else openNewWOModal();
 }
 
@@ -4775,6 +4796,7 @@ async function addOwner() {
     document.getElementById('newOwnerPassword').value = '';
     addLocalOwner(name, '', '');
     logActivity(`Owner account created: ${name}`, '#1d7a50');
+    const f = document.getElementById('ownerAddForm'); if (f) f.style.display = 'none';
     loadOwners();
   } catch (err) {
     errEl.textContent = `Failed to add owner: ${err.message}`;
@@ -4925,6 +4947,7 @@ async function addTenant() {
     document.getElementById('newTenantPhone').value = '';
     document.getElementById('newTenantPassword').value = '';
     logActivity(`Tenant account created: ${firstName} ${lastName} (${email}) — ${property}`, '#1d7a50');
+    const f = document.getElementById('tenantAddForm'); if (f) f.style.display = 'none';
     loadTenants();
     renderManagedProps();
   } catch (err) {
@@ -5051,6 +5074,38 @@ async function deleteTenant(id, name) {
 }
 
 
+function toggleOwnerForm() {
+  const f = document.getElementById('ownerAddForm');
+  if (!f) return;
+  const showing = f.style.display !== 'none';
+  f.style.display = showing ? 'none' : '';
+  if (!showing) setTimeout(() => document.getElementById('newOwnerName')?.focus(), 50);
+}
+
+function toggleTenantForm() {
+  const f = document.getElementById('tenantAddForm');
+  if (!f) return;
+  const showing = f.style.display !== 'none';
+  f.style.display = showing ? 'none' : '';
+  if (!showing) setTimeout(() => document.getElementById('newTenantFirst')?.focus(), 50);
+}
+
+function togglePropForm() {
+  const f = document.getElementById('propAddForm');
+  if (!f) return;
+  const showing = f.style.display !== 'none';
+  f.style.display = showing ? 'none' : '';
+  if (!showing) setTimeout(() => document.getElementById('newPropAddress')?.focus(), 50);
+}
+
+function filterOwners() {
+  const search = (document.getElementById('ownerSearch')?.value || '').toLowerCase();
+  const rows = document.querySelectorAll('#ownersList tbody tr');
+  rows.forEach(row => {
+    row.style.display = !search || row.textContent.toLowerCase().includes(search) ? '' : 'none';
+  });
+}
+
 const KEY_MANAGED_PROPS = 'vr_managed_properties';
 
 function getManagedProps() { return S.get(KEY_MANAGED_PROPS, []); }
@@ -5102,6 +5157,7 @@ function addProperty() {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   logActivity(`Property added: ${address} (Owner: ${owner})`, '#1d7a50');
+  const f = document.getElementById('propAddForm'); if (f) f.style.display = 'none';
   updateSidebarBadges();
   renderManagedProps();
 }
