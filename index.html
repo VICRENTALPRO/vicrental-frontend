@@ -5211,6 +5211,11 @@ function goToProperty(address) {
   }, 150);
 }
 
+function renderManagedProps() {
+  const el = document.getElementById('managedPropsList');
+  if (!el) return;
+
+  const search = (document.getElementById('propSearch')?.value || '').toLowerCase();
   let props = getManagedProps();
 
   // Also surface properties that appear in work orders but haven't been added manually
