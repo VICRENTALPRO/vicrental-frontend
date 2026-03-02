@@ -1709,6 +1709,9 @@ window.addEventListener('DOMContentLoaded', function() {
       <div class="nav-item" id="nav-owners" onclick="showPage('owners')">
         <span class="nav-icon">👤</span> Manage Owners
       </div>
+      <div class="nav-item" id="nav-tenants" onclick="showPage('tenants')">
+        <span class="nav-icon">🏡</span> Manage Tenants
+      </div>
       <div class="nav-item" id="nav-manageprops" onclick="showPage('manageprops')">
         <span class="nav-icon">🏘️</span> Manage Properties
       </div>
@@ -2063,6 +2066,60 @@ window.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
 
+      <!-- ═══ MANAGE TENANTS ═══ -->
+      <div class="page" id="page-tenants">
+        <!-- Add Tenant -->
+        <div class="panel" style="margin-bottom:20px;">
+          <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:14px;">Add New Tenant</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">First Name *</label>
+              <input type="text" id="newTenantFirst" placeholder="e.g. John" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+            </div>
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Last Name *</label>
+              <input type="text" id="newTenantLast" placeholder="e.g. Smith" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+            </div>
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Email Address *</label>
+              <input type="email" id="newTenantEmail" placeholder="e.g. john@email.com" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:12px;align-items:end;">
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Property Address *</label>
+              <input type="text" id="newTenantProperty" placeholder="e.g. 42 Sample Street, Richmond VIC 3121" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+            </div>
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Phone</label>
+              <input type="text" id="newTenantPhone" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+            </div>
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Password *</label>
+              <input type="text" id="newTenantPassword" placeholder="e.g. tenant123" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+            </div>
+            <button class="btn btn-primary" onclick="addTenant()" style="padding:9px 20px;white-space:nowrap;">+ Add Tenant</button>
+          </div>
+          <div id="tenantAddError" style="display:none;margin-top:10px;color:var(--red);font-size:0.8rem;"></div>
+          <div id="tenantAddSuccess" style="display:none;margin-top:10px;color:var(--green);font-size:0.8rem;font-weight:600;"></div>
+          <div style="margin-top:14px;padding:12px 14px;background:var(--amber-pale);border-radius:8px;border:1px solid rgba(181,110,0,0.2);font-size:0.75rem;color:var(--amber);">
+            ⚠️ Tenants log in at the <strong>Tenant Portal</strong> using their email and the password you set here. They can also self-register directly at the tenant portal.
+          </div>
+        </div>
+
+        <!-- Tenant List -->
+        <div class="panel">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Registered Tenants</div>
+            <div style="display:flex;gap:8px;">
+              <input type="text" id="tenantSearch" placeholder="🔍 Search name, email or property…" oninput="renderTenantsList()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'DM Sans',sans-serif;font-size:0.8rem;width:260px;">
+              <button class="btn btn-ghost" onclick="loadTenants()" style="font-size:0.75rem;padding:5px 12px;">↺ Refresh</button>
+            </div>
+          </div>
+          <div id="tenantsList"><div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">Loading tenants…</div></div>
+        </div>
+      </div>
+
       <!-- ═══ MANAGE PROPERTIES ═══ -->
       <div class="page" id="page-manageprops">
         <!-- Add Property -->
@@ -2104,14 +2161,15 @@ window.addEventListener('DOMContentLoaded', function() {
         <!-- Header info -->
         <div class="panel" style="margin-bottom:20px;background:linear-gradient(135deg,var(--navy) 0%,var(--navy-soft) 100%);color:#fff;border:none;">
           <div style="font-size:1rem;font-weight:700;margin-bottom:6px;">⬆️ Import from External System</div>
-          <div style="font-size:0.82rem;opacity:0.75;line-height:1.6;">Import owners and properties in bulk from property management software like Console Cloud, PropertyMe, MRI, Re-Leased, or any CSV export. Download a template to get started.</div>
+          <div style="font-size:0.82rem;opacity:0.75;line-height:1.6;">Import owners, tenants and properties in bulk from property management software like Console Cloud, PropertyMe, MRI, Re-Leased, or any CSV export. Download a template to get started.</div>
           <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
             <button class="btn" onclick="downloadOwnerTemplate()" style="background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.2);font-size:0.78rem;padding:7px 14px;">⬇ Owner CSV Template</button>
+            <button class="btn" onclick="downloadTenantTemplate()" style="background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.2);font-size:0.78rem;padding:7px 14px;">⬇ Tenant CSV Template</button>
             <button class="btn" onclick="downloadPropertyTemplate()" style="background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.2);font-size:0.78rem;padding:7px 14px;">⬇ Property CSV Template</button>
           </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
           <!-- Import Owners -->
           <div class="panel">
             <div style="font-size:0.85rem;font-weight:700;margin-bottom:4px;">👤 Import Owners</div>
@@ -2123,9 +2181,26 @@ window.addEventListener('DOMContentLoaded', function() {
             </div>
             <input type="file" id="ownerCsvInput" accept=".csv" style="display:none" onchange="handleImportFile(event,'owner')">
             <div id="ownerImportPreview" style="display:none;margin-top:14px;"></div>
-            <div style="display:flex;gap:8px;margin-top:12px;" id="ownerImportActions" style="display:none;">
+            <div style="display:flex;gap:8px;margin-top:12px;">
               <button class="btn btn-primary" id="ownerImportBtn" onclick="executeImport('owner')" style="display:none;">⬆ Import Owners</button>
               <button class="btn btn-ghost" id="ownerImportClear" onclick="clearImport('owner')" style="display:none;">✕ Clear</button>
+            </div>
+          </div>
+
+          <!-- Import Tenants -->
+          <div class="panel">
+            <div style="font-size:0.85rem;font-weight:700;margin-bottom:4px;">🏡 Import Tenants</div>
+            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:14px;">CSV columns: <code>first_name, last_name, email, password, property, phone</code></div>
+            <div id="tenantDropZone" class="import-dropzone" onclick="document.getElementById('tenantCsvInput').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleImportDrop(event,'tenant')">
+              <div style="font-size:2rem;margin-bottom:8px;">📄</div>
+              <div style="font-size:0.82rem;font-weight:600;color:var(--navy);">Drop CSV here or click to browse</div>
+              <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">Supports .csv files</div>
+            </div>
+            <input type="file" id="tenantCsvInput" accept=".csv" style="display:none" onchange="handleImportFile(event,'tenant')">
+            <div id="tenantImportPreview" style="display:none;margin-top:14px;"></div>
+            <div style="display:flex;gap:8px;margin-top:12px;">
+              <button class="btn btn-primary" id="tenantImportBtn" onclick="executeImport('tenant')" style="display:none;">⬆ Import Tenants</button>
+              <button class="btn btn-ghost" id="tenantImportClear" onclick="clearImport('tenant')" style="display:none;">✕ Clear</button>
             </div>
           </div>
 
@@ -2473,6 +2548,7 @@ const PAGE_CONFIG = {
   tenantreqs: { title: 'Tenant Requests',    sub: 'Maintenance requests submitted by tenants via the Tenant Portal', mainBtn: '+ New Work Order', extraBtn: null },
   activity:   { title: 'Activity Log',       sub: 'Full audit trail of all changes', mainBtn: '+ New Work Order', extraBtn: null },
   owners:     { title: 'Manage Owners',      sub: 'Add and manage owner portal accounts', mainBtn: '+ New Work Order', extraBtn: null },
+  tenants:    { title: 'Manage Tenants',     sub: 'Add and manage tenant portal accounts', mainBtn: '+ Add Tenant', extraBtn: null },
   manageprops:{ title: 'Manage Properties',  sub: 'Add and manage your property portfolio', mainBtn: '+ Add Property', extraBtn: null },
   import:     { title: 'Import Data',        sub: 'Bulk import owners and properties from external systems', mainBtn: '+ New Work Order', extraBtn: null },
 };
@@ -2510,6 +2586,7 @@ function showPage(id) {
   else if (id === 'reports') renderReports();
   else if (id === 'activity') renderActivityPage();
   else if (id === 'owners') loadOwners();
+  else if (id === 'tenants') loadTenants();
   else if (id === 'manageprops') renderManagedProps();
   else if (id === 'import') renderImportPage();
   else if (id === 'vault') renderVault();
@@ -2525,6 +2602,7 @@ function topbarMainAction() {
   else if (currentPage === 'vault') document.getElementById('vaultFileInput')?.click();
   else if (currentPage === 'quotes') document.getElementById('qProperty')?.focus();
   else if (currentPage === 'manageprops') document.getElementById('newPropAddress')?.focus();
+  else if (currentPage === 'tenants') document.getElementById('newTenantFirst')?.focus();
   else openNewWOModal();
 }
 
@@ -4739,8 +4817,146 @@ async function deleteOwner(id, name) {
 
 
 // ═══════════════════════════════════════════════
-// MANAGED PROPERTIES
+// TENANT MANAGEMENT
 // ═══════════════════════════════════════════════
+let cachedTenants = [];
+
+async function addTenant() {
+  const firstName = document.getElementById('newTenantFirst').value.trim();
+  const lastName  = document.getElementById('newTenantLast').value.trim();
+  const email     = document.getElementById('newTenantEmail').value.trim().toLowerCase();
+  const property  = document.getElementById('newTenantProperty').value.trim();
+  const phone     = document.getElementById('newTenantPhone').value.trim();
+  const password  = document.getElementById('newTenantPassword').value.trim();
+  const errEl     = document.getElementById('tenantAddError');
+  const okEl      = document.getElementById('tenantAddSuccess');
+  errEl.style.display = 'none';
+  okEl.style.display  = 'none';
+
+  if (!firstName || !lastName || !email || !property || !password) {
+    errEl.textContent = 'Please fill in all required fields (first name, last name, email, property, password).';
+    errEl.style.display = '';
+    return;
+  }
+
+  const btn = document.querySelector('#page-tenants .btn-primary');
+  if (btn) { btn.textContent = 'Adding…'; btn.disabled = true; }
+
+  try {
+    const res = await fetch(`${BACKEND}/auth/tenant/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ firstName, lastName, email, password, property, phone })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+
+    okEl.textContent = `✅ Tenant "${firstName} ${lastName}" added! They can now log in at the Tenant Portal with their email and password.`;
+    okEl.style.display = '';
+    document.getElementById('newTenantFirst').value = '';
+    document.getElementById('newTenantLast').value  = '';
+    document.getElementById('newTenantEmail').value = '';
+    document.getElementById('newTenantProperty').value = '';
+    document.getElementById('newTenantPhone').value = '';
+    document.getElementById('newTenantPassword').value = '';
+    logActivity(`Tenant account created: ${firstName} ${lastName} (${email}) — ${property}`, '#1d7a50');
+    loadTenants();
+  } catch (err) {
+    errEl.textContent = `Failed to add tenant: ${err.message}`;
+    errEl.style.display = '';
+  } finally {
+    if (btn) { btn.textContent = '+ Add Tenant'; btn.disabled = false; }
+  }
+}
+
+async function loadTenants() {
+  const el = document.getElementById('tenantsList');
+  if (!el) return;
+  el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">Loading…</div>';
+
+  try {
+    const res = await fetch(`${BACKEND}/auth/tenant/list`, { headers: getAuthHeaders() });
+    if (res.status === 404) {
+      // Endpoint may not exist yet — show helpful message
+      el.innerHTML = `
+        <div style="padding:16px;background:var(--blue-pale);border-radius:8px;font-size:0.82rem;line-height:1.7;color:var(--blue);">
+          <strong>Tenant list endpoint not available.</strong><br>
+          Tenants can self-register at the Tenant Portal, or you can pre-register them using the form above.<br>
+          Once registered, their accounts are stored in the Railway backend.
+        </div>`;
+      return;
+    }
+    const data = await res.json();
+    cachedTenants = data.tenants || data || [];
+    renderTenantsList();
+  } catch (err) {
+    el.innerHTML = `<div style="padding:16px;background:var(--red-pale);border-radius:8px;font-size:0.8rem;color:var(--red);">Could not load tenants: ${err.message}</div>`;
+  }
+}
+
+function renderTenantsList() {
+  const el = document.getElementById('tenantsList');
+  if (!el) return;
+
+  const search = (document.getElementById('tenantSearch')?.value || '').toLowerCase();
+  let tenants = cachedTenants;
+  if (search) tenants = tenants.filter(t =>
+    (t.firstName||'').toLowerCase().includes(search) ||
+    (t.lastName||'').toLowerCase().includes(search) ||
+    (t.email||'').toLowerCase().includes(search) ||
+    (t.property||'').toLowerCase().includes(search)
+  );
+
+  if (!tenants.length) {
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">No tenants found. Add one above or ask tenants to self-register at the Tenant Portal.</div>';
+    return;
+  }
+
+  el.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+      <thead>
+        <tr style="border-bottom:2px solid var(--border);">
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Name</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Email</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Property</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Phone</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Registered</th>
+          <th style="padding:8px 12px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${tenants.map(t => `
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:10px 12px;font-weight:600;">🏡 ${t.firstName||''} ${t.lastName||''}</td>
+            <td style="padding:10px 12px;color:var(--muted);">${t.email||'—'}</td>
+            <td style="padding:10px 12px;">📍 ${t.property||'—'}</td>
+            <td style="padding:10px 12px;color:var(--muted);">${t.phone||'—'}</td>
+            <td style="padding:10px 12px;color:var(--muted);">${t.createdAt ? new Date(t.createdAt).toLocaleDateString('en-AU') : '—'}</td>
+            <td style="padding:10px 12px;text-align:right;">
+              <button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteTenant('${t.id||t.email}', '${t.firstName||''} ${t.lastName||''}')">🗑 Remove</button>
+            </td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+async function deleteTenant(id, name) {
+  if (!confirm(`Remove tenant "${name}"? They will no longer be able to log in.`)) return;
+  try {
+    const res = await fetch(`${BACKEND}/auth/tenant/${encodeURIComponent(id)}`, {
+      method: 'DELETE', headers: getAuthHeaders()
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    cachedTenants = cachedTenants.filter(t => (t.id||t.email) !== id);
+    toast(`Tenant "${name}" removed`, 'success');
+    logActivity(`Tenant account removed: ${name}`, '#c0392b');
+    renderTenantsList();
+  } catch (err) {
+    toast(`Could not remove tenant: ${err.message}`, 'error');
+  }
+}
+
+
 const KEY_MANAGED_PROPS = 'vr_managed_properties';
 
 function getManagedProps() { return S.get(KEY_MANAGED_PROPS, []); }
@@ -4870,6 +5086,10 @@ function downloadOwnerTemplate() {
   downloadCSVBlob('name,password\nMichael Chen,owner123\nSarah Williams,secure456\n', 'owner-import-template.csv');
 }
 
+function downloadTenantTemplate() {
+  downloadCSVBlob('first_name,last_name,email,password,property,phone\nJohn,Smith,john@email.com,tenant123,42 Sample Street Richmond VIC 3121,0412345678\nJane,Doe,jane@email.com,tenant456,7 Demo Lane Fitzroy VIC 3065,\n', 'tenant-import-template.csv');
+}
+
 function downloadPropertyTemplate() {
   downloadCSVBlob('address,owner_name,tenant_name\n42 Sample Street Richmond VIC 3121,Michael Chen,John Smith\n7 Demo Lane Fitzroy VIC 3065,Sarah Williams,\n', 'property-import-template.csv');
 }
@@ -4884,7 +5104,8 @@ function downloadCSVBlob(content, filename) {
 
 function handleImportDrop(e, type) {
   e.preventDefault();
-  document.getElementById(type === 'owner' ? 'ownerDropZone' : 'propDropZone').classList.remove('drag-over');
+  const zoneId = type === 'owner' ? 'ownerDropZone' : type === 'tenant' ? 'tenantDropZone' : 'propDropZone';
+  document.getElementById(zoneId).classList.remove('drag-over');
   const file = e.dataTransfer.files[0];
   if (file) parseImportCSV(file, type);
 }
@@ -4908,12 +5129,13 @@ function parseImportCSV(file, type) {
 function renderImportPreview(type) {
   const data      = importData[type];
   const isOwner   = type === 'owner';
-  const previewEl = document.getElementById(isOwner ? 'ownerImportPreview' : 'propImportPreview');
-  const btnEl     = document.getElementById(isOwner ? 'ownerImportBtn'    : 'propImportBtn');
-  const clearEl   = document.getElementById(isOwner ? 'ownerImportClear'  : 'propImportClear');
+  const isTenant  = type === 'tenant';
+  const previewEl = document.getElementById(isOwner ? 'ownerImportPreview' : isTenant ? 'tenantImportPreview' : 'propImportPreview');
+  const btnEl     = document.getElementById(isOwner ? 'ownerImportBtn'    : isTenant ? 'tenantImportBtn'    : 'propImportBtn');
+  const clearEl   = document.getElementById(isOwner ? 'ownerImportClear'  : isTenant ? 'tenantImportClear'  : 'propImportClear');
   if (!data || !previewEl) return;
 
-  const required = isOwner ? ['name','password'] : ['address','owner_name'];
+  const required = isOwner ? ['name','password'] : isTenant ? ['first_name','last_name','email','password','property'] : ['address','owner_name'];
   const missing  = required.filter(r => !data.headers.includes(r));
 
   clearEl.style.display = '';
@@ -4943,8 +5165,9 @@ function renderImportPreview(type) {
 async function executeImport(type) {
   const data    = importData[type];
   if (!data) return;
-  const isOwner = type === 'owner';
-  const btnEl   = document.getElementById(isOwner ? 'ownerImportBtn' : 'propImportBtn');
+  const isOwner  = type === 'owner';
+  const isTenant = type === 'tenant';
+  const btnEl    = document.getElementById(isOwner ? 'ownerImportBtn' : isTenant ? 'tenantImportBtn' : 'propImportBtn');
   btnEl.textContent = 'Importing…'; btnEl.disabled = true;
 
   let success = 0, failed = 0, errors = [];
@@ -4963,6 +5186,25 @@ async function executeImport(type) {
         success++;
       } catch(err) { failed++; errors.push(`${name}: ${err.message}`); }
     }
+  } else if (isTenant) {
+    const fi = data.headers.indexOf('first_name'), li = data.headers.indexOf('last_name');
+    const ei = data.headers.indexOf('email'), pi = data.headers.indexOf('password');
+    const pri = data.headers.indexOf('property'), phi = data.headers.indexOf('phone');
+    for (const row of data.rows) {
+      const firstName = row[fi], lastName = row[li], email = row[ei];
+      const password = row[pi], property = row[pri], phone = phi >= 0 ? row[phi] : '';
+      if (!firstName || !lastName || !email || !password || !property) { failed++; errors.push(`${email||'?'}: missing required fields`); continue; }
+      try {
+        const res = await fetch(`${BACKEND}/auth/tenant/register`, {
+          method:'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ firstName, lastName, email, password, property, phone })
+        });
+        const d = await res.json();
+        if (!res.ok) throw new Error(d.error || `HTTP ${res.status}`);
+        success++;
+      } catch(err) { failed++; errors.push(`${email}: ${err.message}`); }
+    }
+    if (success > 0) loadTenants();
   } else {
     const ai = data.headers.indexOf('address'), oi = data.headers.indexOf('owner_name'), ti = data.headers.indexOf('tenant_name');
     const props = getManagedProps();
@@ -4975,37 +5217,42 @@ async function executeImport(type) {
     }
     saveManagedProps(props);
     updateSidebarBadges();
+    if (success > 0) renderManagedProps();
   }
 
-  btnEl.textContent = isOwner ? '⬆ Import Owners' : '⬆ Import Properties';
+  btnEl.textContent = isOwner ? '⬆ Import Owners' : isTenant ? '⬆ Import Tenants' : '⬆ Import Properties';
   btnEl.disabled = false;
 
   // Add to import log
   const logEl = document.getElementById('importLog');
   if (logEl) {
-    if (logEl.querySelector('i') || logEl.style.fontStyle==='italic') logEl.innerHTML='';
+    if (logEl.style.fontStyle==='italic') logEl.innerHTML='';
+    const typeLabel = isOwner ? 'Owner' : isTenant ? 'Tenant' : 'Property';
     const entry = document.createElement('div');
     entry.style.cssText = `padding:10px 14px;border-radius:8px;margin-bottom:8px;font-size:0.8rem;background:${failed===0?'var(--green-pale)':'var(--amber-pale)'};border:1px solid ${failed===0?'rgba(26,122,74,0.2)':'rgba(181,110,0,0.2)'};`;
-    entry.innerHTML = `<strong>${new Date().toLocaleString('en-AU')}</strong> — ${isOwner?'Owner':'Property'} import: <span style="color:var(--green)">✅ ${success} imported</span>${failed?` <span style="color:var(--red)">⚠️ ${failed} failed</span>`:''}${errors.length?`<br><span style="color:var(--muted);font-size:0.75rem;">${errors.slice(0,3).join(' · ')}${errors.length>3?` +${errors.length-3} more`:''}</span>`:''}`;
+    entry.innerHTML = `<strong>${new Date().toLocaleString('en-AU')}</strong> — ${typeLabel} import: <span style="color:var(--green)">✅ ${success} imported</span>${failed?` <span style="color:var(--red)">⚠️ ${failed} failed</span>`:''}${errors.length?`<br><span style="color:var(--muted);font-size:0.75rem;">${errors.slice(0,3).join(' · ')}${errors.length>3?` +${errors.length-3} more`:''}</span>`:''}`;
     logEl.prepend(entry);
   }
 
   if (success > 0) {
-    toast(`${success} ${isOwner?'owner':'propert'}${success!==1?(isOwner?'s':'ies'):(isOwner?'':'y')} imported`, 'success');
-    logActivity(`Imported ${success} ${isOwner?'owners':'properties'} via CSV`, '#1d7a50');
-    if (!isOwner) renderManagedProps();
+    const label = isOwner ? 'owner' : isTenant ? 'tenant' : 'propert';
+    const plural = isOwner ? 's' : isTenant ? 's' : 'ies';
+    toast(`${success} ${label}${success!==1?plural:''} imported`, 'success');
+    logActivity(`Imported ${success} ${isOwner?'owners':isTenant?'tenants':'properties'} via CSV`, '#1d7a50');
   }
   if (failed > 0) toast(`${failed} row${failed!==1?'s':''} failed — see import log`, 'error');
 }
 
 function clearImport(type) {
   importData[type] = null;
-  const isOwner = type === 'owner';
+  const isOwner  = type === 'owner';
+  const isTenant = type === 'tenant';
+  const prefix   = isOwner ? 'owner' : isTenant ? 'tenant' : 'prop';
   ['Preview','Btn','Clear'].forEach(s => {
-    const el = document.getElementById((isOwner?'owner':'prop') + 'Import' + s);
+    const el = document.getElementById(prefix + 'Import' + s);
     if (el) { el.style.display = 'none'; if (s==='Preview') el.innerHTML=''; }
   });
-  const inp = document.getElementById(isOwner ? 'ownerCsvInput' : 'propCsvInput');
+  const inp = document.getElementById(isOwner ? 'ownerCsvInput' : isTenant ? 'tenantCsvInput' : 'propCsvInput');
   if (inp) inp.value = '';
 }
 
