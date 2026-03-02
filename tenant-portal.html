@@ -1653,11 +1653,20 @@ function submitRequest() {
   // ── Also POST to Railway backend so PM portal can see it ──
   const token = localStorage.getItem('vr_token');
   if (token) {
+    // Backend expects multipart/form-data (Api.upload)
+    const fd = new FormData();
+    Object.entries(req).forEach(([k, v]) => {
+      if (v !== null && v !== undefined) {
+        fd.append(k, typeof v === 'object' ? JSON.stringify(v) : String(v));
+      }
+    });
     fetch('https://vicrental-backend1-production.up.railway.app/api/tenant-requests', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify(req)
-    }).catch(() => {/* non-fatal — stored locally */});
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: fd
+    }).then(r => {
+      if (!r.ok) return r.json().then(d => console.warn('TR backend error:', d));
+    }).catch(e => console.warn('TR backend unavailable:', e));
   }
 
   // Show success

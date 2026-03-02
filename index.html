@@ -2037,6 +2037,7 @@ window.addEventListener('DOMContentLoaded', function() {
           <div class="filter-pill fp-nc"  id="trf-submitted"  onclick="setTRFilter('submitted')">New</div>
           <div class="filter-pill fp-ip"  id="trf-inprogress" onclick="setTRFilter('inprogress')">In Progress</div>
           <div class="filter-pill fp-ok"  id="trf-completed"  onclick="setTRFilter('completed')">Completed</div>
+          <button class="btn btn-ghost" style="font-size:0.72rem;padding:5px 12px;margin-left:auto;" onclick="loadTenantReqs().then(()=>toast('Synced from backend','success'))">↺ Sync</button>
         </div>
         <div id="tenantReqsList"></div>
       </div>
@@ -2695,6 +2696,7 @@ const S = {
 };
 
 const KEY_WO    = 'vicrental_workorders';
+const BACKEND   = 'https://vicrental-backend1-production.up.railway.app/api';
 const KEY_PORT  = 'vicrental_portal';
 const KEY_ACT   = 'vicrental_activity';
 const KEY_CL    = 'vicrental_checklist';
@@ -4831,28 +4833,50 @@ async function loadTenantReqs() {
     const res = await fetch(`${BACKEND}/tenant-requests/all`, { headers: getAuthHeaders() });
     if (res.ok) {
       const data = await res.json();
-      const backendReqs = data.requests || data || [];
-      if (Array.isArray(backendReqs) && backendReqs.length > 0) {
+      const backendReqs = Array.isArray(data) ? data : (data.requests || data.data || []);
+      if (backendReqs.length > 0) {
         const local = S.get(KEY_TREQS, []);
-        // Merge: add backend reqs not already in local, update status of existing
         backendReqs.forEach(br => {
-          const li = local.findIndex(r => r.id === br.id);
+          // Normalise field names — backend may use camelCase or snake_case
+          const norm = {
+            id:             br.id,
+            tenantId:       br.tenantId   || br.tenant_id   || '',
+            tenantName:     br.tenantName || br.tenant_name || (br.firstName ? br.firstName + ' ' + br.lastName : '') || '',
+            property:       br.property   || br.address     || '',
+            categories:     br.categories || [],
+            categoryLabels: br.categoryLabels || br.category_labels || [],
+            priority:       br.priority   || 'routine',
+            description:    br.description|| br.desc        || '',
+            status:         br.status     || 'submitted',
+            submittedAt:    br.submittedAt|| br.submitted_at|| br.createdAt || new Date().toISOString(),
+            pmResponse:     br.pmResponse || br.pm_response || null,
+            updatedAt:      br.updatedAt  || br.updated_at  || null,
+            photos:         br.photos     || [],
+            contact:        br.contact    || '',
+            notes:          br.notes      || '',
+            location:       br.location   || '',
+          };
+          const li = local.findIndex(r => r.id === norm.id);
           if (li >= 0) {
-            // Update fields that PM may have changed
-            local[li].status     = br.status     || local[li].status;
-            local[li].pmResponse = br.pmResponse || local[li].pmResponse;
-            local[li].updatedAt  = br.updatedAt  || local[li].updatedAt;
+            local[li].status     = norm.status;
+            local[li].pmResponse = norm.pmResponse || local[li].pmResponse;
+            local[li].updatedAt  = norm.updatedAt  || local[li].updatedAt;
           } else {
-            local.unshift(br);  // New request from tenant portal
+            local.unshift(norm);
           }
         });
-        // Sort by submittedAt desc
         local.sort((a,b) => new Date(b.submittedAt||0) - new Date(a.submittedAt||0));
         S.set(KEY_TREQS, local);
+        logActivity(`Synced ${backendReqs.length} tenant request(s) from backend`, '#0f4c81');
       }
+    } else {
+      console.warn('loadTenantReqs: backend returned', res.status);
     }
-  } catch(e) { /* backend unavailable — use localStorage */ }
+  } catch(e) {
+    console.warn('loadTenantReqs: fetch failed', e);
+  }
   renderTenantReqs();
+  updateSidebarBadges();
 }
 
 function renderTenantReqs() {
@@ -5094,7 +5118,6 @@ function openTRPhoto(dataUrl) {
 // ═══════════════════════════════════════════════
 // OWNER MANAGEMENT
 // ═══════════════════════════════════════════════
-const BACKEND = 'https://vicrental-backend1-production.up.railway.app/api';
 const KEY_LOCAL_OWNERS = 'vr_local_owners';
 
 function getLocalOwners() { return S.get(KEY_LOCAL_OWNERS, []); }
