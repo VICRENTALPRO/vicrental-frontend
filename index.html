@@ -2351,6 +2351,144 @@ window.addEventListener('DOMContentLoaded', function() {
     </div><!-- /content -->
   </div><!-- /main -->
 </div><!-- /app -->
+<!-- ═══════════════════════════════════════════
+     EDIT MODALS
+═══════════════════════════════════════════ -->
+
+<!-- EDIT OWNER MODAL -->
+<div id="editOwnerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;padding:28px 32px;width:480px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.25);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div style="font-size:1rem;font-weight:700;color:var(--navy);">Edit Owner</div>
+      <button onclick="closeEditOwner()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);">X</button>
+    </div>
+    <input type="hidden" id="editOwnerId">
+    <div style="display:grid;gap:14px;">
+      <div>
+        <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Full Name *</label>
+        <input type="text" id="editOwnerName" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Email</label>
+          <input type="email" id="editOwnerEmail" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        </div>
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Phone</label>
+          <input type="text" id="editOwnerPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        </div>
+      </div>
+      <div>
+        <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">New Password (leave blank to keep existing)</label>
+        <input type="text" id="editOwnerPassword" placeholder="Enter new password to change" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+      </div>
+    </div>
+    <div id="editOwnerError" style="display:none;margin-top:10px;color:var(--red);font-size:0.8rem;"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+      <button onclick="closeEditOwner()" class="btn btn-ghost">Cancel</button>
+      <button onclick="saveEditOwner()" class="btn btn-primary">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT TENANT MODAL -->
+<div id="editTenantModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;padding:28px 32px;width:560px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.25);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div style="font-size:1rem;font-weight:700;color:var(--navy);">Edit Tenant</div>
+      <button onclick="closeEditTenant()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);">X</button>
+    </div>
+    <input type="hidden" id="editTenantId">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div>
+        <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">First Name *</label>
+        <input type="text" id="editTenantFirst" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+      </div>
+      <div>
+        <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Last Name *</label>
+        <input type="text" id="editTenantLast" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+      </div>
+      <div>
+        <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Email *</label>
+        <input type="email" id="editTenantEmail" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+      </div>
+      <div>
+        <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Phone</label>
+        <input type="text" id="editTenantPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+      </div>
+      <div style="grid-column:1/-1;">
+        <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Property Address</label>
+        <input type="text" id="editTenantProperty" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+      </div>
+      <div style="grid-column:1/-1;">
+        <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">New Password (leave blank to keep existing)</label>
+        <input type="text" id="editTenantPassword" placeholder="Enter new password to change" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+      </div>
+    </div>
+    <div id="editTenantError" style="display:none;margin-top:10px;color:var(--red);font-size:0.8rem;"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+      <button onclick="closeEditTenant()" class="btn btn-ghost">Cancel</button>
+      <button onclick="saveEditTenant()" class="btn btn-primary">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT PROPERTY MODAL -->
+<div id="editPropertyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;padding:28px 32px;width:640px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.25);max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div style="font-size:1rem;font-weight:700;color:var(--navy);">Edit Property</div>
+      <button onclick="closeEditProperty()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);">X</button>
+    </div>
+    <input type="hidden" id="editPropertyId">
+    <div style="margin-bottom:16px;">
+      <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">Property</div>
+      <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Address *</label>
+      <input type="text" id="editPropAddress" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+    </div>
+    <div style="margin-bottom:16px;">
+      <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">Owner</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Name</label>
+          <input type="text" id="editPropOwner" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        </div>
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Email</label>
+          <input type="email" id="editPropOwnerEmail" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        </div>
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Phone</label>
+          <input type="text" id="editPropOwnerPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        </div>
+      </div>
+    </div>
+    <div style="margin-bottom:16px;">
+      <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">Tenant</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Name</label>
+          <input type="text" id="editPropTenant" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        </div>
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Email</label>
+          <input type="email" id="editPropTenantEmail" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        </div>
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Phone</label>
+          <input type="text" id="editPropTenantPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        </div>
+      </div>
+    </div>
+    <div id="editPropertyError" style="display:none;margin-top:10px;color:var(--red);font-size:0.8rem;"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+      <button onclick="closeEditProperty()" class="btn btn-ghost">Cancel</button>
+      <button onclick="saveEditProperty()" class="btn btn-primary">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+
 
 <!-- ══════════════════════ DETAIL PANEL ══════════════════════ -->
 <div class="detail-overlay" id="detailOverlay" onclick="closeDetail()"></div>
@@ -4881,7 +5019,8 @@ async function loadOwners() {
               <td style="padding:10px 12px;">${propBadge}</td>
               <td style="padding:10px 12px;color:var(--muted);">${o.createdAt ? new Date(o.createdAt).toLocaleDateString('en-AU') : '—'}</td>
               <td style="padding:10px 12px;text-align:right;">
-                ${o.source !== 'property' ? `<button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteOwner('${o.id || o.name}', '${name}')">🗑 Remove</button>` : ''}
+                <button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;" onclick='openEditOwner(${JSON.stringify({id: o.id||o.name, name: name, email: o.email||"", phone: o.phone||""})})'>✏️ Edit</button>
+                ${o.source !== 'property' ? `<button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteOwner('${o.id || o.name}', '${name.replace(/'/g,"\\'")}')">🗑 Remove</button>` : ''}
               </td>
             </tr>`;
         }).join('')}
@@ -5052,7 +5191,8 @@ function renderTenantsList() {
               <td style="padding:10px 12px;color:var(--muted);">${t.phone||'—'}</td>
               <td style="padding:10px 12px;color:var(--muted);">${t.createdAt ? new Date(t.createdAt).toLocaleDateString('en-AU') : '—'}</td>
               <td style="padding:10px 12px;text-align:right;">
-                ${t.source !== 'import' ? `<button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteTenant('${t.id||t.email}', '${(t.firstName||'')} ${(t.lastName||'')}')">🗑 Remove</button>` : ''}
+                <button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;" onclick='openEditTenant(${JSON.stringify({id:t.id||t.email, firstName:t.firstName||"", lastName:t.lastName||"", email:t.email||"", phone:t.phone||"", property:t.property||""})})'>✏️ Edit</button>
+                ${t.source !== 'import' ? `<button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteTenant('${(t.id||t.email).replace(/'/g,"\\'")}', '${(t.firstName||'')} ${(t.lastName||'')}')">🗑 Remove</button>` : ''}
               </td>
             </tr>`;
         }).join('')}
@@ -5076,6 +5216,191 @@ async function deleteTenant(id, name) {
   }
 }
 
+
+// ═══════════════════════════════════════════════
+// EDIT MODALS
+// ═══════════════════════════════════════════════
+
+// ── OWNER EDIT ──────────────────────────────
+let editOwnerData = null;
+
+function openEditOwner(o) {
+  editOwnerData = o;
+  document.getElementById('editOwnerId').value    = o.id || o.name || '';
+  document.getElementById('editOwnerName').value  = o.name || o.username || '';
+  document.getElementById('editOwnerEmail').value = o.email || '';
+  document.getElementById('editOwnerPhone').value = o.phone || '';
+  document.getElementById('editOwnerPassword').value = '';
+  document.getElementById('editOwnerError').style.display = 'none';
+  const m = document.getElementById('editOwnerModal');
+  m.style.display = 'flex';
+}
+function closeEditOwner() { document.getElementById('editOwnerModal').style.display = 'none'; }
+
+async function saveEditOwner() {
+  const name     = document.getElementById('editOwnerName').value.trim();
+  const email    = document.getElementById('editOwnerEmail').value.trim();
+  const phone    = document.getElementById('editOwnerPhone').value.trim();
+  const password = document.getElementById('editOwnerPassword').value.trim();
+  const errEl    = document.getElementById('editOwnerError');
+  errEl.style.display = 'none';
+  if (!name) { errEl.textContent = 'Name is required.'; errEl.style.display = ''; return; }
+
+  // Update local owners list
+  const owners = getLocalOwners();
+  const idx = owners.findIndex(o => o.id === editOwnerData.id || o.name.toLowerCase() === (editOwnerData.name||'').toLowerCase());
+  if (idx >= 0) {
+    owners[idx] = { ...owners[idx], name, email, phone };
+    saveLocalOwners(owners);
+  } else {
+    // Was backend-only — add to local now
+    addLocalOwner(name, email, phone);
+  }
+
+  // Update any matching managed properties
+  const props = getManagedProps();
+  const oldName = (editOwnerData.name || editOwnerData.username || '').toLowerCase();
+  props.forEach(p => {
+    if (p.owner && p.owner.toLowerCase() === oldName) {
+      p.owner = name;
+      if (email) p.ownerEmail = email;
+      if (phone) p.ownerPhone = phone;
+    }
+  });
+  saveManagedProps(props);
+
+  // If password changed, update backend
+  if (password) {
+    try {
+      await fetch(`${BACKEND}/auth/owner/register`, {
+        method: 'POST', headers: getAuthHeaders(),
+        body: JSON.stringify({ name, password })
+      });
+    } catch(e) { /* non-fatal */ }
+  }
+
+  closeEditOwner();
+  toast(`Owner "${name}" updated`, 'success');
+  logActivity(`Owner updated: ${name}`, '#1d4f91');
+  loadOwners();
+  renderManagedProps();
+}
+
+// ── TENANT EDIT ──────────────────────────────
+let editTenantData = null;
+
+function openEditTenant(t) {
+  editTenantData = t;
+  document.getElementById('editTenantId').value       = t.id || t.email || '';
+  document.getElementById('editTenantFirst').value    = t.firstName || '';
+  document.getElementById('editTenantLast').value     = t.lastName  || '';
+  document.getElementById('editTenantEmail').value    = t.email     || '';
+  document.getElementById('editTenantPhone').value    = t.phone     || '';
+  document.getElementById('editTenantProperty').value = t.property  || '';
+  document.getElementById('editTenantPassword').value = '';
+  document.getElementById('editTenantError').style.display = 'none';
+  document.getElementById('editTenantModal').style.display = 'flex';
+}
+function closeEditTenant() { document.getElementById('editTenantModal').style.display = 'none'; }
+
+async function saveEditTenant() {
+  const firstName = document.getElementById('editTenantFirst').value.trim();
+  const lastName  = document.getElementById('editTenantLast').value.trim();
+  const email     = document.getElementById('editTenantEmail').value.trim();
+  const phone     = document.getElementById('editTenantPhone').value.trim();
+  const property  = document.getElementById('editTenantProperty').value.trim();
+  const password  = document.getElementById('editTenantPassword').value.trim();
+  const errEl     = document.getElementById('editTenantError');
+  errEl.style.display = 'none';
+  if (!firstName || !email) { errEl.textContent = 'First name and email are required.'; errEl.style.display = ''; return; }
+
+  // Update cached tenants
+  const ti = cachedTenants.findIndex(t => (t.id||t.email) === (editTenantData.id||editTenantData.email));
+  if (ti >= 0) cachedTenants[ti] = { ...cachedTenants[ti], firstName, lastName, email, phone, property };
+
+  // Update matching managed property tenant details
+  const props = getManagedProps();
+  const oldEmail = (editTenantData.email||'').toLowerCase();
+  props.forEach(p => {
+    if (p.tenantEmail && p.tenantEmail.toLowerCase() === oldEmail) {
+      p.tenant = `${firstName} ${lastName}`.trim();
+      p.tenantEmail = email;
+      p.tenantPhone = phone;
+    }
+  });
+  saveManagedProps(props);
+
+  // Update backend if password provided
+  if (password) {
+    try {
+      await fetch(`${BACKEND}/auth/tenant/register`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firstName, lastName, email, password, property, phone })
+      });
+    } catch(e) { /* non-fatal */ }
+  }
+
+  closeEditTenant();
+  toast(`Tenant "${firstName} ${lastName}" updated`, 'success');
+  logActivity(`Tenant updated: ${firstName} ${lastName}`, '#1d4f91');
+  renderTenantsList();
+  renderManagedProps();
+}
+
+// ── PROPERTY EDIT ──────────────────────────────
+let editPropertyData = null;
+
+function openEditProperty(id) {
+  const props = getManagedProps();
+  const p = props.find(x => x.id === id);
+  if (!p) return;
+  editPropertyData = p;
+  document.getElementById('editPropertyId').value     = p.id;
+  document.getElementById('editPropAddress').value    = p.address        || '';
+  document.getElementById('editPropOwner').value      = p.owner          || '';
+  document.getElementById('editPropOwnerEmail').value = p.ownerEmail     || '';
+  document.getElementById('editPropOwnerPhone').value = p.ownerPhone     || '';
+  document.getElementById('editPropTenant').value     = p.tenant         || '';
+  document.getElementById('editPropTenantEmail').value= p.tenantEmail    || '';
+  document.getElementById('editPropTenantPhone').value= p.tenantPhone    || '';
+  document.getElementById('editPropertyError').style.display = 'none';
+  document.getElementById('editPropertyModal').style.display = 'flex';
+}
+function closeEditProperty() { document.getElementById('editPropertyModal').style.display = 'none'; }
+
+function saveEditProperty() {
+  const id          = document.getElementById('editPropertyId').value;
+  const address     = document.getElementById('editPropAddress').value.trim();
+  const owner       = document.getElementById('editPropOwner').value.trim();
+  const ownerEmail  = document.getElementById('editPropOwnerEmail').value.trim();
+  const ownerPhone  = document.getElementById('editPropOwnerPhone').value.trim();
+  const tenant      = document.getElementById('editPropTenant').value.trim();
+  const tenantEmail = document.getElementById('editPropTenantEmail').value.trim();
+  const tenantPhone = document.getElementById('editPropTenantPhone').value.trim();
+  const errEl       = document.getElementById('editPropertyError');
+  errEl.style.display = 'none';
+  if (!address) { errEl.textContent = 'Address is required.'; errEl.style.display = ''; return; }
+
+  const props = getManagedProps();
+  const idx = props.findIndex(p => p.id === id);
+  if (idx < 0) return;
+  props[idx] = { ...props[idx], address, owner, ownerEmail, ownerPhone, tenant, tenantEmail, tenantPhone };
+  saveManagedProps(props);
+
+  // Keep local owners in sync
+  if (owner) addLocalOwner(owner, ownerEmail, ownerPhone);
+
+  closeEditProperty();
+  toast(`Property updated`, 'success');
+  logActivity(`Property updated: ${address}`, '#1d4f91');
+  renderManagedProps();
+  loadOwners();
+}
+
+function toggleModal(id, show) {
+  const m = document.getElementById(id);
+  if (m) m.style.display = show ? 'flex' : 'none';
+}
 
 function toggleOwnerForm() {
   const f = document.getElementById('ownerAddForm');
@@ -5244,6 +5569,7 @@ function renderManagedProps() {
               </td>
               <td style="padding:10px 12px;">${badge} <span style="color:var(--muted);font-size:0.75rem;margin-left:4px;">${propWOs.length} total</span></td>
               <td style="padding:10px 12px;text-align:right;">
+                <button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;" onclick="openEditProperty('${p.id}')">✏️ Edit</button>
                 ${!p.auto ? `<button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteProperty('${p.id}')">🗑 Remove</button>` : ''}
               </td>
             </tr>`;
@@ -5332,6 +5658,7 @@ function renderManagedProps() {
               </td>
               <td style="padding:10px 12px;">${badge} <span style="color:var(--muted);font-size:0.75rem;margin-left:4px;">${propWOs.length} total</span></td>
               <td style="padding:10px 12px;text-align:right;">
+                <button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;" onclick="openEditProperty('${p.id}')">✏️ Edit</button>
                 ${!p.auto ? `<button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteProperty('${p.id}')">🗑 Remove</button>` : ''}
               </td>
             </tr>`;
@@ -5453,9 +5780,11 @@ async function executeImport(type) {
         });
         const d = await res.json();
         if (!res.ok) throw new Error(d.error || `HTTP ${res.status}`);
+        addLocalOwner(name, '', '');
         success++;
       } catch(err) { failed++; errors.push(`${name}: ${err.message}`); }
     }
+    if (success > 0) loadOwners();
   } else if (isTenant) {
     const fi = data.headers.indexOf('first_name'), li = data.headers.indexOf('last_name');
     const ei = data.headers.indexOf('email'), pi = data.headers.indexOf('password');
@@ -5471,10 +5800,16 @@ async function executeImport(type) {
         });
         const d = await res.json();
         if (!res.ok) throw new Error(d.error || `HTTP ${res.status}`);
+        // Auto-create property record if not exists
+        const tprops = getManagedProps();
+        if (property && !tprops.find(p => p.address.toLowerCase() === property.toLowerCase())) {
+          tprops.unshift({ id: 'PROP-' + Date.now() + Math.random(), address: property, owner: '—', ownerEmail: '', ownerPhone: '', tenant: `${firstName} ${lastName}`, tenantEmail: email, tenantPhone: phone, createdAt: new Date().toISOString() });
+          saveManagedProps(tprops);
+        }
         success++;
       } catch(err) { failed++; errors.push(`${email}: ${err.message}`); }
     }
-    if (success > 0) loadTenants();
+    if (success > 0) { loadTenants(); renderManagedProps(); }
   } else {
     const ai   = data.headers.indexOf('address');
     const oi   = data.headers.indexOf('owner_name');
