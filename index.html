@@ -5119,9 +5119,22 @@ function openTRPhoto(dataUrl) {
 // OWNER MANAGEMENT
 // ═══════════════════════════════════════════════
 const KEY_LOCAL_OWNERS = 'vr_local_owners';
+const KEY_LOCAL_TENANTS = 'vr_local_tenants';
 
 function getLocalOwners() { return S.get(KEY_LOCAL_OWNERS, []); }
 function saveLocalOwners(owners) { S.set(KEY_LOCAL_OWNERS, owners); }
+
+function getLocalTenants() { return S.get(KEY_LOCAL_TENANTS, []); }
+function saveLocalTenants(tenants) { S.set(KEY_LOCAL_TENANTS, tenants); }
+function addLocalTenant(firstName, lastName, email, phone, property) {
+  if (!email) return;
+  const tenants = getLocalTenants();
+  const existing = tenants.findIndex(t => t.email.toLowerCase() === email.toLowerCase());
+  const entry = { id: 'local-' + email, firstName, lastName, email, phone: phone||'', property: property||'', createdAt: new Date().toISOString(), source: 'local' };
+  if (existing >= 0) tenants[existing] = { ...tenants[existing], ...entry };
+  else tenants.unshift(entry);
+  saveLocalTenants(tenants);
+}
 
 function addLocalOwner(name, email, phone) {
   const owners = getLocalOwners();
@@ -5312,6 +5325,8 @@ async function addTenant() {
 
     okEl.textContent = `✅ Tenant "${firstName} ${lastName}" added! They can now log in at the Tenant Portal with their email and password.`;
     okEl.style.display = '';
+    // Save locally so they always appear in list even if backend list call fails
+    addLocalTenant(firstName, lastName, email, phone, property);
     document.getElementById('newTenantFirst').value = '';
     document.getElementById('newTenantLast').value  = '';
     document.getElementById('newTenantEmail').value = '';
@@ -5347,6 +5362,16 @@ async function loadTenants() {
   // Also pick up tenants from managed properties that were imported via CSV
   const managedProps = getManagedProps();
   const merged = [...backendTenants];
+
+  // Merge locally-stored tenants (added via Add Tenant form)
+  const localTenants = getLocalTenants();
+  localTenants.forEach(lt => {
+    if (!merged.find(t => (t.email||'').toLowerCase() === lt.email.toLowerCase())) {
+      merged.push(lt);
+    }
+  });
+
+  // Merge tenants from imported properties
   managedProps.forEach(p => {
     if (p.tenantEmail && !merged.find(t => (t.email||'').toLowerCase() === p.tenantEmail.toLowerCase())) {
       const nameParts = (p.tenant || '').split(' ');
@@ -6039,6 +6064,8 @@ async function executeImport(type) {
         });
         const d = await res.json();
         if (!res.ok) throw new Error(d.error || `HTTP ${res.status}`);
+        // Save locally so they appear in list immediately
+        addLocalTenant(firstName, lastName, email, phone, property);
         // Auto-create property record if not exists
         const tprops = getManagedProps();
         if (property && !tprops.find(p => p.address.toLowerCase() === property.toLowerCase())) {
@@ -6091,6 +6118,11 @@ async function executeImport(type) {
 
       // Save owner to local owners list
       if (owner) addLocalOwner(owner, ownerEmail, ownerPhone);
+
+      // If tenant details provided, save locally so they show in Manage Tenants
+      if (firstName && lastName && tenantEmail) {
+        addLocalTenant(firstName, lastName, tenantEmail, tenantPhone, address);
+      }
 
       // If tenant details + password provided, also register them in Railway
       if (firstName && lastName && tenantEmail && tenantPass) {
