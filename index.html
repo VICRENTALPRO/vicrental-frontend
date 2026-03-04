@@ -2142,15 +2142,18 @@ window.addEventListener('DOMContentLoaded', function() {
               <input type="text" id="newTenantPhone" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
             </div>
             <div>
-              <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Password *</label>
+              <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Password <span style="font-weight:400;">(optional — needed for portal login)</span></label>
               <input type="text" id="newTenantPassword" placeholder="e.g. tenant123" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
             </div>
-            <button class="btn btn-primary" onclick="addTenant()" style="padding:9px 20px;white-space:nowrap;">+ Add Tenant</button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-primary" onclick="addTenant()" style="padding:9px 20px;white-space:nowrap;">+ Add &amp; Register</button>
+              <button class="btn btn-ghost" onclick="addTenantLocalOnly()" style="padding:9px 20px;white-space:nowrap;">+ Add to List Only</button>
+            </div>
           </div>
           <div id="tenantAddError" style="display:none;margin-top:10px;color:var(--red);font-size:0.8rem;"></div>
           <div id="tenantAddSuccess" style="display:none;margin-top:10px;color:var(--green);font-size:0.8rem;font-weight:600;"></div>
           <div style="margin-top:14px;padding:12px 14px;background:var(--amber-pale);border-radius:8px;border:1px solid rgba(181,110,0,0.2);font-size:0.75rem;color:var(--amber);">
-            ⚠️ Tenants log in at the <strong>Tenant Portal</strong> using their email and the password you set here. They can also self-register directly at the tenant portal.
+            ⚠️ <strong>Add &amp; Register</strong> creates a portal login. <strong>Add to List Only</strong> saves them to records without a portal account — useful for existing tenants.
           </div>
         </div>
       </div>
@@ -5293,6 +5296,28 @@ async function deleteOwner(id, name) {
 // ═══════════════════════════════════════════════
 let cachedTenants = [];
 
+function addTenantLocalOnly() {
+  const firstName = document.getElementById('newTenantFirst').value.trim();
+  const lastName  = document.getElementById('newTenantLast').value.trim();
+  const email     = document.getElementById('newTenantEmail').value.trim().toLowerCase();
+  const property  = document.getElementById('newTenantProperty').value.trim();
+  const phone     = document.getElementById('newTenantPhone').value.trim();
+  const errEl     = document.getElementById('tenantAddError');
+  const okEl      = document.getElementById('tenantAddSuccess');
+  errEl.style.display = 'none'; okEl.style.display = 'none';
+  if (!firstName || !lastName || !email || !property) {
+    errEl.textContent = 'Please fill in first name, last name, email and property.';
+    errEl.style.display = ''; return;
+  }
+  addLocalTenant(firstName, lastName, email, phone, property);
+  okEl.textContent = `✅ ${firstName} ${lastName} added to your tenant list.`;
+  okEl.style.display = '';
+  ['newTenantFirst','newTenantLast','newTenantEmail','newTenantProperty','newTenantPhone','newTenantPassword'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+  logActivity(`Tenant added to list: ${firstName} ${lastName} (${email}) — ${property}`, '#1d7a50');
+  const f = document.getElementById('tenantAddForm'); if (f) f.style.display = 'none';
+  loadTenants(); renderManagedProps();
+}
+
 async function addTenant() {
   const firstName = document.getElementById('newTenantFirst').value.trim();
   const lastName  = document.getElementById('newTenantLast').value.trim();
@@ -5350,859 +5375,46 @@ async function loadTenants() {
   if (!el) return;
   el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">Loading…</div>';
 
-  let backendTenants = [];
+  // Try to pull from backend and save any found tenants locally
   try {
     const res = await fetch(`${BACKEND}/auth/tenant/list`, { headers: getAuthHeaders() });
     if (res.ok) {
       const data = await res.json();
-      backendTenants = data.tenants || data || [];
+      const backendTenants = data.tenants || data.users || data || [];
+      backendTenants.forEach(t => {
+        if (t.email) addLocalTenant(
+          t.firstName || t.first_name || '',
+          t.lastName  || t.last_name  || '',
+          t.email, t.phone || '', t.property || ''
+        );
+      });
     }
-  } catch(e) { /* fall through */ }
+  } catch(e) { /* fall through to local */ }
 
-  // Also pick up tenants from managed properties that were imported via CSV
-  const managedProps = getManagedProps();
-  const merged = [...backendTenants];
-
-  // Merge locally-stored tenants (added via Add Tenant form)
+  // Local storage is the source of truth — always show these
   const localTenants = getLocalTenants();
-  localTenants.forEach(lt => {
-    if (!merged.find(t => (t.email||'').toLowerCase() === lt.email.toLowerCase())) {
-      merged.push(lt);
-    }
-  });
+  const managedProps = getManagedProps();
+  const merged = [...localTenants];
 
-  // Merge tenants from imported properties
+  // Also pull in tenants linked to managed properties
   managedProps.forEach(p => {
     if (p.tenantEmail && !merged.find(t => (t.email||'').toLowerCase() === p.tenantEmail.toLowerCase())) {
       const nameParts = (p.tenant || '').split(' ');
       merged.push({
-        id: 'auto-' + p.tenantEmail,
+        id: 'prop-' + p.tenantEmail,
         firstName: nameParts[0] || '',
-        lastName: nameParts.slice(1).join(' ') || '',
-        email: p.tenantEmail,
-        phone: p.tenantPhone || '',
-        property: p.address,
+        lastName:  nameParts.slice(1).join(' ') || '',
+        email:     p.tenantEmail,
+        phone:     p.tenantPhone || '',
+        property:  p.address,
         createdAt: p.createdAt,
-        source: 'import'
+        source:    'property'
       });
     }
   });
 
   cachedTenants = merged;
   renderTenantsList();
-}
-
-function renderTenantsList() {
-  const el = document.getElementById('tenantsList');
-  if (!el) return;
-
-  const search = (document.getElementById('tenantSearch')?.value || '').toLowerCase();
-  let tenants = cachedTenants;
-  if (search) tenants = tenants.filter(t =>
-    (t.firstName||'').toLowerCase().includes(search) ||
-    (t.lastName||'').toLowerCase().includes(search) ||
-    (t.email||'').toLowerCase().includes(search) ||
-    (t.property||'').toLowerCase().includes(search)
-  );
-
-  // Sort alphabetically by last name then first name
-  tenants = [...tenants].sort((a, b) => {
-    const aName = `${a.lastName||''} ${a.firstName||''}`.trim().toLowerCase();
-    const bName = `${b.lastName||''} ${b.firstName||''}`.trim().toLowerCase();
-    return aName.localeCompare(bName);
-  });
-
-  if (!tenants.length) {
-    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">No tenants found. Add one above, import via CSV, or ask tenants to self-register at the Tenant Portal.</div>';
-    return;
-  }
-
-  // Cache sorted tenants for edit lookups
-  window._cachedSortedTenants = tenants;
-
-  el.innerHTML = `
-    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
-      <thead>
-        <tr style="border-bottom:2px solid var(--border);">
-          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Name</th>
-          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Email</th>
-          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Property</th>
-          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Phone</th>
-          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Registered</th>
-          <th style="padding:8px 12px;"></th>
-        </tr>
-      </thead>
-      <tbody>
-        ${tenants.map((t, ti) => {
-          const sourceTag = t.source === 'import'
-            ? `<span style="font-size:0.6rem;background:var(--blue-pale);color:var(--blue);padding:1px 6px;border-radius:4px;margin-left:6px;">from import</span>`
-            : '';
-          const safeAddr = (t.property||'').replace(/'/g, "\\'");
-          const propLink = t.property
-            ? `<a onclick="goToProperty('${safeAddr}')" style="color:var(--blue);cursor:pointer;text-decoration:underline;text-underline-offset:2px;">📍 ${t.property}</a>`
-            : '—';
-          return `
-            <tr style="border-bottom:1px solid var(--border);">
-              <td style="padding:10px 12px;font-weight:600;">🏡 ${t.firstName||''} ${t.lastName||''}${sourceTag}</td>
-              <td style="padding:10px 12px;color:var(--muted);">${t.email||'—'}</td>
-              <td style="padding:10px 12px;">${propLink}</td>
-              <td style="padding:10px 12px;color:var(--muted);">${t.phone||'—'}</td>
-              <td style="padding:10px 12px;color:var(--muted);">${t.createdAt ? new Date(t.createdAt).toLocaleDateString('en-AU') : '—'}</td>
-              <td style="padding:10px 12px;text-align:right;">
-                <button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;" onclick="openEditTenantByIdx(${ti})">✏️ Edit</button>
-                ${t.source !== 'import' ? `<button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteTenant('${(t.id||t.email).replace(/'/g,"\\'")}', '${(t.firstName||'')} ${(t.lastName||'')}')">🗑 Remove</button>` : ''}
-              </td>
-            </tr>`;
-        }).join('')}
-      </tbody>
-    </table>`;
-}
-
-async function deleteTenant(id, name) {
-  if (!confirm(`Remove tenant "${name}"? They will no longer be able to log in.`)) return;
-  try {
-    const res = await fetch(`${BACKEND}/auth/tenant/${encodeURIComponent(id)}`, {
-      method: 'DELETE', headers: getAuthHeaders()
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    cachedTenants = cachedTenants.filter(t => (t.id||t.email) !== id);
-    toast(`Tenant "${name}" removed`, 'success');
-    logActivity(`Tenant account removed: ${name}`, '#c0392b');
-    renderTenantsList();
-  } catch (err) {
-    toast(`Could not remove tenant: ${err.message}`, 'error');
-  }
-}
-
-
-// ═══════════════════════════════════════════════
-// EDIT MODALS
-// ═══════════════════════════════════════════════
-
-function openEditOwnerByIdx(idx) {
-  const o = (window._cachedOwners || [])[idx];
-  if (o) openEditOwner(o);
-}
-
-function openEditTenantByIdx(idx) {
-  const t = (window._cachedSortedTenants || [])[idx];
-  if (t) openEditTenant(t);
-}
-
-// ── OWNER EDIT ──────────────────────────────
-let editOwnerData = null;
-
-function openEditOwner(o) {
-  editOwnerData = o;
-  document.getElementById('editOwnerId').value    = o.id || o.name || '';
-  document.getElementById('editOwnerName').value  = o.name || o.username || '';
-  document.getElementById('editOwnerEmail').value = o.email || '';
-  document.getElementById('editOwnerPhone').value = o.phone || '';
-  document.getElementById('editOwnerPassword').value = '';
-  document.getElementById('editOwnerError').style.display = 'none';
-  const m = document.getElementById('editOwnerModal');
-  m.style.display = 'flex';
-}
-function closeEditOwner() { document.getElementById('editOwnerModal').style.display = 'none'; }
-
-async function saveEditOwner() {
-  const name     = document.getElementById('editOwnerName').value.trim();
-  const email    = document.getElementById('editOwnerEmail').value.trim();
-  const phone    = document.getElementById('editOwnerPhone').value.trim();
-  const password = document.getElementById('editOwnerPassword').value.trim();
-  const errEl    = document.getElementById('editOwnerError');
-  errEl.style.display = 'none';
-  if (!name) { errEl.textContent = 'Name is required.'; errEl.style.display = ''; return; }
-
-  // Update local owners list
-  const owners = getLocalOwners();
-  const idx = owners.findIndex(o => o.id === editOwnerData.id || o.name.toLowerCase() === (editOwnerData.name||'').toLowerCase());
-  if (idx >= 0) {
-    owners[idx] = { ...owners[idx], name, email, phone };
-    saveLocalOwners(owners);
-  } else {
-    // Was backend-only — add to local now
-    addLocalOwner(name, email, phone);
-  }
-
-  // Update any matching managed properties
-  const props = getManagedProps();
-  const oldName = (editOwnerData.name || editOwnerData.username || '').toLowerCase();
-  props.forEach(p => {
-    if (p.owner && p.owner.toLowerCase() === oldName) {
-      p.owner = name;
-      if (email) p.ownerEmail = email;
-      if (phone) p.ownerPhone = phone;
-    }
-  });
-  saveManagedProps(props);
-
-  // If password changed, update backend
-  if (password) {
-    try {
-      await fetch(`${BACKEND}/auth/owner/register`, {
-        method: 'POST', headers: getAuthHeaders(),
-        body: JSON.stringify({ name, password })
-      });
-    } catch(e) { /* non-fatal */ }
-  }
-
-  closeEditOwner();
-  toast(`Owner "${name}" updated`, 'success');
-  logActivity(`Owner updated: ${name}`, '#1d4f91');
-  loadOwners();
-  renderManagedProps();
-}
-
-// ── TENANT EDIT ──────────────────────────────
-let editTenantData = null;
-
-function openEditTenant(t) {
-  editTenantData = t;
-  document.getElementById('editTenantId').value       = t.id || t.email || '';
-  document.getElementById('editTenantFirst').value    = t.firstName || '';
-  document.getElementById('editTenantLast').value     = t.lastName  || '';
-  document.getElementById('editTenantEmail').value    = t.email     || '';
-  document.getElementById('editTenantPhone').value    = t.phone     || '';
-  document.getElementById('editTenantProperty').value = t.property  || '';
-  document.getElementById('editTenantPassword').value = '';
-  document.getElementById('editTenantError').style.display = 'none';
-  document.getElementById('editTenantModal').style.display = 'flex';
-}
-function closeEditTenant() { document.getElementById('editTenantModal').style.display = 'none'; }
-
-async function saveEditTenant() {
-  const firstName = document.getElementById('editTenantFirst').value.trim();
-  const lastName  = document.getElementById('editTenantLast').value.trim();
-  const email     = document.getElementById('editTenantEmail').value.trim();
-  const phone     = document.getElementById('editTenantPhone').value.trim();
-  const property  = document.getElementById('editTenantProperty').value.trim();
-  const password  = document.getElementById('editTenantPassword').value.trim();
-  const errEl     = document.getElementById('editTenantError');
-  errEl.style.display = 'none';
-  if (!firstName || !email) { errEl.textContent = 'First name and email are required.'; errEl.style.display = ''; return; }
-
-  // Update cached tenants
-  const ti = cachedTenants.findIndex(t => (t.id||t.email) === (editTenantData.id||editTenantData.email));
-  if (ti >= 0) cachedTenants[ti] = { ...cachedTenants[ti], firstName, lastName, email, phone, property };
-
-  // Update matching managed property tenant details
-  const props = getManagedProps();
-  const oldEmail = (editTenantData.email||'').toLowerCase();
-  props.forEach(p => {
-    if (p.tenantEmail && p.tenantEmail.toLowerCase() === oldEmail) {
-      p.tenant = `${firstName} ${lastName}`.trim();
-      p.tenantEmail = email;
-      p.tenantPhone = phone;
-    }
-  });
-  saveManagedProps(props);
-
-  // Update backend if password provided
-  if (password) {
-    try {
-      await fetch(`${BACKEND}/auth/tenant/register`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firstName, lastName, email, password, property, phone })
-      });
-    } catch(e) { /* non-fatal */ }
-  }
-
-  closeEditTenant();
-  toast(`Tenant "${firstName} ${lastName}" updated`, 'success');
-  logActivity(`Tenant updated: ${firstName} ${lastName}`, '#1d4f91');
-  renderTenantsList();
-  renderManagedProps();
-}
-
-// ── PROPERTY EDIT ──────────────────────────────
-let editPropertyData = null;
-
-function openEditProperty(id) {
-  const props = getManagedProps();
-  const p = props.find(x => x.id === id);
-  if (!p) return;
-  editPropertyData = p;
-  document.getElementById('editPropertyId').value     = p.id;
-  document.getElementById('editPropAddress').value    = p.address        || '';
-  document.getElementById('editPropOwner').value      = p.owner          || '';
-  document.getElementById('editPropOwnerEmail').value = p.ownerEmail     || '';
-  document.getElementById('editPropOwnerPhone').value = p.ownerPhone     || '';
-  document.getElementById('editPropTenant').value     = p.tenant         || '';
-  document.getElementById('editPropTenantEmail').value= p.tenantEmail    || '';
-  document.getElementById('editPropTenantPhone').value= p.tenantPhone    || '';
-  document.getElementById('editPropertyError').style.display = 'none';
-  document.getElementById('editPropertyModal').style.display = 'flex';
-}
-function closeEditProperty() { document.getElementById('editPropertyModal').style.display = 'none'; }
-
-function saveEditProperty() {
-  const id          = document.getElementById('editPropertyId').value;
-  const address     = document.getElementById('editPropAddress').value.trim();
-  const owner       = document.getElementById('editPropOwner').value.trim();
-  const ownerEmail  = document.getElementById('editPropOwnerEmail').value.trim();
-  const ownerPhone  = document.getElementById('editPropOwnerPhone').value.trim();
-  const tenant      = document.getElementById('editPropTenant').value.trim();
-  const tenantEmail = document.getElementById('editPropTenantEmail').value.trim();
-  const tenantPhone = document.getElementById('editPropTenantPhone').value.trim();
-  const errEl       = document.getElementById('editPropertyError');
-  errEl.style.display = 'none';
-  if (!address) { errEl.textContent = 'Address is required.'; errEl.style.display = ''; return; }
-
-  const props = getManagedProps();
-  const idx = props.findIndex(p => p.id === id);
-  if (idx < 0) return;
-  props[idx] = { ...props[idx], address, owner, ownerEmail, ownerPhone, tenant, tenantEmail, tenantPhone };
-  saveManagedProps(props);
-
-  // Keep local owners in sync
-  if (owner) addLocalOwner(owner, ownerEmail, ownerPhone);
-
-  closeEditProperty();
-  toast(`Property updated`, 'success');
-  logActivity(`Property updated: ${address}`, '#1d4f91');
-  renderManagedProps();
-  loadOwners();
-}
-
-function toggleModal(id, show) {
-  const m = document.getElementById(id);
-  if (m) m.style.display = show ? 'flex' : 'none';
-}
-
-function toggleOwnerForm() {
-  const f = document.getElementById('ownerAddForm');
-  if (!f) return;
-  const showing = f.style.display !== 'none';
-  f.style.display = showing ? 'none' : '';
-  if (!showing) setTimeout(() => document.getElementById('newOwnerName')?.focus(), 50);
-}
-
-function toggleTenantForm() {
-  const f = document.getElementById('tenantAddForm');
-  if (!f) return;
-  const showing = f.style.display !== 'none';
-  f.style.display = showing ? 'none' : '';
-  if (!showing) setTimeout(() => document.getElementById('newTenantFirst')?.focus(), 50);
-}
-
-function togglePropForm() {
-  const f = document.getElementById('propAddForm');
-  if (!f) return;
-  const showing = f.style.display !== 'none';
-  f.style.display = showing ? 'none' : '';
-  if (!showing) setTimeout(() => document.getElementById('newPropAddress')?.focus(), 50);
-}
-
-function filterOwners() {
-  const search = (document.getElementById('ownerSearch')?.value || '').toLowerCase();
-  const rows = document.querySelectorAll('#ownersList tbody tr');
-  rows.forEach(row => {
-    row.style.display = !search || row.textContent.toLowerCase().includes(search) ? '' : 'none';
-  });
-}
-
-const KEY_MANAGED_PROPS = 'vr_managed_properties';
-
-function getManagedProps() { return S.get(KEY_MANAGED_PROPS, []); }
-function saveManagedProps(props) { S.set(KEY_MANAGED_PROPS, props); }
-
-function addProperty() {
-  const address       = document.getElementById('newPropAddress').value.trim();
-  const owner         = document.getElementById('newPropOwner').value.trim();
-  const ownerEmail    = document.getElementById('newPropOwnerEmail').value.trim();
-  const ownerPhone    = document.getElementById('newPropOwnerPhone').value.trim();
-  const tenant        = document.getElementById('newPropTenant').value.trim();
-  const tenantEmail   = document.getElementById('newPropTenantEmail').value.trim();
-  const tenantPhone   = document.getElementById('newPropTenantPhone').value.trim();
-  const tenantPassword= document.getElementById('newPropTenantPassword').value.trim();
-  const errEl         = document.getElementById('propAddError');
-  const okEl          = document.getElementById('propAddSuccess');
-  errEl.style.display = 'none';
-  okEl.style.display  = 'none';
-
-  if (!address || !owner) {
-    errEl.textContent = 'Please enter at least an address and owner name.';
-    errEl.style.display = '';
-    return;
-  }
-
-  const props = getManagedProps();
-  if (props.find(p => p.address.toLowerCase() === address.toLowerCase())) {
-    errEl.textContent = 'A property with this address already exists.';
-    errEl.style.display = '';
-    return;
-  }
-
-  const newProp = {
-    id: 'PROP-' + Date.now(),
-    address, owner,
-    ownerEmail: ownerEmail || '',
-    ownerPhone: ownerPhone || '',
-    tenant: tenant || '',
-    tenantEmail: tenantEmail || '',
-    tenantPhone: tenantPhone || '',
-    createdAt: new Date().toISOString(),
-  };
-  props.unshift(newProp);
-  saveManagedProps(props);
-
-  okEl.textContent = `✅ Property "${address}" added successfully!`;
-  okEl.style.display = '';
-  ['newPropAddress','newPropOwner','newPropOwnerEmail','newPropOwnerPhone','newPropTenant','newPropTenantEmail','newPropTenantPhone','newPropTenantPassword'].forEach(id => {
-    const el = document.getElementById(id); if (el) el.value = '';
-  });
-  logActivity(`Property added: ${address} (Owner: ${owner})`, '#1d7a50');
-  const f = document.getElementById('propAddForm'); if (f) f.style.display = 'none';
-  updateSidebarBadges();
-  renderManagedProps();
-}
-
-function deleteProperty(id) {
-  const props = getManagedProps();
-  const prop  = props.find(p => p.id === id);
-  if (!prop) return;
-  if (!confirm(`Remove property "${prop.address}"? This only removes it from the managed list — work orders are not affected.`)) return;
-  saveManagedProps(props.filter(p => p.id !== id));
-  toast('Property removed', 'info');
-  logActivity(`Property removed: ${prop.address}`, '#c0392b');
-  renderManagedProps();
-}
-
-function renderManagedProps() {
-  const el = document.getElementById('managedPropsList');
-  if (!el) return;
-
-  const search = (document.getElementById('propSearch')?.value || '').toLowerCase();
-  let props = getManagedProps();
-
-  // Also surface properties that appear in work orders but haven't been added manually
-  const woProps = [...new Set(getWOs().map(w => w.property).filter(Boolean))];
-  woProps.forEach(addr => {
-    if (!props.find(p => p.address === addr)) {
-      props.push({ id: 'auto-' + addr, address: addr, owner: '—', tenant: '', createdAt: null, auto: true });
-    }
-  });
-
-  if (search) props = props.filter(p =>
-    p.address.toLowerCase().includes(search) || p.owner.toLowerCase().includes(search)
-  );
-
-  // Sort alphabetically by address
-  props.sort((a, b) => a.address.localeCompare(b.address));
-
-  if (!props.length) {
-    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">No properties yet. Add one above or import from CSV.</div>';
-    return;
-  }
-
-  const wos = getWOs();
-  el.innerHTML = `
-    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
-      <thead>
-        <tr style="border-bottom:2px solid var(--border);">
-          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Address</th>
-          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Owner</th>
-          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Tenant</th>
-          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Work Orders</th>
-          <th style="padding:8px 12px;"></th>
-        </tr>
-      </thead>
-      <tbody>
-        ${props.map(p => {
-          const propWOs = wos.filter(w => w.property === p.address);
-          const open = propWOs.filter(w => w.status === 'open' || w.status === 'inprogress').length;
-          const badge = open > 0
-            ? `<span style="background:var(--red);color:#fff;font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:10px;">${open} open</span>`
-            : `<span style="background:var(--green-pale);color:var(--green);font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:10px;">✓ clear</span>`;
-          const autoTag = p.auto
-            ? `<span style="font-size:0.6rem;background:var(--blue-pale);color:var(--blue);padding:1px 6px;border-radius:4px;margin-left:6px;">from WO</span>`
-            : '';
-          const ownerDetail = [p.ownerEmail, p.ownerPhone].filter(Boolean).join(' · ');
-          const tenantName  = p.tenant || '—';
-          const tenantDetail= [p.tenantEmail, p.tenantPhone].filter(Boolean).join(' · ');
-          const safeAddr = p.address.replace(/'/g, "\\'");
-          return `
-            <tr style="border-bottom:1px solid var(--border);">
-              <td style="padding:10px 12px;">
-                <a onclick="goToProperty('${safeAddr}')" style="font-weight:700;color:var(--navy);cursor:pointer;text-decoration:underline;text-underline-offset:3px;">📍 ${p.address}</a>${autoTag}
-              </td>
-              <td style="padding:10px 12px;">
-                <div style="font-weight:600;">👤 ${p.owner}</div>
-                ${ownerDetail ? `<div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">${ownerDetail}</div>` : ''}
-              </td>
-              <td style="padding:10px 12px;">
-                <div>${tenantName}</div>
-                ${tenantDetail ? `<div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">${tenantDetail}</div>` : ''}
-              </td>
-              <td style="padding:10px 12px;">${badge} <span style="color:var(--muted);font-size:0.75rem;margin-left:4px;">${propWOs.length} total</span></td>
-              <td style="padding:10px 12px;text-align:right;">
-                <button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;" onclick="openEditProperty('${p.id}')">✏️ Edit</button>
-                ${!p.auto ? `<button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteProperty('${p.id}')">🗑 Remove</button>` : ''}
-              </td>
-            </tr>`;
-        }).join('')}
-      </tbody>
-    </table>`;
-}
-
-function goToProperty(address) {
-  showPage('properties');
-  setTimeout(() => {
-    const safeId = 'propcard_' + address.replace(/[^a-zA-Z0-9]/g, '_');
-    const card = document.getElementById(safeId);
-    if (card) {
-      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      card.style.outline = '3px solid var(--gold)';
-      card.style.boxShadow = '0 0 0 8px rgba(201,151,58,0.18)';
-      setTimeout(() => { card.style.outline = ''; card.style.boxShadow = ''; }, 2500);
-    }
-  }, 150);
-}
-
-function renderManagedProps() {
-  const el = document.getElementById('managedPropsList');
-  if (!el) return;
-
-  const search = (document.getElementById('propSearch')?.value || '').toLowerCase();
-  let props = getManagedProps();
-
-  // Also surface properties that appear in work orders but haven't been added manually
-  const woProps = [...new Set(getWOs().map(w => w.property).filter(Boolean))];
-  woProps.forEach(addr => {
-    if (!props.find(p => p.address === addr)) {
-      props.push({ id: 'auto-' + addr, address: addr, owner: '—', tenant: '', createdAt: null, auto: true });
-    }
-  });
-
-  if (search) props = props.filter(p =>
-    p.address.toLowerCase().includes(search) || p.owner.toLowerCase().includes(search)
-  );
-
-  if (!props.length) {
-    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">No properties yet. Add one above or import from CSV.</div>';
-    return;
-  }
-
-  const wos = getWOs();
-  el.innerHTML = `
-    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
-      <thead>
-        <tr style="border-bottom:2px solid var(--border);">
-          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Address</th>
-          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Owner</th>
-          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Tenant</th>
-          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Work Orders</th>
-          <th style="padding:8px 12px;"></th>
-        </tr>
-      </thead>
-      <tbody>
-        ${props.map(p => {
-          const propWOs = wos.filter(w => w.property === p.address);
-          const open = propWOs.filter(w => w.status === 'open' || w.status === 'inprogress').length;
-          const badge = open > 0
-            ? `<span style="background:var(--red);color:#fff;font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:10px;">${open} open</span>`
-            : `<span style="background:var(--green-pale);color:var(--green);font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:10px;">✓ clear</span>`;
-          const autoTag = p.auto
-            ? `<span style="font-size:0.6rem;background:var(--blue-pale);color:var(--blue);padding:1px 6px;border-radius:4px;margin-left:6px;">from WO</span>`
-            : '';
-          const ownerDetail = [p.ownerEmail, p.ownerPhone].filter(Boolean).join(' · ');
-          const tenantName  = p.tenant || '—';
-          const tenantDetail= [p.tenantEmail, p.tenantPhone].filter(Boolean).join(' · ');
-          return `
-            <tr style="border-bottom:1px solid var(--border);">
-              <td style="padding:10px 12px;font-weight:600;">📍 ${p.address}${autoTag}</td>
-              <td style="padding:10px 12px;">
-                <div style="font-weight:600;">👤 ${p.owner}</div>
-                ${ownerDetail ? `<div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">${ownerDetail}</div>` : ''}
-              </td>
-              <td style="padding:10px 12px;">
-                <div>${tenantName}</div>
-                ${tenantDetail ? `<div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">${tenantDetail}</div>` : ''}
-              </td>
-              <td style="padding:10px 12px;">${badge} <span style="color:var(--muted);font-size:0.75rem;margin-left:4px;">${propWOs.length} total</span></td>
-              <td style="padding:10px 12px;text-align:right;">
-                <button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;" onclick="openEditProperty('${p.id}')">✏️ Edit</button>
-                ${!p.auto ? `<button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteProperty('${p.id}')">🗑 Remove</button>` : ''}
-              </td>
-            </tr>`;
-        }).join('')}
-      </tbody>
-    </table>`;
-}
-
-// ═══════════════════════════════════════════════
-// IMPORT DATA
-// ═══════════════════════════════════════════════
-let importData = { owner: null, property: null };
-
-function renderImportPage() { /* static page */ }
-
-function downloadOwnerTemplate() {
-  downloadCSVBlob('name,password\nMichael Chen,owner123\nSarah Williams,secure456\n', 'owner-import-template.csv');
-}
-
-function downloadTenantTemplate() {
-  downloadCSVBlob('first_name,last_name,email,password,property,phone\nJohn,Smith,john@email.com,tenant123,42 Sample Street Richmond VIC 3121,0412345678\nJane,Doe,jane@email.com,tenant456,7 Demo Lane Fitzroy VIC 3065,\n', 'tenant-import-template.csv');
-}
-
-function downloadPropertyTemplate() {
-  downloadCSVBlob(
-    'address,owner_name,owner_email,owner_phone,first_name,last_name,email,password,phone\n' +
-    '42 Sample Street Richmond VIC 3121,Michael Chen,michael@email.com,0412345678,John,Smith,john@email.com,tenant123,0498765432\n' +
-    '7 Demo Lane Fitzroy VIC 3065,Sarah Williams,sarah@email.com,,Jane,Doe,jane@email.com,tenant456,\n',
-    'property-import-template.csv'
-  );
-}
-
-function downloadCSVBlob(content, filename) {
-  const a = Object.assign(document.createElement('a'), {
-    href: URL.createObjectURL(new Blob([content], { type: 'text/csv' })),
-    download: filename
-  });
-  a.click();
-}
-
-function handleImportDrop(e, type) {
-  e.preventDefault();
-  const zoneId = type === 'owner' ? 'ownerDropZone' : type === 'tenant' ? 'tenantDropZone' : 'propDropZone';
-  document.getElementById(zoneId).classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  if (file) parseImportCSV(file, type);
-}
-
-function handleImportFile(e, type) {
-  const file = e.target.files[0];
-  if (file) parseImportCSV(file, type);
-}
-
-function parseImportCSV(file, type) {
-  const reader = new FileReader();
-  reader.onload = e => {
-    const lines   = e.target.result.trim().split('\n').map(l => l.split(',').map(c => c.trim().replace(/^"|"$/g, '')));
-    if (lines.length < 2) { toast('CSV appears empty', 'error'); return; }
-    importData[type] = { headers: lines[0].map(h => h.toLowerCase()), rows: lines.slice(1).filter(r => r.some(c => c)), filename: file.name };
-    renderImportPreview(type);
-  };
-  reader.readAsText(file);
-}
-
-function renderImportPreview(type) {
-  const data      = importData[type];
-  const isOwner   = type === 'owner';
-  const isTenant  = type === 'tenant';
-  const previewEl = document.getElementById(isOwner ? 'ownerImportPreview' : isTenant ? 'tenantImportPreview' : 'propImportPreview');
-  const btnEl     = document.getElementById(isOwner ? 'ownerImportBtn'    : isTenant ? 'tenantImportBtn'    : 'propImportBtn');
-  const clearEl   = document.getElementById(isOwner ? 'ownerImportClear'  : isTenant ? 'tenantImportClear'  : 'propImportClear');
-  if (!data || !previewEl) return;
-
-  const required = isOwner ? ['name','password'] : isTenant ? ['first_name','last_name','email','password','property'] : ['address','owner_name'];
-  const missing  = required.filter(r => !data.headers.includes(r));
-
-  clearEl.style.display = '';
-  if (missing.length) {
-    previewEl.style.display = '';
-    previewEl.innerHTML = `<div style="padding:12px;background:var(--red-pale);border-radius:8px;font-size:0.8rem;color:var(--red);">⚠️ Missing required columns: <strong>${missing.join(', ')}</strong></div>`;
-    btnEl.style.display = 'none';
-    return;
-  }
-
-  const preview = data.rows.slice(0, 5);
-  previewEl.style.display = '';
-  previewEl.innerHTML = `
-    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;">Preview: <strong>${data.rows.length} row${data.rows.length!==1?'s':''}</strong> in ${data.filename}</div>
-    <table style="width:100%;border-collapse:collapse;font-size:0.78rem;border:1px solid var(--border);border-radius:8px;overflow:hidden;">
-      <thead style="background:var(--warm);">
-        <tr>${data.headers.map(h=>`<th style="padding:7px 10px;text-align:left;font-weight:600;color:var(--muted);">${h}</th>`).join('')}</tr>
-      </thead>
-      <tbody>
-        ${preview.map(row=>`<tr style="border-top:1px solid var(--border);">${row.map(c=>`<td style="padding:7px 10px;">${c||'—'}</td>`).join('')}</tr>`).join('')}
-        ${data.rows.length>5?`<tr><td colspan="${data.headers.length}" style="padding:7px 10px;color:var(--muted);font-style:italic;border-top:1px solid var(--border);">…and ${data.rows.length-5} more rows</td></tr>`:''}
-      </tbody>
-    </table>`;
-  btnEl.style.display = '';
-}
-
-async function executeImport(type) {
-  const data    = importData[type];
-  if (!data) return;
-  const isOwner  = type === 'owner';
-  const isTenant = type === 'tenant';
-  const btnEl    = document.getElementById(isOwner ? 'ownerImportBtn' : isTenant ? 'tenantImportBtn' : 'propImportBtn');
-  btnEl.textContent = 'Importing…'; btnEl.disabled = true;
-
-  let success = 0, failed = 0, errors = [];
-
-  if (isOwner) {
-    const ni = data.headers.indexOf('name'), pi = data.headers.indexOf('password');
-    for (const row of data.rows) {
-      const name = row[ni], password = row[pi];
-      if (!name || !password) { failed++; continue; }
-      try {
-        const res = await fetch(`${BACKEND}/auth/owner/register`, {
-          method:'POST', headers: getAuthHeaders(), body: JSON.stringify({ name, password })
-        });
-        const d = await res.json();
-        if (!res.ok) throw new Error(d.error || `HTTP ${res.status}`);
-        addLocalOwner(name, '', '');
-        success++;
-      } catch(err) { failed++; errors.push(`${name}: ${err.message}`); }
-    }
-    if (success > 0) loadOwners();
-  } else if (isTenant) {
-    const fi = data.headers.indexOf('first_name'), li = data.headers.indexOf('last_name');
-    const ei = data.headers.indexOf('email'), pi = data.headers.indexOf('password');
-    const pri = data.headers.indexOf('property'), phi = data.headers.indexOf('phone');
-    for (const row of data.rows) {
-      const firstName = row[fi], lastName = row[li], email = row[ei];
-      const password = row[pi], property = row[pri], phone = phi >= 0 ? row[phi] : '';
-      if (!firstName || !lastName || !email || !password || !property) { failed++; errors.push(`${email||'?'}: missing required fields`); continue; }
-      try {
-        const res = await fetch(`${BACKEND}/auth/tenant/register`, {
-          method:'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ firstName, lastName, email, password, property, phone })
-        });
-        const d = await res.json();
-        if (!res.ok) throw new Error(d.error || `HTTP ${res.status}`);
-        // Save locally so they appear in list immediately
-        addLocalTenant(firstName, lastName, email, phone, property);
-        // Auto-create property record if not exists
-        const tprops = getManagedProps();
-        if (property && !tprops.find(p => p.address.toLowerCase() === property.toLowerCase())) {
-          tprops.unshift({ id: 'PROP-' + Date.now() + Math.random(), address: property, owner: '—', ownerEmail: '', ownerPhone: '', tenant: `${firstName} ${lastName}`, tenantEmail: email, tenantPhone: phone, createdAt: new Date().toISOString() });
-          saveManagedProps(tprops);
-        }
-        success++;
-      } catch(err) { failed++; errors.push(`${email}: ${err.message}`); }
-    }
-    if (success > 0) { loadTenants(); renderManagedProps(); }
-  } else {
-    const ai   = data.headers.indexOf('address');
-    const oi   = data.headers.indexOf('owner_name');
-    const oei  = data.headers.indexOf('owner_email');
-    const opi  = data.headers.indexOf('owner_phone');
-    const fi   = data.headers.indexOf('first_name');
-    const li   = data.headers.indexOf('last_name');
-    const ei   = data.headers.indexOf('email');
-    const pi   = data.headers.indexOf('password');
-    const phi  = data.headers.indexOf('phone');
-
-    const props = getManagedProps();
-    for (const row of data.rows) {
-      const address    = row[ai];
-      const owner      = row[oi];
-      const ownerEmail = oei >= 0 ? row[oei] : '';
-      const ownerPhone = opi >= 0 ? row[opi] : '';
-      const firstName  = fi  >= 0 ? row[fi]  : '';
-      const lastName   = li  >= 0 ? row[li]  : '';
-      const tenantEmail= ei  >= 0 ? row[ei]  : '';
-      const tenantPass = pi  >= 0 ? row[pi]  : '';
-      const tenantPhone= phi >= 0 ? row[phi] : '';
-
-      if (!address || !owner) { failed++; continue; }
-      if (props.find(p => p.address.toLowerCase() === address.toLowerCase())) {
-        failed++; errors.push(`${address}: duplicate`); continue;
-      }
-
-      props.unshift({
-        id: 'PROP-' + Date.now() + Math.random(),
-        address, owner,
-        ownerEmail: ownerEmail || '',
-        ownerPhone: ownerPhone || '',
-        tenant: firstName && lastName ? `${firstName} ${lastName}` : '',
-        tenantEmail: tenantEmail || '',
-        tenantPhone: tenantPhone || '',
-        createdAt: new Date().toISOString()
-      });
-      success++;
-
-      // Save owner to local owners list
-      if (owner) addLocalOwner(owner, ownerEmail, ownerPhone);
-
-      // If tenant details provided, save locally so they show in Manage Tenants
-      if (firstName && lastName && tenantEmail) {
-        addLocalTenant(firstName, lastName, tenantEmail, tenantPhone, address);
-      }
-
-      // If tenant details + password provided, also register them in Railway
-      if (firstName && lastName && tenantEmail && tenantPass) {
-        try {
-          const res = await fetch(`${BACKEND}/auth/tenant/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ firstName, lastName, email: tenantEmail, password: tenantPass, property: address, phone: tenantPhone })
-          });
-          if (!res.ok) errors.push(`Tenant ${tenantEmail}: registration failed`);
-        } catch(e) { errors.push(`Tenant ${tenantEmail}: ${e.message}`); }
-      }
-    }
-    saveManagedProps(props);
-    updateSidebarBadges();
-    if (success > 0) {
-      renderManagedProps();
-      // Refresh owners and tenants tabs so they show the imported data
-      loadOwners();
-      loadTenants();
-    }
-  }
-
-  btnEl.textContent = isOwner ? '⬆ Import Owners' : isTenant ? '⬆ Import Tenants' : '⬆ Import Properties';
-  btnEl.disabled = false;
-
-  // Add to import log
-  const logEl = document.getElementById('importLog');
-  if (logEl) {
-    if (logEl.style.fontStyle==='italic') logEl.innerHTML='';
-    const typeLabel = isOwner ? 'Owner' : isTenant ? 'Tenant' : 'Property';
-    const entry = document.createElement('div');
-    entry.style.cssText = `padding:10px 14px;border-radius:8px;margin-bottom:8px;font-size:0.8rem;background:${failed===0?'var(--green-pale)':'var(--amber-pale)'};border:1px solid ${failed===0?'rgba(26,122,74,0.2)':'rgba(181,110,0,0.2)'};`;
-    entry.innerHTML = `<strong>${new Date().toLocaleString('en-AU')}</strong> — ${typeLabel} import: <span style="color:var(--green)">✅ ${success} imported</span>${failed?` <span style="color:var(--red)">⚠️ ${failed} failed</span>`:''}${errors.length?`<br><span style="color:var(--muted);font-size:0.75rem;">${errors.slice(0,3).join(' · ')}${errors.length>3?` +${errors.length-3} more`:''}</span>`:''}`;
-    logEl.prepend(entry);
-  }
-
-  if (success > 0) {
-    const label = isOwner ? 'owner' : isTenant ? 'tenant' : 'propert';
-    const plural = isOwner ? 's' : isTenant ? 's' : 'ies';
-    toast(`${success} ${label}${success!==1?plural:''} imported`, 'success');
-    logActivity(`Imported ${success} ${isOwner?'owners':isTenant?'tenants':'properties'} via CSV`, '#1d7a50');
-  }
-  if (failed > 0) toast(`${failed} row${failed!==1?'s':''} failed — see import log`, 'error');
-}
-
-function clearImport(type) {
-  importData[type] = null;
-  const isOwner  = type === 'owner';
-  const isTenant = type === 'tenant';
-  const prefix   = isOwner ? 'owner' : isTenant ? 'tenant' : 'prop';
-  ['Preview','Btn','Clear'].forEach(s => {
-    const el = document.getElementById(prefix + 'Import' + s);
-    if (el) { el.style.display = 'none'; if (s==='Preview') el.innerHTML=''; }
-  });
-  const inp = document.getElementById(isOwner ? 'ownerCsvInput' : isTenant ? 'tenantCsvInput' : 'propCsvInput');
-  if (inp) inp.value = '';
-}
-
-function seedDemo() {
-  if (getWOs().length === 0 && S.get(KEY_PORT,[]).length === 0) {
-    const wos = [
-      { id:'WO-0001', property:'42 Sample Street, Richmond VIC 3121', ownerName:'Michael Chen', issue:'Working smoke alarm on every storey', category:'Smoke Alarms', categoryIcon:'🔴', priority:'critical', legalRef:'Building Regs', action:'Install working smoke alarms on every storey before occupancy.', trade:'Electrician', dueDate: new Date(Date.now()+86400000).toISOString().split('T')[0], inspector:'Jane Smith', status:'open', createdAt:new Date(Date.now()-86400000*2).toISOString(), photos:[], evidenceDocs:[], timeline:[{type:'created',msg:'Created from inspection — smoke alarm failure',time:new Date(Date.now()-86400000*2).toISOString()}] },
-      { id:'WO-0002', property:'42 Sample Street, Richmond VIC 3121', ownerName:'Michael Chen', issue:'Fixed heater present in main living area', category:'Heating', categoryIcon:'🌡️', priority:'critical', legalRef:'Reg 5I', action:'Install a fixed, energy-efficient heater in the main living area.', trade:'HVAC Technician', dueDate:new Date(Date.now()+86400000*2).toISOString().split('T')[0], inspector:'Jane Smith', status:'inprogress', createdAt:new Date(Date.now()-86400000*3).toISOString(), photos:[], evidenceDocs:[], assignedTo:'Melbourne HVAC Pty Ltd', timeline:[{type:'created',msg:'Created from inspection',time:new Date(Date.now()-86400000*3).toISOString()},{type:'inprogress',msg:'Status changed to In Progress',time:new Date(Date.now()-86400000).toISOString()}] },
-      { id:'WO-0003', property:'7 Demo Lane, Fitzroy VIC 3065', ownerName:'Michael Chen', issue:'External entry doors have functioning deadlatch or deadlock', category:'Locks & Security', categoryIcon:'🔒', priority:'critical', legalRef:'Reg 5A', action:'Install or repair deadlatch/deadlock on all external entry doors.', trade:'Locksmith', dueDate:new Date(Date.now()-86400000*2).toISOString().split('T')[0], inspector:'Mark Johnson', status:'completed', createdAt:new Date(Date.now()-86400000*5).toISOString(), photos:[], evidenceDocs:[{id:1,dataUrl:'',name:'invoice.jpg',uploadedAt:new Date().toISOString()}], assignedTo:'SecureLock Melbourne', timeline:[{type:'created',msg:'Created from inspection',time:new Date(Date.now()-86400000*5).toISOString()},{type:'completed',msg:'Status changed to Completed',time:new Date(Date.now()-86400000).toISOString()}] },
-      { id:'WO-0004', property:'7 Demo Lane, Fitzroy VIC 3065', ownerName:'Michael Chen', issue:'No visible mould on walls, ceilings, or floors', category:'Mould & Dampness', categoryIcon:'🌿', priority:'high', legalRef:'Reg 5J', action:'Identify and remediate source of mould.', trade:'Remediation Specialist', dueDate:new Date(Date.now()+86400000*7).toISOString().split('T')[0], inspector:'Mark Johnson', status:'open', createdAt:new Date(Date.now()-86400000).toISOString(), photos:[], evidenceDocs:[], timeline:[{type:'created',msg:'Created from inspection — mould found',time:new Date(Date.now()-86400000).toISOString()}] },
-    ];
-    saveWOs(wos);
-
-    const portal = wos.map(wo => ({
-      id: wo.id, property: wo.property, ownerName: wo.ownerName,
-      issue: wo.issue, category: wo.category, categoryIcon: wo.categoryIcon,
-      priority: wo.priority, legalRef: wo.legalRef, action: wo.action,
-      trade: wo.trade, inspector: wo.inspector, dueDate: wo.dueDate,
-      notifiedAt: wo.createdAt,
-    }));
-    S.set(KEY_PORT, portal);
-
-    logActivity('Demo data loaded — 4 work orders across 2 properties', '#3b82f6');
-  }
 }
 </script>
 </body>
