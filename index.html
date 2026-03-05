@@ -5417,6 +5417,87 @@ async function loadTenants() {
   cachedTenants = merged;
   renderTenantsList();
 }
+
+function renderTenantsList() {
+  const el = document.getElementById('tenantsList');
+  if (!el) return;
+
+  const search = (document.getElementById('tenantSearch')?.value || '').toLowerCase();
+  let tenants = [...cachedTenants];
+
+  // Filter by search
+  if (search) tenants = tenants.filter(t =>
+    (t.firstName||'').toLowerCase().includes(search) ||
+    (t.lastName||'').toLowerCase().includes(search) ||
+    (t.email||'').toLowerCase().includes(search) ||
+    (t.property||'').toLowerCase().includes(search)
+  );
+
+  // Sort A-Z by last name then first name
+  tenants.sort((a,b) => {
+    const aName = ((a.lastName||'') + (a.firstName||'')).toLowerCase();
+    const bName = ((b.lastName||'') + (b.firstName||'')).toLowerCase();
+    return aName.localeCompare(bName);
+  });
+
+  if (tenants.length === 0) {
+    el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted);font-size:0.85rem;">
+      ${search ? 'No tenants match your search.' : 'No tenants yet. Use the form above to add tenants.'}
+    </div>`;
+    return;
+  }
+
+  // Get managed props for compliance status lookup
+  const managedProps = getManagedProps();
+
+  el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:8px;">
+    ${tenants.map(t => {
+      const fullName = `${t.firstName||''} ${t.lastName||''}`.trim() || t.email;
+      const initials = ((t.firstName||'?')[0] + (t.lastName||'?')[0]).toUpperCase();
+      const prop = managedProps.find(p => p.address && t.property &&
+        p.address.toLowerCase() === t.property.toLowerCase());
+      const compliance = prop?.complianceStatus || prop?.lastInspectionGrade || null;
+      const complianceColor = prop?.lastInspectionColor || '#6b7280';
+      const lastInspection = prop?.lastInspectionScore ? `${prop.lastInspectionScore}% · ${prop.lastInspectionGrade}` : null;
+
+      return `<div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+        <!-- Header -->
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--navy-mid));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.9rem;flex-shrink:0;">${initials}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;font-size:0.95rem;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${fullName}</div>
+            <div style="font-size:0.75rem;color:var(--muted);">${t.source === 'import' ? 'Imported' : t.source === 'property' ? 'From property' : 'Registered'}</div>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button onclick="openEditTenantByIdx(${cachedTenants.indexOf(t)})" style="background:none;border:1px solid var(--border);border-radius:7px;padding:4px 10px;font-size:0.72rem;cursor:pointer;color:var(--navy);">Edit</button>
+            <button onclick="deleteTenant('${t.id||t.email}')" style="background:none;border:1px solid #fca5a5;border-radius:7px;padding:4px 10px;font-size:0.72rem;cursor:pointer;color:var(--red);">Remove</button>
+          </div>
+        </div>
+
+        <!-- Contact details -->
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:0.8rem;">
+          ${t.email ? `<div style="display:flex;align-items:center;gap:8px;color:var(--text);">
+            <span style="color:var(--muted);width:16px;">✉</span>
+            <a href="mailto:${t.email}" style="color:var(--navy);text-decoration:none;">${t.email}</a>
+          </div>` : ''}
+          ${t.phone ? `<div style="display:flex;align-items:center;gap:8px;color:var(--text);">
+            <span style="color:var(--muted);width:16px;">📞</span>
+            <a href="tel:${t.phone}" style="color:var(--navy);text-decoration:none;">${t.phone}</a>
+          </div>` : ''}
+        </div>
+
+        <!-- Property link -->
+        ${t.property ? `<div style="background:var(--warm);border-radius:9px;padding:10px 12px;cursor:pointer;" onclick="goToProperty('${t.property.replace(/'/g,"\\'")}')">
+          <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px;">🏠 Property</div>
+          <div style="font-size:0.82rem;font-weight:600;color:var(--navy);">${t.property}</div>
+          ${lastInspection ? `<div style="margin-top:6px;display:flex;align-items:center;gap:6px;">
+            <span style="background:${complianceColor};color:#fff;border-radius:5px;padding:2px 8px;font-size:0.7rem;font-weight:600;">${lastInspection}</span>
+          </div>` : `<div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">Click to view property →</div>`}
+        </div>` : `<div style="font-size:0.78rem;color:var(--muted);font-style:italic;">No property assigned</div>`}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
 </script>
 </body>
 </html>
