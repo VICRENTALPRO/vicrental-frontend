@@ -2701,13 +2701,94 @@ const S = {
 
 const KEY_WO    = 'vicrental_workorders';
 const BACKEND   = 'https://vicrental-backend1-production.up.railway.app/api';
+const KEY_MANAGED = 'vr_managed_props';
+
+function getManagedProps() { return S.get(KEY_MANAGED, []); }
+function saveManagedProps(props) { S.set(KEY_MANAGED, props); }
 const KEY_PORT  = 'vicrental_portal';
+
+function renderManagedProps() {
+  const el = document.getElementById('managedPropsList');
+  if (!el) return;
+  const search = (document.getElementById('propSearch')?.value || '').toLowerCase();
+  let props = getManagedProps();
+  if (search) props = props.filter(p =>
+    (p.address||'').toLowerCase().includes(search) ||
+    (p.owner||'').toLowerCase().includes(search) ||
+    (p.tenant||'').toLowerCase().includes(search)
+  );
+  props.sort((a,b) => (a.address||'').localeCompare(b.address||''));
+  if (!props.length) {
+    el.innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">${search ? 'No properties match.' : 'No properties yet. Add one above or import via CSV.'}</div>`;
+    return;
+  }
+  el.innerHTML = props.map(p => {
+    const gradeColor = p.lastInspectionColor || '#6b7280';
+    return `<div style="display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:0.88rem;color:var(--navy);">🏠 ${p.address||'—'}</div>
+        <div style="font-size:0.78rem;color:var(--muted);margin-top:2px;">Owner: ${p.owner||'—'} ${p.ownerEmail ? '· '+p.ownerEmail : ''} ${p.ownerPhone ? '· '+p.ownerPhone : ''}</div>
+        <div style="font-size:0.78rem;color:var(--muted);">Tenant: ${p.tenant||'—'} ${p.tenantEmail ? '· '+p.tenantEmail : ''} ${p.tenantPhone ? '· '+p.tenantPhone : ''}</div>
+      </div>
+      ${p.lastInspectionScore ? `<span style="background:${gradeColor};color:#fff;border-radius:6px;padding:3px 10px;font-size:0.72rem;font-weight:600;white-space:nowrap;">${p.lastInspectionScore}% · ${p.lastInspectionGrade}</span>` : ''}
+      <button onclick="deleteManagedProp('${(p.id||p.address).replace(/'/g,"&#39;")}')" style="background:none;border:1px solid #fca5a5;border-radius:7px;padding:4px 10px;font-size:0.72rem;cursor:pointer;color:var(--red);">Remove</button>
+    </div>`;
+  }).join('');
+}
+
+function deleteManagedProp(id) {
+  if (!confirm('Remove this property?')) return;
+  let props = getManagedProps();
+  props = props.filter(p => (p.id||p.address) !== id);
+  saveManagedProps(props);
+  renderManagedProps();
+  updateSidebarBadges();
+}
+
+function togglePropForm() {
+  const f = document.getElementById('propAddForm');
+  if (f) f.style.display = f.style.display === 'none' ? '' : 'none';
+}
+
+function addProperty() {
+  const address     = document.getElementById('newPropAddress')?.value.trim();
+  const owner       = document.getElementById('newPropOwner')?.value.trim();
+  const ownerEmail  = document.getElementById('newPropOwnerEmail')?.value.trim();
+  const ownerPhone  = document.getElementById('newPropOwnerPhone')?.value.trim();
+  const tenant      = document.getElementById('newPropTenant')?.value.trim();
+  const tenantEmail = document.getElementById('newPropTenantEmail')?.value.trim();
+  const tenantPhone = document.getElementById('newPropTenantPhone')?.value.trim();
+  const errEl = document.getElementById('propAddError');
+  const okEl  = document.getElementById('propAddSuccess');
+  if (errEl) { errEl.style.display = 'none'; }
+  if (okEl)  { okEl.style.display  = 'none'; }
+  if (!address || !owner) {
+    if (errEl) { errEl.textContent = 'Address and owner name are required.'; errEl.style.display = ''; }
+    return;
+  }
+  const props = getManagedProps();
+  if (props.find(p => p.address.toLowerCase() === address.toLowerCase())) {
+    if (errEl) { errEl.textContent = 'This property already exists.'; errEl.style.display = ''; }
+    return;
+  }
+  props.unshift({ id: 'PROP-' + Date.now(), address, owner, ownerEmail, ownerPhone, tenant, tenantEmail, tenantPhone, createdAt: new Date().toISOString() });
+  saveManagedProps(props);
+  if (tenantEmail && tenant) addLocalTenant((tenant.split(' ')[0]||''), (tenant.split(' ').slice(1).join(' ')||''), tenantEmail, tenantPhone, address);
+  if (owner) addLocalOwner(owner, ownerEmail||'', ownerPhone||'');
+  if (okEl) { okEl.textContent = '✅ Property added!'; okEl.style.display = ''; }
+  ['newPropAddress','newPropOwner','newPropOwnerEmail','newPropOwnerPhone','newPropTenant','newPropTenantEmail','newPropTenantPhone','newPropTenantPassword'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+  renderManagedProps();
+  updateSidebarBadges();
+  logActivity('Property added: ' + address, '#1d7a50');
+}
+
 const KEY_ACT   = 'vicrental_activity';
 const KEY_CL    = 'vicrental_checklist';
 const KEY_PHOTOS= 'vicrental_photos';
 const KEY_VAULT  = 'vicrental_vault';
 const KEY_QUOTES = 'vicrental_quotes';
 const KEY_TREQS  = 'vicrental_tenant_requests';
+
 
 // ═══════════════════════════════════════════════
 // TOAST
@@ -5376,21 +5457,7 @@ async function loadTenants() {
   if (!el) return;
   el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">Loading…</div>';
 
-  // Try to pull from backend and save any found tenants locally
-  try {
-    const res = await fetch(`${BACKEND}/auth/tenant/list`, { headers: getAuthHeaders() });
-    if (res.ok) {
-      const data = await res.json();
-      const backendTenants = data.tenants || data.users || data || [];
-      backendTenants.forEach(t => {
-        if (t.email) addLocalTenant(
-          t.firstName || t.first_name || '',
-          t.lastName  || t.last_name  || '',
-          t.email, t.phone || '', t.property || ''
-        );
-      });
-    }
-  } catch(e) { /* fall through to local */ }
+  // Backend /auth/tenant/list not available — use local storage only
 
   // Local storage is the source of truth — always show these
   const localTenants = getLocalTenants();
@@ -5498,6 +5565,35 @@ function renderTenantsList() {
     }).join('')}
   </div>`;
 }
+
+function goToProperty(address) {
+  showPage('properties');
+  setTimeout(() => {
+    const safeId = 'propcard_' + address.replace(/[^a-zA-Z0-9]/g, '_');
+    const card = document.getElementById(safeId);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.style.outline = '3px solid var(--gold)';
+      card.style.boxShadow = '0 0 0 4px rgba(201,151,58,0.25)';
+      setTimeout(() => { card.style.outline = ''; card.style.boxShadow = ''; }, 2500);
+    }
+  }, 300);
+}
+
+function toggleTenantForm() {
+  const f = document.getElementById('tenantAddForm');
+  if (f) f.style.display = f.style.display === 'none' ? '' : 'none';
+}
+
+function toggleOwnerForm() {
+  const f = document.getElementById('ownerAddForm');
+  if (f) f.style.display = f.style.display === 'none' ? '' : 'none';
+}
+
+function renderImportPage() { /* Import page is static HTML */ }
+
+function seedDemo() { /* Demo data seeding skipped */ }
+
 </script>
 </body>
 </html>
