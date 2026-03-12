@@ -1583,8 +1583,6 @@ body {
 <script>
 const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
 </script>
-  <!-- Google Places Autocomplete -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9prsNmGE4JCKFBrUD3iVoG_yHhRJiIvE&libraries=places&callback=initGooglePlaces" async defer></script>
 </head>
 <body>
 
@@ -2185,9 +2183,10 @@ window.addEventListener('DOMContentLoaded', function() {
           <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-bottom:12px;">
             <div style="position:relative;">
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Property Address *</label>
-              <input type="text" id="newPropAddress" placeholder="Start typing address…" autocomplete="off"
+              <input type="text" id="newPropAddress" placeholder="Start typing an Australian address…" autocomplete="off"
+                oninput="nominatimSearch(this.value)"
                 style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
-              <div id="propAddressSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:0 0 8px 8px;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,0.12);max-height:220px;overflow-y:auto;"></div>
+              <div id="propAddressSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:0 0 9px 9px;z-index:9999;box-shadow:0 6px 20px rgba(0,0,0,0.13);max-height:220px;overflow-y:auto;"></div>
             </div>
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Owner Name *</label>
@@ -2706,122 +2705,15 @@ const S = {
 const KEY_WO    = 'vicrental_workorders';
 const BACKEND   = 'https://vicrental-backend1-production.up.railway.app/api';
 const KEY_MANAGED = 'vr_managed_props';
-
 function getManagedProps() { return S.get(KEY_MANAGED, []); }
 function saveManagedProps(props) { S.set(KEY_MANAGED, props); }
 const KEY_PORT  = 'vicrental_portal';
-
-function renderManagedProps() {
-  const el = document.getElementById('managedPropsList');
-  if (!el) return;
-  const search = (document.getElementById('propSearch')?.value || '').toLowerCase();
-  let props = getManagedProps();
-  if (search) props = props.filter(p =>
-    (p.address||'').toLowerCase().includes(search) ||
-    (p.owner||'').toLowerCase().includes(search) ||
-    (p.tenant||'').toLowerCase().includes(search)
-  );
-  props.sort((a,b) => (a.address||'').localeCompare(b.address||''));
-
-  if (!props.length) {
-    el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted);font-size:0.85rem;">${search ? 'No properties match your search.' : 'No properties yet. Click + Add Property to get started.'}</div>`;
-    return;
-  }
-
-  el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-top:8px;">' +
-    props.map(p => {
-      const propId = (p.id || p.address).replace(/'/g,"&#39;");
-      const gradeColor = p.lastInspectionColor || '#6b7280';
-      const parts = (p.address||'').split(',');
-      const line1 = parts[0] || p.address || '—';
-      const line2 = parts.slice(1).join(',').trim();
-      const tenantName = p.tenant ? p.tenant : '<span style="font-style:italic;color:var(--muted);font-weight:400;">No tenant assigned</span>';
-      const cardId = 'propcard_' + (p.id||p.address).replace(/[^a-zA-Z0-9]/g,'_');
-      return `<div id="${cardId}" style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;flex-direction:column;gap:12px;">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
-          <div style="flex:1;min-width:0;">
-            <div style="font-weight:700;font-size:0.95rem;color:var(--navy);line-height:1.3;">🏠 ${line1}</div>
-            ${line2 ? `<div style="font-size:0.76rem;color:var(--muted);margin-top:2px;">${line2}</div>` : ''}
-          </div>
-          ${p.lastInspectionScore ? `<span style="background:${gradeColor};color:#fff;border-radius:6px;padding:3px 9px;font-size:0.7rem;font-weight:700;white-space:nowrap;flex-shrink:0;">${p.lastInspectionScore}% · ${p.lastInspectionGrade||''}</span>` : ''}
-        </div>
-        <div style="background:var(--warm);border-radius:9px;padding:10px 12px;">
-          <div style="font-size:0.67rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px;">👤 Owner</div>
-          <div style="font-weight:600;font-size:0.82rem;color:var(--navy);">${p.owner||'—'}</div>
-          <div style="font-size:0.74rem;color:var(--muted);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap;">
-            ${p.ownerEmail ? `<a href="mailto:${p.ownerEmail}" style="color:var(--navy);text-decoration:none;">✉ ${p.ownerEmail}</a>` : ''}
-            ${p.ownerPhone ? `<a href="tel:${p.ownerPhone}" style="color:var(--navy);text-decoration:none;">📞 ${p.ownerPhone}</a>` : ''}
-          </div>
-        </div>
-        <div style="background:#f0fdf4;border-radius:9px;padding:10px 12px;">
-          <div style="font-size:0.67rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px;">🏡 Tenant</div>
-          <div style="font-weight:600;font-size:0.82rem;color:var(--navy);">${tenantName}</div>
-          <div style="font-size:0.74rem;color:var(--muted);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap;">
-            ${p.tenantEmail ? `<a href="mailto:${p.tenantEmail}" style="color:var(--navy);text-decoration:none;">✉ ${p.tenantEmail}</a>` : ''}
-            ${p.tenantPhone ? `<a href="tel:${p.tenantPhone}" style="color:var(--navy);text-decoration:none;">📞 ${p.tenantPhone}</a>` : ''}
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:auto;">
-          <button onclick="openEditPropModal('${propId}')" style="flex:1;padding:8px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:inherit;">✏️ Edit</button>
-          <button onclick="deleteManagedProp('${propId}')" style="padding:8px 14px;background:#fff;color:var(--red);border:1px solid #fca5a5;border-radius:8px;font-size:0.78rem;cursor:pointer;font-family:inherit;">Remove</button>
-        </div>
-      </div>`;
-    }).join('') + '</div>';
-}
-
-function deleteManagedProp(id) {
-  if (!confirm('Remove this property?')) return;
-  let props = getManagedProps();
-  props = props.filter(p => (p.id||p.address) !== id);
-  saveManagedProps(props);
-  renderManagedProps();
-  updateSidebarBadges();
-}
-
-function togglePropForm() {
-  const f = document.getElementById('propAddForm');
-  if (f) f.style.display = f.style.display === 'none' ? '' : 'none';
-}
-
-function addProperty() {
-  const address     = document.getElementById('newPropAddress')?.value.trim();
-  const owner       = document.getElementById('newPropOwner')?.value.trim();
-  const ownerEmail  = document.getElementById('newPropOwnerEmail')?.value.trim();
-  const ownerPhone  = document.getElementById('newPropOwnerPhone')?.value.trim();
-  const tenant      = document.getElementById('newPropTenant')?.value.trim();
-  const tenantEmail = document.getElementById('newPropTenantEmail')?.value.trim();
-  const tenantPhone = document.getElementById('newPropTenantPhone')?.value.trim();
-  const errEl = document.getElementById('propAddError');
-  const okEl  = document.getElementById('propAddSuccess');
-  if (errEl) { errEl.style.display = 'none'; }
-  if (okEl)  { okEl.style.display  = 'none'; }
-  if (!address || !owner) {
-    if (errEl) { errEl.textContent = 'Address and owner name are required.'; errEl.style.display = ''; }
-    return;
-  }
-  const props = getManagedProps();
-  if (props.find(p => p.address.toLowerCase() === address.toLowerCase())) {
-    if (errEl) { errEl.textContent = 'This property already exists.'; errEl.style.display = ''; }
-    return;
-  }
-  props.unshift({ id: 'PROP-' + Date.now(), address, owner, ownerEmail, ownerPhone, tenant, tenantEmail, tenantPhone, createdAt: new Date().toISOString() });
-  saveManagedProps(props);
-  if (tenantEmail && tenant) addLocalTenant((tenant.split(' ')[0]||''), (tenant.split(' ').slice(1).join(' ')||''), tenantEmail, tenantPhone, address);
-  if (owner) addLocalOwner(owner, ownerEmail||'', ownerPhone||'');
-  if (okEl) { okEl.textContent = '✅ Property added!'; okEl.style.display = ''; }
-  ['newPropAddress','newPropOwner','newPropOwnerEmail','newPropOwnerPhone','newPropTenant','newPropTenantEmail','newPropTenantPhone','newPropTenantPassword'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
-  renderManagedProps();
-  updateSidebarBadges();
-  logActivity('Property added: ' + address, '#1d7a50');
-}
-
 const KEY_ACT   = 'vicrental_activity';
 const KEY_CL    = 'vicrental_checklist';
 const KEY_PHOTOS= 'vicrental_photos';
 const KEY_VAULT  = 'vicrental_vault';
 const KEY_QUOTES = 'vicrental_quotes';
 const KEY_TREQS  = 'vicrental_tenant_requests';
-
 
 // ═══════════════════════════════════════════════
 // TOAST
@@ -5490,7 +5382,21 @@ async function loadTenants() {
   if (!el) return;
   el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">Loading…</div>';
 
-  // Backend /auth/tenant/list not available — use local storage only
+  // Try to pull from backend and save any found tenants locally
+  try {
+    const res = await fetch(`${BACKEND}/auth/tenant/list`, { headers: getAuthHeaders() });
+    if (res.ok) {
+      const data = await res.json();
+      const backendTenants = data.tenants || data.users || data || [];
+      backendTenants.forEach(t => {
+        if (t.email) addLocalTenant(
+          t.firstName || t.first_name || '',
+          t.lastName  || t.last_name  || '',
+          t.email, t.phone || '', t.property || ''
+        );
+      });
+    }
+  } catch(e) { /* fall through to local */ }
 
   // Local storage is the source of truth — always show these
   const localTenants = getLocalTenants();
@@ -5518,99 +5424,272 @@ async function loadTenants() {
   renderTenantsList();
 }
 
+// ─── Nominatim Address Autocomplete (OpenStreetMap, no API key needed) ───────
+let nominatimTimer = null;
+function nominatimSearch(val) {
+  const box = document.getElementById('propAddressSuggestions');
+  clearTimeout(nominatimTimer);
+  if (!val || val.length < 4) { box.style.display = 'none'; return; }
+  nominatimTimer = setTimeout(async () => {
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&countrycodes=au&format=json&addressdetails=1&limit=6`;
+      const res = await fetch(url, { headers: { 'Accept-Language': 'en', 'User-Agent': 'VicRentalPro/1.0' } });
+      const data = await res.json();
+      if (!data.length) { box.style.display = 'none'; return; }
+      box.innerHTML = data.map(r => {
+        const label = r.display_name;
+        const safe = label.replace(/'/g, "&#39;");
+        return `<div onclick="selectPropAddress('${safe}')"
+          style="padding:10px 14px;cursor:pointer;font-size:0.81rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;"
+          onmouseover="this.style.background='var(--warm)'" onmouseout="this.style.background=''">
+          <span style="color:var(--muted);flex-shrink:0;">📍</span>
+          <span>${label}</span>
+        </div>`;
+      }).join('');
+      box.style.display = 'block';
+    } catch(e) { box.style.display = 'none'; }
+  }, 350);
+}
+
+function selectPropAddress(address) {
+  document.getElementById('newPropAddress').value = address;
+  document.getElementById('propAddressSuggestions').style.display = 'none';
+}
+
+document.addEventListener('click', e => {
+  const box = document.getElementById('propAddressSuggestions');
+  const inp = document.getElementById('newPropAddress');
+  if (box && inp && !inp.contains(e.target) && !box.contains(e.target)) box.style.display = 'none';
+});
+
+// ─── Manage Properties ────────────────────────────────────────────────────────
+function togglePropForm() {
+  const f = document.getElementById('propAddForm');
+  if (f) f.style.display = f.style.display === 'none' ? '' : 'none';
+}
+
+function addProperty() {
+  const address     = (document.getElementById('newPropAddress')?.value || '').trim();
+  const owner       = (document.getElementById('newPropOwner')?.value || '').trim();
+  const ownerEmail  = (document.getElementById('newPropOwnerEmail')?.value || '').trim();
+  const ownerPhone  = (document.getElementById('newPropOwnerPhone')?.value || '').trim();
+  const tenant      = (document.getElementById('newPropTenant')?.value || '').trim();
+  const tenantEmail = (document.getElementById('newPropTenantEmail')?.value || '').trim();
+  const tenantPhone = (document.getElementById('newPropTenantPhone')?.value || '').trim();
+  const errEl = document.getElementById('propAddError');
+  const okEl  = document.getElementById('propAddSuccess');
+  if (errEl) errEl.style.display = 'none';
+  if (okEl)  okEl.style.display  = 'none';
+  if (!address || !owner) {
+    if (errEl) { errEl.textContent = 'Address and owner name are required.'; errEl.style.display = ''; }
+    return;
+  }
+  const props = getManagedProps();
+  if (props.find(p => (p.address||'').toLowerCase() === address.toLowerCase())) {
+    if (errEl) { errEl.textContent = 'This property already exists.'; errEl.style.display = ''; }
+    return;
+  }
+  props.unshift({ id: 'PROP-' + Date.now(), address, owner, ownerEmail, ownerPhone, tenant, tenantEmail, tenantPhone, createdAt: new Date().toISOString() });
+  saveManagedProps(props);
+  if (tenantEmail && tenant) addLocalTenant((tenant.split(' ')[0]||''), (tenant.split(' ').slice(1).join(' ')||''), tenantEmail, tenantPhone, address);
+  if (owner) addLocalOwner(owner, ownerEmail||'', ownerPhone||'');
+  if (okEl) { okEl.textContent = '✅ Property added!'; okEl.style.display = ''; }
+  ['newPropAddress','newPropOwner','newPropOwnerEmail','newPropOwnerPhone','newPropTenant','newPropTenantEmail','newPropTenantPhone','newPropTenantPassword'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+  renderManagedProps();
+  if (typeof updateSidebarBadges === 'function') updateSidebarBadges();
+  if (typeof logActivity === 'function') logActivity('Property added: ' + address, '#1d7a50');
+}
+
+function renderManagedProps() {
+  const el = document.getElementById('managedPropsList');
+  if (!el) return;
+  const search = (document.getElementById('propSearch')?.value || '').toLowerCase();
+  let props = getManagedProps();
+  if (search) props = props.filter(p =>
+    (p.address||'').toLowerCase().includes(search) ||
+    (p.owner||'').toLowerCase().includes(search) ||
+    (p.tenant||'').toLowerCase().includes(search)
+  );
+  props.sort((a,b) => (a.address||'').localeCompare(b.address||''));
+  if (!props.length) {
+    el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted);font-size:0.85rem;">${search ? 'No properties match your search.' : 'No properties yet. Click + Add Property to get started.'}</div>`;
+    return;
+  }
+  el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-top:8px;">' +
+    props.map(p => {
+      const propId = (p.id || p.address).replace(/'/g,"&#39;");
+      const gradeColor = p.lastInspectionColor || '#6b7280';
+      const parts = (p.address||'').split(',');
+      const line1 = parts[0] || '—';
+      const line2 = parts.slice(1).join(',').trim();
+      const cardId = 'propcard_' + (p.id||p.address).replace(/[^a-zA-Z0-9]/g,'_');
+      return `<div id="${cardId}" style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;font-size:0.95rem;color:var(--navy);line-height:1.3;">🏠 ${line1}</div>
+            ${line2 ? `<div style="font-size:0.76rem;color:var(--muted);margin-top:2px;">${line2}</div>` : ''}
+          </div>
+          ${p.lastInspectionScore ? `<span style="background:${gradeColor};color:#fff;border-radius:6px;padding:3px 9px;font-size:0.7rem;font-weight:700;white-space:nowrap;flex-shrink:0;">${p.lastInspectionScore}% · ${p.lastInspectionGrade||''}</span>` : ''}
+        </div>
+        <div style="background:var(--warm);border-radius:9px;padding:10px 12px;">
+          <div style="font-size:0.67rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px;">👤 Owner</div>
+          <div style="font-weight:600;font-size:0.82rem;color:var(--navy);">${p.owner||'—'}</div>
+          <div style="font-size:0.74rem;color:var(--muted);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap;">
+            ${p.ownerEmail ? `<a href="mailto:${p.ownerEmail}" style="color:var(--navy);text-decoration:none;">✉ ${p.ownerEmail}</a>` : ''}
+            ${p.ownerPhone ? `<a href="tel:${p.ownerPhone}" style="color:var(--navy);text-decoration:none;">📞 ${p.ownerPhone}</a>` : ''}
+          </div>
+        </div>
+        <div style="background:#f0fdf4;border-radius:9px;padding:10px 12px;">
+          <div style="font-size:0.67rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px;">🏡 Tenant</div>
+          <div style="font-weight:600;font-size:0.82rem;color:var(--navy);">${p.tenant || 'No tenant assigned'}</div>
+          <div style="font-size:0.74rem;color:var(--muted);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap;">
+            ${p.tenantEmail ? `<a href="mailto:${p.tenantEmail}" style="color:var(--navy);text-decoration:none;">✉ ${p.tenantEmail}</a>` : ''}
+            ${p.tenantPhone ? `<a href="tel:${p.tenantPhone}" style="color:var(--navy);text-decoration:none;">📞 ${p.tenantPhone}</a>` : ''}
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:auto;">
+          <button onclick="openEditPropModal('${propId}')" style="flex:1;padding:8px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:inherit;">✏️ Edit</button>
+          <button onclick="deleteManagedProp('${propId}')" style="padding:8px 14px;background:#fff;color:var(--red);border:1px solid #fca5a5;border-radius:8px;font-size:0.78rem;cursor:pointer;font-family:inherit;">Remove</button>
+        </div>
+      </div>`;
+    }).join('') + '</div>';
+}
+
+function deleteManagedProp(id) {
+  if (!confirm('Remove this property?')) return;
+  let props = getManagedProps();
+  props = props.filter(p => (p.id||p.address) !== id);
+  saveManagedProps(props);
+  renderManagedProps();
+  if (typeof updateSidebarBadges === 'function') updateSidebarBadges();
+}
+
+function openEditPropModal(propId) {
+  const props = getManagedProps();
+  const p = props.find(x => (x.id||x.address).replace(/'/g,"&#39;") === propId || (x.id||x.address) === propId);
+  if (!p) return;
+  document.getElementById('editPropId').value         = p.id || p.address;
+  document.getElementById('editPropAddress').value    = p.address || '';
+  document.getElementById('editPropOwner').value      = p.owner || '';
+  document.getElementById('editPropOwnerEmail').value = p.ownerEmail || '';
+  document.getElementById('editPropOwnerPhone').value = p.ownerPhone || '';
+  document.getElementById('editPropTenant').value     = p.tenant || '';
+  document.getElementById('editPropTenantEmail').value= p.tenantEmail || '';
+  document.getElementById('editPropTenantPhone').value= p.tenantPhone || '';
+  document.getElementById('editPropModal').style.display = 'flex';
+}
+
+function closeEditPropModal() {
+  document.getElementById('editPropModal').style.display = 'none';
+}
+
+function saveEditProp() {
+  const propId  = document.getElementById('editPropId').value;
+  const address = (document.getElementById('editPropAddress').value || '').trim();
+  const owner   = (document.getElementById('editPropOwner').value || '').trim();
+  if (!address || !owner) { alert('Address and owner are required'); return; }
+  const props = getManagedProps();
+  const idx = props.findIndex(x => (x.id||x.address) === propId);
+  if (idx === -1) return;
+  props[idx] = { ...props[idx], address, owner,
+    ownerEmail:  (document.getElementById('editPropOwnerEmail').value||'').trim(),
+    ownerPhone:  (document.getElementById('editPropOwnerPhone').value||'').trim(),
+    tenant:      (document.getElementById('editPropTenant').value||'').trim(),
+    tenantEmail: (document.getElementById('editPropTenantEmail').value||'').trim(),
+    tenantPhone: (document.getElementById('editPropTenantPhone').value||'').trim(),
+    updatedAt:   new Date().toISOString()
+  };
+  saveManagedProps(props);
+  closeEditPropModal();
+  renderManagedProps();
+}
+
+function goToProperty(address) {
+  showPage('manageprops');
+  setTimeout(() => {
+    const cardId = 'propcard_' + address.replace(/[^a-zA-Z0-9]/g,'_');
+    const card = document.getElementById(cardId);
+    if (card) {
+      card.scrollIntoView({ behavior:'smooth', block:'center' });
+      card.style.outline = '3px solid var(--gold)';
+      setTimeout(() => { card.style.outline = ''; }, 2500);
+    }
+  }, 300);
+}
+
+// ─── Tenant list ──────────────────────────────────────────────────────────────
+
+async function loadTenants() {
+  const el = document.getElementById('tenantsList');
+  if (!el) return;
+  el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">Loading…</div>';
+  try {
+    const res = await fetch(`${BACKEND}/auth/tenant/list`, { headers: getAuthHeaders() });
+    if (res.ok) {
+      const data = await res.json();
+      const backendTenants = data.tenants || data.users || data || [];
+      backendTenants.forEach(t => {
+        if (t.email) addLocalTenant(t.firstName||t.first_name||'', t.lastName||t.last_name||'', t.email, t.phone||'', t.property||'');
+      });
+    }
+  } catch(e) {}
+  const localTenants = getLocalTenants();
+  const managedProps = getManagedProps();
+  const merged = [...localTenants];
+  managedProps.forEach(p => {
+    if (p.tenantEmail && !merged.find(t => (t.email||'').toLowerCase() === p.tenantEmail.toLowerCase())) {
+      const nameParts = (p.tenant||'').split(' ');
+      merged.push({ id:'prop-'+p.tenantEmail, firstName:nameParts[0]||'', lastName:nameParts.slice(1).join(' ')||'', email:p.tenantEmail, phone:p.tenantPhone||'', property:p.address, source:'property' });
+    }
+  });
+  cachedTenants = merged;
+  renderTenantsList();
+}
+
 function renderTenantsList() {
   const el = document.getElementById('tenantsList');
   if (!el) return;
-
   const search = (document.getElementById('tenantSearch')?.value || '').toLowerCase();
   let tenants = [...cachedTenants];
-
-  // Filter by search
   if (search) tenants = tenants.filter(t =>
     (t.firstName||'').toLowerCase().includes(search) ||
     (t.lastName||'').toLowerCase().includes(search) ||
     (t.email||'').toLowerCase().includes(search) ||
     (t.property||'').toLowerCase().includes(search)
   );
-
-  // Sort A-Z by last name then first name
-  tenants.sort((a,b) => {
-    const aName = ((a.lastName||'') + (a.firstName||'')).toLowerCase();
-    const bName = ((b.lastName||'') + (b.firstName||'')).toLowerCase();
-    return aName.localeCompare(bName);
-  });
-
-  if (tenants.length === 0) {
-    el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted);font-size:0.85rem;">
-      ${search ? 'No tenants match your search.' : 'No tenants yet. Use the form above to add tenants.'}
-    </div>`;
+  tenants.sort((a,b) => ((a.lastName||'')+(a.firstName||'')).localeCompare((b.lastName||'')+(b.firstName||'')));
+  if (!tenants.length) {
+    el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted);font-size:0.85rem;">${search ? 'No tenants match your search.' : 'No tenants yet.'}</div>`;
     return;
   }
-
-  // Get managed props for compliance status lookup
   const managedProps = getManagedProps();
-
-  el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:8px;">
-    ${tenants.map(t => {
+  el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:8px;">' +
+    tenants.map(t => {
       const fullName = `${t.firstName||''} ${t.lastName||''}`.trim() || t.email;
-      const initials = ((t.firstName||'?')[0] + (t.lastName||'?')[0]).toUpperCase();
-      const prop = managedProps.find(p => p.address && t.property &&
-        p.address.toLowerCase() === t.property.toLowerCase());
-      const compliance = prop?.complianceStatus || prop?.lastInspectionGrade || null;
-      const complianceColor = prop?.lastInspectionColor || '#6b7280';
-      const lastInspection = prop?.lastInspectionScore ? `${prop.lastInspectionScore}% · ${prop.lastInspectionGrade}` : null;
-
+      const initials = ((t.firstName||'?')[0]+(t.lastName||'?')[0]).toUpperCase();
+      const prop = managedProps.find(p => p.address && t.property && p.address.toLowerCase() === (t.property||'').toLowerCase());
+      const gradeColor = prop?.lastInspectionColor || '#6b7280';
+      const score = prop?.lastInspectionScore;
+      const grade = prop?.lastInspectionGrade;
       return `<div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
-        <!-- Header -->
         <div style="display:flex;align-items:center;gap:12px;">
-          <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--navy-mid));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.9rem;flex-shrink:0;">${initials}</div>
+          <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--navy-mid,#2d5a8e));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.9rem;flex-shrink:0;">${initials}</div>
           <div style="flex:1;min-width:0;">
             <div style="font-weight:700;font-size:0.95rem;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${fullName}</div>
-            <div style="font-size:0.75rem;color:var(--muted);">${t.source === 'import' ? 'Imported' : t.source === 'property' ? 'From property' : 'Registered'}</div>
-          </div>
-          <div style="display:flex;gap:6px;">
-            <button onclick="openEditTenantByIdx(${cachedTenants.indexOf(t)})" style="background:none;border:1px solid var(--border);border-radius:7px;padding:4px 10px;font-size:0.72rem;cursor:pointer;color:var(--navy);">Edit</button>
-            <button onclick="deleteTenant('${t.id||t.email}')" style="background:none;border:1px solid #fca5a5;border-radius:7px;padding:4px 10px;font-size:0.72rem;cursor:pointer;color:var(--red);">Remove</button>
+            <div style="font-size:0.72rem;color:var(--muted);">${t.source==='property'?'From property':t.source==='import'?'Imported':'Registered'}</div>
           </div>
         </div>
-
-        <!-- Contact details -->
-        <div style="display:flex;flex-direction:column;gap:6px;font-size:0.8rem;">
-          ${t.email ? `<div style="display:flex;align-items:center;gap:8px;color:var(--text);">
-            <span style="color:var(--muted);width:16px;">✉</span>
-            <a href="mailto:${t.email}" style="color:var(--navy);text-decoration:none;">${t.email}</a>
-          </div>` : ''}
-          ${t.phone ? `<div style="display:flex;align-items:center;gap:8px;color:var(--text);">
-            <span style="color:var(--muted);width:16px;">📞</span>
-            <a href="tel:${t.phone}" style="color:var(--navy);text-decoration:none;">${t.phone}</a>
-          </div>` : ''}
+        <div style="display:flex;flex-direction:column;gap:5px;font-size:0.8rem;">
+          ${t.email ? `<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--muted);">✉</span><a href="mailto:${t.email}" style="color:var(--navy);text-decoration:none;">${t.email}</a></div>` : ''}
+          ${t.phone ? `<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--muted);">📞</span><a href="tel:${t.phone}" style="color:var(--navy);text-decoration:none;">${t.phone}</a></div>` : ''}
         </div>
-
-        <!-- Property link -->
-        ${t.property ? `<div style="background:var(--warm);border-radius:9px;padding:10px 12px;cursor:pointer;" onclick="goToProperty('${t.property.replace(/'/g,"\\'")}')">
-          <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px;">🏠 Property</div>
+        ${t.property ? `<div style="background:var(--warm);border-radius:9px;padding:10px 12px;cursor:pointer;" onclick="goToProperty('${(t.property||'').replace(/'/g,"&#39;")}')">
+          <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px;">🏠 Property</div>
           <div style="font-size:0.82rem;font-weight:600;color:var(--navy);">${t.property}</div>
-          ${lastInspection ? `<div style="margin-top:6px;display:flex;align-items:center;gap:6px;">
-            <span style="background:${complianceColor};color:#fff;border-radius:5px;padding:2px 8px;font-size:0.7rem;font-weight:600;">${lastInspection}</span>
-          </div>` : `<div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">Click to view property →</div>`}
-        </div>` : `<div style="font-size:0.78rem;color:var(--muted);font-style:italic;">No property assigned</div>`}
+          ${score ? `<span style="background:${gradeColor};color:#fff;border-radius:5px;padding:2px 8px;font-size:0.7rem;font-weight:600;display:inline-block;margin-top:5px;">${score}% · ${grade}</span>` : '<div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">Click to view property →</div>'}
+        </div>` : '<div style="font-size:0.78rem;color:var(--muted);font-style:italic;">No property assigned</div>'}
       </div>`;
-    }).join('')}
-  </div>`;
-}
-
-function goToProperty(address) {
-  showPage('properties');
-  setTimeout(() => {
-    const safeId = 'propcard_' + address.replace(/[^a-zA-Z0-9]/g, '_');
-    const card = document.getElementById(safeId);
-    if (card) {
-      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      card.style.outline = '3px solid var(--gold)';
-      card.style.boxShadow = '0 0 0 4px rgba(201,151,58,0.25)';
-      setTimeout(() => { card.style.outline = ''; card.style.boxShadow = ''; }, 2500);
-    }
-  }, 300);
+    }).join('') + '</div>';
 }
 
 function toggleTenantForm() {
@@ -5623,109 +5702,8 @@ function toggleOwnerForm() {
   if (f) f.style.display = f.style.display === 'none' ? '' : 'none';
 }
 
-function renderImportPage() { /* Import page is static HTML */ }
-
-function seedDemo() { /* Demo data seeding skipped */ }
-
-// ─── Google Places Autocomplete ───────────────────────────────────────────────
-let placesService = null;
-let autocompleteSessionToken = null;
-
-function initGooglePlaces() {
-  placesService = new google.maps.places.AutocompleteService();
-  autocompleteSessionToken = new google.maps.places.AutocompleteSessionToken();
-
-  const input = document.getElementById('newPropAddress');
-  if (!input) return;
-
-  input.addEventListener('input', () => {
-    const val = input.value.trim();
-    const box = document.getElementById('propAddressSuggestions');
-    if (!val || val.length < 3) { box.style.display = 'none'; return; }
-
-    placesService.getPlacePredictions({
-      input: val,
-      sessionToken: autocompleteSessionToken,
-      componentRestrictions: { country: 'au' },
-      types: ['address']
-    }, (predictions, status) => {
-      if (status !== google.maps.places.PlacesServiceStatus.OK || !predictions) {
-        box.style.display = 'none'; return;
-      }
-      box.innerHTML = predictions.map(p => `
-        <div onclick="selectPropAddress('${p.description.replace(/'/g,"&#39;")}')"
-          style="padding:10px 14px;cursor:pointer;font-size:0.82rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;"
-          onmouseover="this.style.background='var(--warm)'" onmouseout="this.style.background=''">
-          <span style="color:var(--muted);">📍</span>
-          <span>${p.description}</span>
-        </div>`).join('');
-      box.style.display = 'block';
-    });
-  });
-
-  // Hide suggestions on outside click
-  document.addEventListener('click', e => {
-    if (!input.contains(e.target)) {
-      document.getElementById('propAddressSuggestions').style.display = 'none';
-    }
-  });
-}
-
-function selectPropAddress(address) {
-  document.getElementById('newPropAddress').value = address;
-  document.getElementById('propAddressSuggestions').style.display = 'none';
-  autocompleteSessionToken = new google.maps.places.AutocompleteSessionToken();
-}
-
-// ─── Edit Property Modal ──────────────────────────────────────────────────────
-function openEditPropModal(propId) {
-  const props = getManagedProps();
-  const p = props.find(x => (x.id || x.address) === propId);
-  if (!p) return;
-
-  document.getElementById('editPropId').value        = propId;
-  document.getElementById('editPropAddress').value   = p.address || '';
-  document.getElementById('editPropOwner').value     = p.owner || '';
-  document.getElementById('editPropOwnerEmail').value= p.ownerEmail || '';
-  document.getElementById('editPropOwnerPhone').value= p.ownerPhone || '';
-  document.getElementById('editPropTenant').value    = p.tenant || '';
-  document.getElementById('editPropTenantEmail').value= p.tenantEmail || '';
-  document.getElementById('editPropTenantPhone').value= p.tenantPhone || '';
-
-  document.getElementById('editPropModal').style.display = 'flex';
-}
-
-function closeEditPropModal() {
-  document.getElementById('editPropModal').style.display = 'none';
-}
-
-function saveEditProp() {
-  const propId   = document.getElementById('editPropId').value;
-  const address  = document.getElementById('editPropAddress').value.trim();
-  const owner    = document.getElementById('editPropOwner').value.trim();
-  if (!address || !owner) { showToast('Address and owner are required', 'err'); return; }
-
-  const props = getManagedProps();
-  const idx = props.findIndex(x => (x.id || x.address) === propId);
-  if (idx === -1) return;
-
-  props[idx] = {
-    ...props[idx],
-    address,
-    owner,
-    ownerEmail:  document.getElementById('editPropOwnerEmail').value.trim(),
-    ownerPhone:  document.getElementById('editPropOwnerPhone').value.trim(),
-    tenant:      document.getElementById('editPropTenant').value.trim(),
-    tenantEmail: document.getElementById('editPropTenantEmail').value.trim(),
-    tenantPhone: document.getElementById('editPropTenantPhone').value.trim(),
-    updatedAt:   new Date().toISOString()
-  };
-
-  saveManagedProps(props);
-  closeEditPropModal();
-  renderManagedProps();
-  showToast('Property updated', 'ok');
-}
+function renderImportPage() {}
+function seedDemo() {}
 
 </script>
 
