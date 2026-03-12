@@ -1583,6 +1583,8 @@ body {
 <script>
 const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
 </script>
+  <!-- Google Places Autocomplete -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9prsNmGE4JCKFBrUD3iVoG_yHhRJiIvE&libraries=places&callback=initGooglePlaces" async defer></script>
 </head>
 <body>
 
@@ -2181,9 +2183,11 @@ window.addEventListener('DOMContentLoaded', function() {
             <button class="btn btn-ghost" onclick="togglePropForm()" style="font-size:0.75rem;padding:4px 10px;">✕ Close</button>
           </div>
           <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-bottom:12px;">
-            <div>
+            <div style="position:relative;">
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Property Address *</label>
-              <input type="text" id="newPropAddress" placeholder="e.g. 42 Sample Street, Richmond VIC 3121" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+              <input type="text" id="newPropAddress" placeholder="Start typing address…" autocomplete="off"
+                style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+              <div id="propAddressSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:0 0 8px 8px;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,0.12);max-height:220px;overflow-y:auto;"></div>
             </div>
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Owner Name *</label>
@@ -2718,22 +2722,51 @@ function renderManagedProps() {
     (p.tenant||'').toLowerCase().includes(search)
   );
   props.sort((a,b) => (a.address||'').localeCompare(b.address||''));
+
   if (!props.length) {
-    el.innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">${search ? 'No properties match.' : 'No properties yet. Add one above or import via CSV.'}</div>`;
+    el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted);font-size:0.85rem;">${search ? 'No properties match your search.' : 'No properties yet. Click + Add Property to get started.'}</div>`;
     return;
   }
-  el.innerHTML = props.map(p => {
-    const gradeColor = p.lastInspectionColor || '#6b7280';
-    return `<div style="display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);">
-      <div style="flex:1;min-width:0;">
-        <div style="font-weight:600;font-size:0.88rem;color:var(--navy);">🏠 ${p.address||'—'}</div>
-        <div style="font-size:0.78rem;color:var(--muted);margin-top:2px;">Owner: ${p.owner||'—'} ${p.ownerEmail ? '· '+p.ownerEmail : ''} ${p.ownerPhone ? '· '+p.ownerPhone : ''}</div>
-        <div style="font-size:0.78rem;color:var(--muted);">Tenant: ${p.tenant||'—'} ${p.tenantEmail ? '· '+p.tenantEmail : ''} ${p.tenantPhone ? '· '+p.tenantPhone : ''}</div>
-      </div>
-      ${p.lastInspectionScore ? `<span style="background:${gradeColor};color:#fff;border-radius:6px;padding:3px 10px;font-size:0.72rem;font-weight:600;white-space:nowrap;">${p.lastInspectionScore}% · ${p.lastInspectionGrade}</span>` : ''}
-      <button onclick="deleteManagedProp('${(p.id||p.address).replace(/'/g,"&#39;")}')" style="background:none;border:1px solid #fca5a5;border-radius:7px;padding:4px 10px;font-size:0.72rem;cursor:pointer;color:var(--red);">Remove</button>
-    </div>`;
-  }).join('');
+
+  el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-top:8px;">' +
+    props.map(p => {
+      const propId = (p.id || p.address).replace(/'/g,"&#39;");
+      const gradeColor = p.lastInspectionColor || '#6b7280';
+      const parts = (p.address||'').split(',');
+      const line1 = parts[0] || p.address || '—';
+      const line2 = parts.slice(1).join(',').trim();
+      const tenantName = p.tenant ? p.tenant : '<span style="font-style:italic;color:var(--muted);font-weight:400;">No tenant assigned</span>';
+      const cardId = 'propcard_' + (p.id||p.address).replace(/[^a-zA-Z0-9]/g,'_');
+      return `<div id="${cardId}" style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;font-size:0.95rem;color:var(--navy);line-height:1.3;">🏠 ${line1}</div>
+            ${line2 ? `<div style="font-size:0.76rem;color:var(--muted);margin-top:2px;">${line2}</div>` : ''}
+          </div>
+          ${p.lastInspectionScore ? `<span style="background:${gradeColor};color:#fff;border-radius:6px;padding:3px 9px;font-size:0.7rem;font-weight:700;white-space:nowrap;flex-shrink:0;">${p.lastInspectionScore}% · ${p.lastInspectionGrade||''}</span>` : ''}
+        </div>
+        <div style="background:var(--warm);border-radius:9px;padding:10px 12px;">
+          <div style="font-size:0.67rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px;">👤 Owner</div>
+          <div style="font-weight:600;font-size:0.82rem;color:var(--navy);">${p.owner||'—'}</div>
+          <div style="font-size:0.74rem;color:var(--muted);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap;">
+            ${p.ownerEmail ? `<a href="mailto:${p.ownerEmail}" style="color:var(--navy);text-decoration:none;">✉ ${p.ownerEmail}</a>` : ''}
+            ${p.ownerPhone ? `<a href="tel:${p.ownerPhone}" style="color:var(--navy);text-decoration:none;">📞 ${p.ownerPhone}</a>` : ''}
+          </div>
+        </div>
+        <div style="background:#f0fdf4;border-radius:9px;padding:10px 12px;">
+          <div style="font-size:0.67rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px;">🏡 Tenant</div>
+          <div style="font-weight:600;font-size:0.82rem;color:var(--navy);">${tenantName}</div>
+          <div style="font-size:0.74rem;color:var(--muted);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap;">
+            ${p.tenantEmail ? `<a href="mailto:${p.tenantEmail}" style="color:var(--navy);text-decoration:none;">✉ ${p.tenantEmail}</a>` : ''}
+            ${p.tenantPhone ? `<a href="tel:${p.tenantPhone}" style="color:var(--navy);text-decoration:none;">📞 ${p.tenantPhone}</a>` : ''}
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:auto;">
+          <button onclick="openEditPropModal('${propId}')" style="flex:1;padding:8px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:inherit;">✏️ Edit</button>
+          <button onclick="deleteManagedProp('${propId}')" style="padding:8px 14px;background:#fff;color:var(--red);border:1px solid #fca5a5;border-radius:8px;font-size:0.78rem;cursor:pointer;font-family:inherit;">Remove</button>
+        </div>
+      </div>`;
+    }).join('') + '</div>';
 }
 
 function deleteManagedProp(id) {
@@ -5594,6 +5627,152 @@ function renderImportPage() { /* Import page is static HTML */ }
 
 function seedDemo() { /* Demo data seeding skipped */ }
 
+// ─── Google Places Autocomplete ───────────────────────────────────────────────
+let placesService = null;
+let autocompleteSessionToken = null;
+
+function initGooglePlaces() {
+  placesService = new google.maps.places.AutocompleteService();
+  autocompleteSessionToken = new google.maps.places.AutocompleteSessionToken();
+
+  const input = document.getElementById('newPropAddress');
+  if (!input) return;
+
+  input.addEventListener('input', () => {
+    const val = input.value.trim();
+    const box = document.getElementById('propAddressSuggestions');
+    if (!val || val.length < 3) { box.style.display = 'none'; return; }
+
+    placesService.getPlacePredictions({
+      input: val,
+      sessionToken: autocompleteSessionToken,
+      componentRestrictions: { country: 'au' },
+      types: ['address']
+    }, (predictions, status) => {
+      if (status !== google.maps.places.PlacesServiceStatus.OK || !predictions) {
+        box.style.display = 'none'; return;
+      }
+      box.innerHTML = predictions.map(p => `
+        <div onclick="selectPropAddress('${p.description.replace(/'/g,"&#39;")}')"
+          style="padding:10px 14px;cursor:pointer;font-size:0.82rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;"
+          onmouseover="this.style.background='var(--warm)'" onmouseout="this.style.background=''">
+          <span style="color:var(--muted);">📍</span>
+          <span>${p.description}</span>
+        </div>`).join('');
+      box.style.display = 'block';
+    });
+  });
+
+  // Hide suggestions on outside click
+  document.addEventListener('click', e => {
+    if (!input.contains(e.target)) {
+      document.getElementById('propAddressSuggestions').style.display = 'none';
+    }
+  });
+}
+
+function selectPropAddress(address) {
+  document.getElementById('newPropAddress').value = address;
+  document.getElementById('propAddressSuggestions').style.display = 'none';
+  autocompleteSessionToken = new google.maps.places.AutocompleteSessionToken();
+}
+
+// ─── Edit Property Modal ──────────────────────────────────────────────────────
+function openEditPropModal(propId) {
+  const props = getManagedProps();
+  const p = props.find(x => (x.id || x.address) === propId);
+  if (!p) return;
+
+  document.getElementById('editPropId').value        = propId;
+  document.getElementById('editPropAddress').value   = p.address || '';
+  document.getElementById('editPropOwner').value     = p.owner || '';
+  document.getElementById('editPropOwnerEmail').value= p.ownerEmail || '';
+  document.getElementById('editPropOwnerPhone').value= p.ownerPhone || '';
+  document.getElementById('editPropTenant').value    = p.tenant || '';
+  document.getElementById('editPropTenantEmail').value= p.tenantEmail || '';
+  document.getElementById('editPropTenantPhone').value= p.tenantPhone || '';
+
+  document.getElementById('editPropModal').style.display = 'flex';
+}
+
+function closeEditPropModal() {
+  document.getElementById('editPropModal').style.display = 'none';
+}
+
+function saveEditProp() {
+  const propId   = document.getElementById('editPropId').value;
+  const address  = document.getElementById('editPropAddress').value.trim();
+  const owner    = document.getElementById('editPropOwner').value.trim();
+  if (!address || !owner) { showToast('Address and owner are required', 'err'); return; }
+
+  const props = getManagedProps();
+  const idx = props.findIndex(x => (x.id || x.address) === propId);
+  if (idx === -1) return;
+
+  props[idx] = {
+    ...props[idx],
+    address,
+    owner,
+    ownerEmail:  document.getElementById('editPropOwnerEmail').value.trim(),
+    ownerPhone:  document.getElementById('editPropOwnerPhone').value.trim(),
+    tenant:      document.getElementById('editPropTenant').value.trim(),
+    tenantEmail: document.getElementById('editPropTenantEmail').value.trim(),
+    tenantPhone: document.getElementById('editPropTenantPhone').value.trim(),
+    updatedAt:   new Date().toISOString()
+  };
+
+  saveManagedProps(props);
+  closeEditPropModal();
+  renderManagedProps();
+  showToast('Property updated', 'ok');
+}
+
 </script>
+
+<!-- Edit Property Modal -->
+<div id="editPropModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div style="font-size:1rem;font-weight:700;color:var(--navy);">✏️ Edit Property</div>
+      <button onclick="closeEditPropModal()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted);">✕</button>
+    </div>
+    <input type="hidden" id="editPropId">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div style="grid-column:1/-1;">
+        <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Property Address *</label>
+        <input type="text" id="editPropAddress" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+      </div>
+      <div>
+        <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Owner Name *</label>
+        <input type="text" id="editPropOwner" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+      </div>
+      <div>
+        <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Owner Email</label>
+        <input type="email" id="editPropOwnerEmail" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+      </div>
+      <div>
+        <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Owner Phone</label>
+        <input type="text" id="editPropOwnerPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+      </div>
+      <div>
+        <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Tenant Name</label>
+        <input type="text" id="editPropTenant" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+      </div>
+      <div>
+        <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Tenant Email</label>
+        <input type="email" id="editPropTenantEmail" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+      </div>
+      <div>
+        <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Tenant Phone</label>
+        <input type="text" id="editPropTenantPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
+      <button onclick="closeEditPropModal()" style="padding:9px 20px;border:1px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;">Cancel</button>
+      <button onclick="saveEditProp()" style="padding:9px 24px;background:var(--navy);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
