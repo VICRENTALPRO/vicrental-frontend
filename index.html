@@ -3593,24 +3593,19 @@ function renderProperties() {
             </td>
 
             <td style="padding:13px 16px;vertical-align:middle;text-align:center;">
-              ${s.total > 0 || s.lastInspScore != null
-                ? `<div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:5px;">
-                    <div title="Issues open" style="width:12px;height:12px;border-radius:50%;background:${s.reported>0?'#dc2626':'#e5e7eb'};box-shadow:${s.reported>0?'0 0 5px #dc262670':''};"></div>
-                    <div title="In progress" style="width:12px;height:12px;border-radius:50%;background:${s.assigned>0?'#d97706':'#e5e7eb'};box-shadow:${s.assigned>0?'0 0 5px #d9770670':''};"></div>
-                    <div title="Compliant" style="width:12px;height:12px;border-radius:50%;background:${s.reported===0&&s.assigned===0?'#16a34a':'#e5e7eb'};box-shadow:${s.reported===0&&s.assigned===0?'0 0 5px #16a34a70':''};"></div>
-                  </div>
-                  <span style="background:${rag.bg};color:${rag.color};border-radius:6px;padding:2px 9px;font-size:0.68rem;font-weight:700;">${rag.label}</span>
-                  ${inspBadge}`
-                : `<span style="background:#f3f4f6;color:#9ca3af;border-radius:6px;padding:3px 10px;font-size:0.7rem;font-weight:600;">— No data</span>`}
+              <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:6px;">
+                <div title="Issues open" style="width:13px;height:13px;border-radius:50%;background:${s.reported>0?'#dc2626':'#e5e7eb'};box-shadow:${s.reported>0?'0 0 6px #dc262670':''};"></div>
+                <div title="In progress" style="width:13px;height:13px;border-radius:50%;background:${s.assigned>0?'#d97706':'#e5e7eb'};box-shadow:${s.assigned>0?'0 0 6px #d9770670':''};"></div>
+                <div title="Compliant" style="width:13px;height:13px;border-radius:50%;background:${s.reported===0&&s.assigned===0&&(s.total>0||s.lastInspScore!=null)?'#16a34a':'#e5e7eb'};box-shadow:${s.reported===0&&s.assigned===0&&(s.total>0||s.lastInspScore!=null)?'0 0 6px #16a34a70':''};"></div>
+              </div>
+              <span style="background:${rag.bg};color:${rag.color};border-radius:6px;padding:2px 9px;font-size:0.68rem;font-weight:700;">${rag.label}</span>
+              ${inspBadge}
             </td>
 
             <td style="padding:13px 16px;vertical-align:middle;text-align:center;">
-              <div style="display:flex;gap:4px;justify-content:center;margin-bottom:3px;">
-                <span title="Reported" style="width:26px;height:26px;border-radius:50%;background:#fee2e2;color:#dc2626;font-size:0.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;">${s.reported}</span>
-                <span title="Assigned/In Progress" style="width:26px;height:26px;border-radius:50%;background:#fef3c7;color:#d97706;font-size:0.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;">${s.assigned}</span>
-                <span title="Completed" style="width:26px;height:26px;border-radius:50%;background:#dcfce7;color:#16a34a;font-size:0.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;">${s.completed}</span>
-              </div>
-              <div style="font-size:0.67rem;color:var(--muted);">${s.total} total</div>
+              <div style="font-size:0.78rem;color:#dc2626;font-weight:600;">${s.reported} open</div>
+              <div style="font-size:0.78rem;color:#d97706;font-weight:600;">${s.assigned} in progress</div>
+              <div style="font-size:0.78rem;color:#16a34a;font-weight:600;">${s.completed} completed</div>
             </td>
 
             <td style="padding:13px 16px;vertical-align:middle;text-align:right;">
