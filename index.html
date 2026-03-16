@@ -3483,23 +3483,26 @@ function renderProperties() {
   const grid = document.getElementById('propsGrid');
   if (!grid) return;
 
+  // WO statuses: open/reported = red, inprogress/assigned = amber, completed/cancelled = green
   const propStats = {};
   wos.forEach(wo => {
-    if (!propStats[wo.property]) propStats[wo.property] = { nc:0, ip:0, ok:0, total:0 };
+    if (!wo.property) return;
+    if (!propStats[wo.property]) propStats[wo.property] = { reported:0, assigned:0, completed:0, total:0 };
     const s = propStats[wo.property];
     s.total++;
-    if (wo.status === 'completed' || wo.status === 'cancelled') s.ok++;
-    else if (wo.status === 'inprogress') s.ip++;
-    else s.nc++;
+    const st = (wo.status||'').toLowerCase();
+    if (st === 'completed' || st === 'cancelled') s.completed++;
+    else if (st === 'inprogress' || st === 'assigned') s.assigned++;
+    else s.reported++; // open, reported, pending, etc
   });
 
   const managed = getManagedProps();
   managed.forEach(p => {
-    if (!propStats[p.address]) propStats[p.address] = { nc:0, ip:0, ok:0, total:0 };
+    if (!propStats[p.address]) propStats[p.address] = { reported:0, assigned:0, completed:0, total:0 };
     Object.assign(propStats[p.address], {
       owner: p.owner||'', ownerEmail: p.ownerEmail||'', ownerPhone: p.ownerPhone||'',
       tenant: p.tenant||'', tenantEmail: p.tenantEmail||'', tenantPhone: p.tenantPhone||'',
-      lastInspDate: p.lastInspectionDate||'',
+      lastInspDate:  p.lastInspectionDate||'',
       lastInspScore: p.lastInspectionScore != null ? p.lastInspectionScore : null,
       lastInspGrade: p.lastInspectionGrade||'',
       lastInspColor: p.lastInspectionColor||'',
@@ -3514,25 +3517,27 @@ function renderProperties() {
 
   const rows = Object.entries(propStats).sort((a,b) => a[0].localeCompare(b[0]));
 
-  // Helper: shorten Nominatim long address to street + suburb + state postcode
+  // Shorten Nominatim verbose address
   function shortAddr(full) {
     if (!full) return '—';
     const parts = full.split(',').map(p => p.trim()).filter(Boolean);
-    // Drop "Australia" and any "City of X" / "Shire of X" entries
     const filtered = parts.filter(p => p !== 'Australia' && !/^(City|Shire|Municipality|Borough) of /i.test(p));
-    if (filtered.length >= 3) return filtered.slice(0, 3).join(', ');
-    return filtered.join(', ');
+    return filtered.length >= 3 ? filtered.slice(0,3).join(', ') : filtered.join(', ');
+  }
+
+  // RAG overall status: red if any reported, amber if any assigned, green if all complete
+  function ragStatus(s) {
+    if (s.reported > 0) return { color:'#dc2626', bg:'#fee2e2', label:'Issues Open' };
+    if (s.assigned > 0) return { color:'#d97706', bg:'#fef3c7', label:'In Progress' };
+    if (s.total > 0 || s.lastInspScore != null) return { color:'#16a34a', bg:'#dcfce7', label:'Compliant' };
+    return { color:'#9ca3af', bg:'#f3f4f6', label:'No data' };
   }
 
   grid.innerHTML = `<div style="background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;width:100%;">
     <table style="width:100%;border-collapse:collapse;font-size:0.82rem;table-layout:fixed;">
       <colgroup>
-        <col style="width:22%">
-        <col style="width:20%">
-        <col style="width:20%">
-        <col style="width:16%">
-        <col style="width:12%">
-        <col style="width:10%">
+        <col style="width:20%"><col style="width:18%"><col style="width:18%">
+        <col style="width:20%"><col style="width:14%"><col style="width:10%">
       </colgroup>
       <thead>
         <tr style="background:var(--warm);border-bottom:2px solid var(--border);">
@@ -3546,63 +3551,68 @@ function renderProperties() {
       </thead>
       <tbody>
         ${rows.map(([prop, s], i) => {
-          const safeId  = 'propcard_' + prop.replace(/[^a-zA-Z0-9]/g,'_');
-          const safeProp = prop.replace(/'/g, "\\'");
-          const short   = shortAddr(prop);
-          const parts   = short.split(',');
-          const line1   = parts[0] || prop;
-          const line2   = parts.slice(1).join(',').trim();
+          const safeId   = 'propcard_' + prop.replace(/[^a-zA-Z0-9]/g,'_');
+          const safeProp = prop.replace(/'/g,"\\'");
+          const short    = shortAddr(prop);
+          const parts    = short.split(',');
+          const line1    = parts[0];
+          const line2    = parts.slice(1).join(',').trim();
+          const rag      = ragStatus(s);
+          const rowBg    = i % 2 === 1 ? '#fafaf9' : '#fff';
 
-          const complianceBadge = s.nc > 0
-            ? `<span style="background:#fee2e2;color:#dc2626;border-radius:6px;padding:3px 10px;font-size:0.7rem;font-weight:600;white-space:nowrap;">⚠ Non-Compliant</span>`
-            : s.ip > 0
-            ? `<span style="background:#fef3c7;color:#d97706;border-radius:6px;padding:3px 10px;font-size:0.7rem;font-weight:600;white-space:nowrap;">🔨 In Progress</span>`
-            : s.total > 0 || s.lastInspScore != null
-            ? `<span style="background:#dcfce7;color:#16a34a;border-radius:6px;padding:3px 10px;font-size:0.7rem;font-weight:600;white-space:nowrap;">✅ Compliant</span>`
-            : `<span style="background:#f3f4f6;color:#6b7280;border-radius:6px;padding:3px 10px;font-size:0.7rem;font-weight:600;white-space:nowrap;">— No data</span>`;
-
+          // Inspection score badge
           const inspBadge = s.lastInspScore != null
-            ? `<div style="margin-top:5px;font-size:0.72rem;font-weight:700;color:${s.lastInspColor||'#1a7a4a'};">${s.lastInspScore}% · ${s.lastInspGrade}</div>`
+            ? `<div style="margin-top:6px;font-size:0.72rem;font-weight:700;color:${s.lastInspColor||'#16a34a'};">${s.lastInspScore}% · ${s.lastInspGrade}</div>
+               ${s.lastInspDate ? `<div style="font-size:0.67rem;color:var(--muted);">${new Date(s.lastInspDate).toLocaleDateString('en-AU')}</div>` : ''}`
             : '';
-
-          const rowBg = i % 2 === 1 ? '#fafaf9' : '#fff';
 
           return `<tr id="${safeId}"
             style="border-bottom:1px solid var(--border);background:${rowBg};"
             onmouseover="this.style.background='#f5f2eb'"
             onmouseout="this.style.background='${rowBg}'">
-            <td style="padding:12px 16px;vertical-align:top;">
-              <div style="font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${line1}</div>
-              ${line2 ? `<div style="font-size:0.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${line2}</div>` : ''}
+
+            <td style="padding:13px 16px;vertical-align:middle;">
+              <div style="font-weight:700;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${line1}</div>
+              ${line2 ? `<div style="font-size:0.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${line2}</div>` : ''}
             </td>
-            <td style="padding:12px 16px;vertical-align:top;">
+
+            <td style="padding:13px 16px;vertical-align:middle;">
               ${s.owner
-                ? `<div style="font-weight:600;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.owner}</div>
-                   <div style="font-size:0.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.ownerEmail||''}</div>
+                ? `<div style="font-weight:600;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.owner}</div>
+                   <div style="font-size:0.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.ownerEmail||''}</div>
                    ${s.ownerPhone ? `<div style="font-size:0.72rem;color:var(--muted);">${s.ownerPhone}</div>` : ''}`
                 : '<span style="color:var(--muted);font-style:italic;font-size:0.8rem;">—</span>'}
             </td>
-            <td style="padding:12px 16px;vertical-align:top;">
+
+            <td style="padding:13px 16px;vertical-align:middle;">
               ${s.tenant
-                ? `<div style="font-weight:600;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.tenant}</div>
-                   <div style="font-size:0.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.tenantEmail||''}</div>
+                ? `<div style="font-weight:600;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.tenant}</div>
+                   <div style="font-size:0.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.tenantEmail||''}</div>
                    ${s.tenantPhone ? `<div style="font-size:0.72rem;color:var(--muted);">${s.tenantPhone}</div>` : ''}`
                 : '<span style="color:var(--muted);font-style:italic;font-size:0.8rem;">No tenant</span>'}
             </td>
-            <td style="padding:12px 16px;vertical-align:top;text-align:center;">
-              ${complianceBadge}
-              ${inspBadge}
-              ${s.lastInspDate ? `<div style="font-size:0.68rem;color:var(--muted);margin-top:3px;">${new Date(s.lastInspDate).toLocaleDateString('en-AU')}</div>` : ''}
-            </td>
-            <td style="padding:12px 16px;vertical-align:top;text-align:center;">
-              <div style="display:flex;gap:4px;justify-content:center;">
-                <span title="Non-compliant" style="background:#fee2e2;color:#dc2626;border-radius:5px;padding:2px 7px;font-size:0.72rem;font-weight:700;">${s.nc}</span>
-                <span title="In progress"   style="background:#fef3c7;color:#d97706;border-radius:5px;padding:2px 7px;font-size:0.72rem;font-weight:700;">${s.ip}</span>
-                <span title="Resolved"      style="background:#dcfce7;color:#16a34a;border-radius:5px;padding:2px 7px;font-size:0.72rem;font-weight:700;">${s.ok}</span>
+
+            <td style="padding:13px 16px;vertical-align:middle;text-align:center;">
+              <!-- RAG traffic light -->
+              <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:5px;">
+                <div style="width:13px;height:13px;border-radius:50%;background:${s.reported>0?'#dc2626':'#e5e7eb'};box-shadow:${s.reported>0?'0 0 6px #dc262680':''};"></div>
+                <div style="width:13px;height:13px;border-radius:50%;background:${s.assigned>0?'#d97706':'#e5e7eb'};box-shadow:${s.assigned>0?'0 0 6px #d9770680':''};"></div>
+                <div style="width:13px;height:13px;border-radius:50%;background:${s.total>0&&s.reported===0&&s.assigned===0?'#16a34a':s.lastInspScore!=null&&s.reported===0&&s.assigned===0?'#16a34a':'#e5e7eb'};box-shadow:${s.reported===0&&s.assigned===0&&(s.total>0||s.lastInspScore!=null)?'0 0 6px #16a34a80':''};"></div>
               </div>
-              <div style="font-size:0.67rem;color:var(--muted);margin-top:3px;">${s.total} total</div>
+              <span style="background:${rag.bg};color:${rag.color};border-radius:6px;padding:2px 9px;font-size:0.68rem;font-weight:700;">${rag.label}</span>
+              ${inspBadge}
             </td>
-            <td style="padding:12px 16px;vertical-align:top;text-align:right;">
+
+            <td style="padding:13px 16px;vertical-align:middle;text-align:center;">
+              <div style="display:flex;gap:4px;justify-content:center;margin-bottom:3px;">
+                <span title="Reported" style="width:26px;height:26px;border-radius:50%;background:#fee2e2;color:#dc2626;font-size:0.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;">${s.reported}</span>
+                <span title="Assigned/In Progress" style="width:26px;height:26px;border-radius:50%;background:#fef3c7;color:#d97706;font-size:0.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;">${s.assigned}</span>
+                <span title="Completed" style="width:26px;height:26px;border-radius:50%;background:#dcfce7;color:#16a34a;font-size:0.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;">${s.completed}</span>
+              </div>
+              <div style="font-size:0.67rem;color:var(--muted);">${s.total} total</div>
+            </td>
+
+            <td style="padding:13px 16px;vertical-align:middle;text-align:right;">
               <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;">
                 <button onclick="createInspectionChecklist('${safeProp}')"
                   style="font-size:0.72rem;padding:5px 11px;border:none;border-radius:7px;background:var(--navy);color:#fff;cursor:pointer;font-family:inherit;white-space:nowrap;">
