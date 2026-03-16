@@ -1091,9 +1091,8 @@ body {
    PROPERTIES PAGE
 ═══════════════════════════════════════════════ */
 .props-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 14px;
+  display: block;
+  width: 100%;
 }
 
 .import-dropzone {
@@ -3480,7 +3479,7 @@ function clearPortalData() {
 // PROPERTIES
 // ═══════════════════════════════════════════════
 function renderProperties() {
-  const wos = getWOs();
+  const wos  = getWOs();
   const grid = document.getElementById('propsGrid');
   if (!grid) return;
 
@@ -3500,20 +3499,41 @@ function renderProperties() {
     Object.assign(propStats[p.address], {
       owner: p.owner||'', ownerEmail: p.ownerEmail||'', ownerPhone: p.ownerPhone||'',
       tenant: p.tenant||'', tenantEmail: p.tenantEmail||'', tenantPhone: p.tenantPhone||'',
-      lastInspDate: p.lastInspectionDate||'', lastInspScore: p.lastInspectionScore != null ? p.lastInspectionScore : null,
-      lastInspGrade: p.lastInspectionGrade||'', lastInspColor: p.lastInspectionColor||''
+      lastInspDate: p.lastInspectionDate||'',
+      lastInspScore: p.lastInspectionScore != null ? p.lastInspectionScore : null,
+      lastInspGrade: p.lastInspectionGrade||'',
+      lastInspColor: p.lastInspectionColor||'',
+      propId: p.id || p.address
     });
   });
 
-  if (Object.keys(propStats).length === 0) {
-    grid.innerHTML = '<div class="empty"><div class="empty-icon">🏘️</div><h3>No Properties</h3><p>Properties appear here once you add them via Manage Properties or create work orders.</p></div>';
+  if (!Object.keys(propStats).length) {
+    grid.innerHTML = '<div class="empty"><div class="empty-icon">🏘️</div><h3>No Properties</h3><p>Add properties via Manage Properties or create work orders.</p></div>';
     return;
   }
 
   const rows = Object.entries(propStats).sort((a,b) => a[0].localeCompare(b[0]));
 
-  grid.innerHTML = `<div style="background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;">
-    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+  // Helper: shorten Nominatim long address to street + suburb + state postcode
+  function shortAddr(full) {
+    if (!full) return '—';
+    const parts = full.split(',').map(p => p.trim()).filter(Boolean);
+    // Drop "Australia" and any "City of X" / "Shire of X" entries
+    const filtered = parts.filter(p => p !== 'Australia' && !/^(City|Shire|Municipality|Borough) of /i.test(p));
+    if (filtered.length >= 3) return filtered.slice(0, 3).join(', ');
+    return filtered.join(', ');
+  }
+
+  grid.innerHTML = `<div style="background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;width:100%;">
+    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;table-layout:fixed;">
+      <colgroup>
+        <col style="width:22%">
+        <col style="width:20%">
+        <col style="width:20%">
+        <col style="width:16%">
+        <col style="width:12%">
+        <col style="width:10%">
+      </colgroup>
       <thead>
         <tr style="background:var(--warm);border-bottom:2px solid var(--border);">
           <th style="padding:11px 16px;text-align:left;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);">Address</th>
@@ -3526,46 +3546,72 @@ function renderProperties() {
       </thead>
       <tbody>
         ${rows.map(([prop, s], i) => {
-          const safeId = 'propcard_' + prop.replace(/[^a-zA-Z0-9]/g,'_');
-          const safeProp = prop.replace(/'/g, "\'");
+          const safeId  = 'propcard_' + prop.replace(/[^a-zA-Z0-9]/g,'_');
+          const safeProp = prop.replace(/'/g, "\\'");
+          const short   = shortAddr(prop);
+          const parts   = short.split(',');
+          const line1   = parts[0] || prop;
+          const line2   = parts.slice(1).join(',').trim();
+
           const complianceBadge = s.nc > 0
-            ? `<span style="background:#fee2e2;color:#dc2626;border-radius:6px;padding:3px 10px;font-size:0.7rem;font-weight:600;">⚠ Non-Compliant</span>`
+            ? `<span style="background:#fee2e2;color:#dc2626;border-radius:6px;padding:3px 10px;font-size:0.7rem;font-weight:600;white-space:nowrap;">⚠ Non-Compliant</span>`
             : s.ip > 0
-            ? `<span style="background:#fef3c7;color:#d97706;border-radius:6px;padding:3px 10px;font-size:0.7rem;font-weight:600;">🔨 In Progress</span>`
-            : `<span style="background:#dcfce7;color:#16a34a;border-radius:6px;padding:3px 10px;font-size:0.7rem;font-weight:600;">✅ Compliant</span>`;
+            ? `<span style="background:#fef3c7;color:#d97706;border-radius:6px;padding:3px 10px;font-size:0.7rem;font-weight:600;white-space:nowrap;">🔨 In Progress</span>`
+            : s.total > 0 || s.lastInspScore != null
+            ? `<span style="background:#dcfce7;color:#16a34a;border-radius:6px;padding:3px 10px;font-size:0.7rem;font-weight:600;white-space:nowrap;">✅ Compliant</span>`
+            : `<span style="background:#f3f4f6;color:#6b7280;border-radius:6px;padding:3px 10px;font-size:0.7rem;font-weight:600;white-space:nowrap;">— No data</span>`;
+
           const inspBadge = s.lastInspScore != null
-            ? `<div style="margin-top:4px;font-size:0.72rem;font-weight:700;color:${s.lastInspColor||'#1a7a4a'};">${s.lastInspScore}% · ${s.lastInspGrade}</div>`
+            ? `<div style="margin-top:5px;font-size:0.72rem;font-weight:700;color:${s.lastInspColor||'#1a7a4a'};">${s.lastInspScore}% · ${s.lastInspGrade}</div>`
             : '';
-          const addrParts = prop.split(',');
-          return `<tr id="${safeId}" style="border-bottom:1px solid var(--border);${i%2===1?'background:#fafaf9;':''}" onmouseover="this.style.background='var(--warm)'" onmouseout="this.style.background='${i%2===1?'#fafaf9':''}'">
-            <td style="padding:12px 16px;">
-              <div style="font-weight:700;color:var(--navy);">${addrParts[0]}</div>
-              ${addrParts.length>1 ? `<div style="font-size:0.72rem;color:var(--muted);">${addrParts.slice(1).join(',').trim()}</div>` : ''}
+
+          const rowBg = i % 2 === 1 ? '#fafaf9' : '#fff';
+
+          return `<tr id="${safeId}"
+            style="border-bottom:1px solid var(--border);background:${rowBg};"
+            onmouseover="this.style.background='#f5f2eb'"
+            onmouseout="this.style.background='${rowBg}'">
+            <td style="padding:12px 16px;vertical-align:top;">
+              <div style="font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${line1}</div>
+              ${line2 ? `<div style="font-size:0.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${line2}</div>` : ''}
             </td>
-            <td style="padding:12px 16px;">
-              ${s.owner ? `<div style="font-weight:600;color:var(--navy);">${s.owner}</div>
-              <div style="font-size:0.72rem;color:var(--muted);">${s.ownerEmail||''} ${s.ownerPhone ? '· '+s.ownerPhone : ''}</div>` : '<span style="color:var(--muted);font-style:italic;">—</span>'}
+            <td style="padding:12px 16px;vertical-align:top;">
+              ${s.owner
+                ? `<div style="font-weight:600;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.owner}</div>
+                   <div style="font-size:0.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.ownerEmail||''}</div>
+                   ${s.ownerPhone ? `<div style="font-size:0.72rem;color:var(--muted);">${s.ownerPhone}</div>` : ''}`
+                : '<span style="color:var(--muted);font-style:italic;font-size:0.8rem;">—</span>'}
             </td>
-            <td style="padding:12px 16px;">
-              ${s.tenant ? `<div style="font-weight:600;color:var(--navy);">${s.tenant}</div>
-              <div style="font-size:0.72rem;color:var(--muted);">${s.tenantEmail||''} ${s.tenantPhone ? '· '+s.tenantPhone : ''}</div>` : '<span style="color:var(--muted);font-style:italic;">No tenant</span>'}
+            <td style="padding:12px 16px;vertical-align:top;">
+              ${s.tenant
+                ? `<div style="font-weight:600;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.tenant}</div>
+                   <div style="font-size:0.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.tenantEmail||''}</div>
+                   ${s.tenantPhone ? `<div style="font-size:0.72rem;color:var(--muted);">${s.tenantPhone}</div>` : ''}`
+                : '<span style="color:var(--muted);font-style:italic;font-size:0.8rem;">No tenant</span>'}
             </td>
-            <td style="padding:12px 16px;text-align:center;">
+            <td style="padding:12px 16px;vertical-align:top;text-align:center;">
               ${complianceBadge}
               ${inspBadge}
+              ${s.lastInspDate ? `<div style="font-size:0.68rem;color:var(--muted);margin-top:3px;">${new Date(s.lastInspDate).toLocaleDateString('en-AU')}</div>` : ''}
             </td>
-            <td style="padding:12px 16px;text-align:center;">
-              <div style="display:flex;gap:6px;justify-content:center;">
-                <span style="background:#fee2e2;color:#dc2626;border-radius:5px;padding:2px 8px;font-size:0.72rem;font-weight:600;">${s.nc}</span>
-                <span style="background:#fef3c7;color:#d97706;border-radius:5px;padding:2px 8px;font-size:0.72rem;font-weight:600;">${s.ip}</span>
-                <span style="background:#dcfce7;color:#16a34a;border-radius:5px;padding:2px 8px;font-size:0.72rem;font-weight:600;">${s.ok}</span>
+            <td style="padding:12px 16px;vertical-align:top;text-align:center;">
+              <div style="display:flex;gap:4px;justify-content:center;">
+                <span title="Non-compliant" style="background:#fee2e2;color:#dc2626;border-radius:5px;padding:2px 7px;font-size:0.72rem;font-weight:700;">${s.nc}</span>
+                <span title="In progress"   style="background:#fef3c7;color:#d97706;border-radius:5px;padding:2px 7px;font-size:0.72rem;font-weight:700;">${s.ip}</span>
+                <span title="Resolved"      style="background:#dcfce7;color:#16a34a;border-radius:5px;padding:2px 7px;font-size:0.72rem;font-weight:700;">${s.ok}</span>
               </div>
-              <div style="font-size:0.68rem;color:var(--muted);margin-top:3px;">${s.total} total</div>
+              <div style="font-size:0.67rem;color:var(--muted);margin-top:3px;">${s.total} total</div>
             </td>
-            <td style="padding:12px 16px;text-align:right;">
-              <div style="display:flex;gap:6px;justify-content:flex-end;">
-                <button style="font-size:0.72rem;padding:5px 10px;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;font-family:inherit;" onclick="filterWOsByProp('${safeProp}')">📋 WOs</button>
-                <button style="font-size:0.72rem;padding:5px 10px;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;font-family:inherit;" onclick="createInspectionChecklist('${safeProp}')">🔍 Inspect</button>
+            <td style="padding:12px 16px;vertical-align:top;text-align:right;">
+              <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;">
+                <button onclick="createInspectionChecklist('${safeProp}')"
+                  style="font-size:0.72rem;padding:5px 11px;border:none;border-radius:7px;background:var(--navy);color:#fff;cursor:pointer;font-family:inherit;white-space:nowrap;">
+                  🔍 Inspect
+                </button>
+                <button onclick="filterWOsByProp('${safeProp}')"
+                  style="font-size:0.72rem;padding:5px 11px;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;font-family:inherit;white-space:nowrap;">
+                  📋 Work Orders
+                </button>
               </div>
             </td>
           </tr>`;
