@@ -3593,14 +3593,15 @@ function renderProperties() {
             </td>
 
             <td style="padding:13px 16px;vertical-align:middle;text-align:center;">
-              <!-- RAG traffic light -->
-              <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:5px;">
-                <div style="width:13px;height:13px;border-radius:50%;background:${s.reported>0?'#dc2626':'#e5e7eb'};box-shadow:${s.reported>0?'0 0 6px #dc262680':''};"></div>
-                <div style="width:13px;height:13px;border-radius:50%;background:${s.assigned>0?'#d97706':'#e5e7eb'};box-shadow:${s.assigned>0?'0 0 6px #d9770680':''};"></div>
-                <div style="width:13px;height:13px;border-radius:50%;background:${s.total>0&&s.reported===0&&s.assigned===0?'#16a34a':s.lastInspScore!=null&&s.reported===0&&s.assigned===0?'#16a34a':'#e5e7eb'};box-shadow:${s.reported===0&&s.assigned===0&&(s.total>0||s.lastInspScore!=null)?'0 0 6px #16a34a80':''};"></div>
-              </div>
-              <span style="background:${rag.bg};color:${rag.color};border-radius:6px;padding:2px 9px;font-size:0.68rem;font-weight:700;">${rag.label}</span>
-              ${inspBadge}
+              ${s.total > 0 || s.lastInspScore != null
+                ? `<div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:5px;">
+                    <div title="Issues open" style="width:12px;height:12px;border-radius:50%;background:${s.reported>0?'#dc2626':'#e5e7eb'};box-shadow:${s.reported>0?'0 0 5px #dc262670':''};"></div>
+                    <div title="In progress" style="width:12px;height:12px;border-radius:50%;background:${s.assigned>0?'#d97706':'#e5e7eb'};box-shadow:${s.assigned>0?'0 0 5px #d9770670':''};"></div>
+                    <div title="Compliant" style="width:12px;height:12px;border-radius:50%;background:${s.reported===0&&s.assigned===0?'#16a34a':'#e5e7eb'};box-shadow:${s.reported===0&&s.assigned===0?'0 0 5px #16a34a70':''};"></div>
+                  </div>
+                  <span style="background:${rag.bg};color:${rag.color};border-radius:6px;padding:2px 9px;font-size:0.68rem;font-weight:700;">${rag.label}</span>
+                  ${inspBadge}`
+                : `<span style="background:#f3f4f6;color:#9ca3af;border-radius:6px;padding:3px 10px;font-size:0.7rem;font-weight:600;">— No data</span>`}
             </td>
 
             <td style="padding:13px 16px;vertical-align:middle;text-align:center;">
