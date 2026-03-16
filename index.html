@@ -2134,9 +2134,12 @@ window.addEventListener('DOMContentLoaded', function() {
             </div>
           </div>
           <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:12px;align-items:end;">
-            <div>
+            <div style="position:relative;">
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Property Address *</label>
-              <input type="text" id="newTenantProperty" placeholder="e.g. 42 Sample Street, Richmond VIC 3121" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+              <input type="text" id="newTenantProperty" placeholder="Select managed property or type address…" autocomplete="off"
+                onfocus="showTenantPropSuggestions()" oninput="tenantPropSearch(this.value)"
+                style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+              <div id="tenantPropSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:0 0 9px 9px;z-index:9999;box-shadow:0 6px 20px rgba(0,0,0,0.13);max-height:220px;overflow-y:auto;"></div>
             </div>
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Phone</label>
@@ -3481,10 +3484,9 @@ function renderProperties() {
   const grid = document.getElementById('propsGrid');
   if (!grid) return;
 
-  // Build stats from work orders
   const propStats = {};
   wos.forEach(wo => {
-    if (!propStats[wo.property]) propStats[wo.property] = { nc: 0, ip: 0, ok: 0, total: 0 };
+    if (!propStats[wo.property]) propStats[wo.property] = { nc:0, ip:0, ok:0, total:0 };
     const s = propStats[wo.property];
     s.total++;
     if (wo.status === 'completed' || wo.status === 'cancelled') s.ok++;
@@ -3492,20 +3494,15 @@ function renderProperties() {
     else s.nc++;
   });
 
-  // Also include managed properties even if they have no work orders
   const managed = getManagedProps();
   managed.forEach(p => {
-    if (!propStats[p.address]) propStats[p.address] = { nc: 0, ip: 0, ok: 0, total: 0 };
-    propStats[p.address].owner       = p.owner       || '';
-    propStats[p.address].ownerEmail  = p.ownerEmail  || '';
-    propStats[p.address].ownerPhone  = p.ownerPhone  || '';
-    propStats[p.address].tenant           = p.tenant             || '';
-    propStats[p.address].tenantEmail      = p.tenantEmail        || '';
-    propStats[p.address].tenantPhone      = p.tenantPhone        || '';
-    propStats[p.address].lastInspDate     = p.lastInspectionDate || '';
-    propStats[p.address].lastInspScore    = p.lastInspectionScore != null ? p.lastInspectionScore : null;
-    propStats[p.address].lastInspGrade    = p.lastInspectionGrade|| '';
-    propStats[p.address].lastInspColor    = p.lastInspectionColor|| '';
+    if (!propStats[p.address]) propStats[p.address] = { nc:0, ip:0, ok:0, total:0 };
+    Object.assign(propStats[p.address], {
+      owner: p.owner||'', ownerEmail: p.ownerEmail||'', ownerPhone: p.ownerPhone||'',
+      tenant: p.tenant||'', tenantEmail: p.tenantEmail||'', tenantPhone: p.tenantPhone||'',
+      lastInspDate: p.lastInspectionDate||'', lastInspScore: p.lastInspectionScore != null ? p.lastInspectionScore : null,
+      lastInspGrade: p.lastInspectionGrade||'', lastInspColor: p.lastInspectionColor||''
+    });
   });
 
   if (Object.keys(propStats).length === 0) {
@@ -3513,40 +3510,69 @@ function renderProperties() {
     return;
   }
 
-  grid.innerHTML = Object.entries(propStats)
-    .sort((a, b) => b[1].nc !== a[1].nc ? b[1].nc - a[1].nc : a[0].localeCompare(b[0]))
-    .map(([prop, s]) => {
-      const statusPill = s.nc > 0 ? `<span class="pill pill-nc">⚠ Non-Compliant</span>` :
-                         s.ip > 0 ? `<span class="pill pill-ip">🔨 In Progress</span>` :
-                                    `<span class="pill pill-ok">✅ Compliant</span>`;
-      const safeId = 'propcard_' + prop.replace(/[^a-zA-Z0-9]/g, '_');
-      const ownerLine  = s.owner  ? `<div style="margin-top:8px;"><div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:2px;">Owner</div><div style="font-size:0.8rem;font-weight:600;color:var(--navy);">${s.owner}</div></div>` : '';
-      const tenantLine = s.tenant ? `<div style="margin-top:6px;"><div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:2px;">Tenant</div><div style="font-size:0.8rem;font-weight:600;color:var(--navy);">${s.tenant}</div></div>` : '';
-      const subText = s.total > 0 ? `${s.total} work order${s.total!==1?'s':''} · Click to view` : 'No work orders yet';
-      const safeProp = prop.replace(/'/g, "\\'");
-      const inspBadge = s.lastInspScore != null
-        ? `<div style="margin-top:8px;padding:6px 10px;background:#f5f2eb;border-radius:7px;display:flex;align-items:center;justify-content:space-between;">
-            <span style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);">Last Inspection</span>
-            <span style="font-size:0.75rem;font-weight:700;color:${s.lastInspColor||'#1a7a4a'};">${s.lastInspScore}% · ${s.lastInspGrade}</span>
-            <span style="font-size:0.65rem;color:var(--muted);">${s.lastInspDate ? new Date(s.lastInspDate).toLocaleDateString('en-AU') : ''}</span>
-           </div>`
-        : '';
-      return `<div class="prop-card" id="${safeId}" onclick="filterWOsByProp('${safeProp}')">
-      <div class="prop-card-address">${prop}</div>
-      <div class="prop-card-sub">${subText}</div>
-      ${ownerLine}${tenantLine}
-      ${inspBadge}
-      <div class="prop-card-stats" style="margin-top:10px;">
-        <div class="prop-stat"><div class="prop-stat-val red">${s.nc}</div><div class="prop-stat-label">Non-Comp.</div></div>
-        <div class="prop-stat"><div class="prop-stat-val amber">${s.ip}</div><div class="prop-stat-label">In Progress</div></div>
-        <div class="prop-stat"><div class="prop-stat-val green">${s.ok}</div><div class="prop-stat-label">Resolved</div></div>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:12px;align-items:center;">
-        ${statusPill}
-        <button class="btn btn-ghost" style="font-size:0.68rem;padding:3px 10px;margin-left:auto;" onclick="event.stopPropagation();createInspectionChecklist('${safeProp}')">📋 Create Inspection</button>
-      </div>
-    </div>`;
-    }).join('');
+  const rows = Object.entries(propStats).sort((a,b) => a[0].localeCompare(b[0]));
+
+  grid.innerHTML = `<div style="background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;">
+    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+      <thead>
+        <tr style="background:var(--warm);border-bottom:2px solid var(--border);">
+          <th style="padding:11px 16px;text-align:left;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);">Address</th>
+          <th style="padding:11px 16px;text-align:left;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);">Owner</th>
+          <th style="padding:11px 16px;text-align:left;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);">Tenant</th>
+          <th style="padding:11px 16px;text-align:center;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);">Compliance</th>
+          <th style="padding:11px 16px;text-align:center;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);">Work Orders</th>
+          <th style="padding:11px 16px;text-align:right;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(([prop, s], i) => {
+          const safeId = 'propcard_' + prop.replace(/[^a-zA-Z0-9]/g,'_');
+          const safeProp = prop.replace(/'/g, "\'");
+          const complianceBadge = s.nc > 0
+            ? `<span style="background:#fee2e2;color:#dc2626;border-radius:6px;padding:3px 10px;font-size:0.7rem;font-weight:600;">⚠ Non-Compliant</span>`
+            : s.ip > 0
+            ? `<span style="background:#fef3c7;color:#d97706;border-radius:6px;padding:3px 10px;font-size:0.7rem;font-weight:600;">🔨 In Progress</span>`
+            : `<span style="background:#dcfce7;color:#16a34a;border-radius:6px;padding:3px 10px;font-size:0.7rem;font-weight:600;">✅ Compliant</span>`;
+          const inspBadge = s.lastInspScore != null
+            ? `<div style="margin-top:4px;font-size:0.72rem;font-weight:700;color:${s.lastInspColor||'#1a7a4a'};">${s.lastInspScore}% · ${s.lastInspGrade}</div>`
+            : '';
+          const addrParts = prop.split(',');
+          return `<tr id="${safeId}" style="border-bottom:1px solid var(--border);${i%2===1?'background:#fafaf9;':''}" onmouseover="this.style.background='var(--warm)'" onmouseout="this.style.background='${i%2===1?'#fafaf9':''}'">
+            <td style="padding:12px 16px;">
+              <div style="font-weight:700;color:var(--navy);">${addrParts[0]}</div>
+              ${addrParts.length>1 ? `<div style="font-size:0.72rem;color:var(--muted);">${addrParts.slice(1).join(',').trim()}</div>` : ''}
+            </td>
+            <td style="padding:12px 16px;">
+              ${s.owner ? `<div style="font-weight:600;color:var(--navy);">${s.owner}</div>
+              <div style="font-size:0.72rem;color:var(--muted);">${s.ownerEmail||''} ${s.ownerPhone ? '· '+s.ownerPhone : ''}</div>` : '<span style="color:var(--muted);font-style:italic;">—</span>'}
+            </td>
+            <td style="padding:12px 16px;">
+              ${s.tenant ? `<div style="font-weight:600;color:var(--navy);">${s.tenant}</div>
+              <div style="font-size:0.72rem;color:var(--muted);">${s.tenantEmail||''} ${s.tenantPhone ? '· '+s.tenantPhone : ''}</div>` : '<span style="color:var(--muted);font-style:italic;">No tenant</span>'}
+            </td>
+            <td style="padding:12px 16px;text-align:center;">
+              ${complianceBadge}
+              ${inspBadge}
+            </td>
+            <td style="padding:12px 16px;text-align:center;">
+              <div style="display:flex;gap:6px;justify-content:center;">
+                <span style="background:#fee2e2;color:#dc2626;border-radius:5px;padding:2px 8px;font-size:0.72rem;font-weight:600;">${s.nc}</span>
+                <span style="background:#fef3c7;color:#d97706;border-radius:5px;padding:2px 8px;font-size:0.72rem;font-weight:600;">${s.ip}</span>
+                <span style="background:#dcfce7;color:#16a34a;border-radius:5px;padding:2px 8px;font-size:0.72rem;font-weight:600;">${s.ok}</span>
+              </div>
+              <div style="font-size:0.68rem;color:var(--muted);margin-top:3px;">${s.total} total</div>
+            </td>
+            <td style="padding:12px 16px;text-align:right;">
+              <div style="display:flex;gap:6px;justify-content:flex-end;">
+                <button style="font-size:0.72rem;padding:5px 10px;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;font-family:inherit;" onclick="filterWOsByProp('${safeProp}')">📋 WOs</button>
+                <button style="font-size:0.72rem;padding:5px 10px;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;font-family:inherit;" onclick="createInspectionChecklist('${safeProp}')">🔍 Inspect</button>
+              </div>
+            </td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
 }
 
 function filterWOsByProp(prop) {
@@ -5456,10 +5482,80 @@ function selectPropAddress(address) {
   document.getElementById('propAddressSuggestions').style.display = 'none';
 }
 
+// ─── Tenant property autocomplete ─────────────────────────────────────────────
+let tenantPropTimer = null;
+
+function showTenantPropSuggestions() {
+  // Show managed properties as quick picks first
+  const box = document.getElementById('tenantPropSuggestions');
+  if (!box) return;
+  const props = getManagedProps();
+  if (!props.length) return;
+  box.innerHTML = `<div style="padding:6px 14px;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);background:var(--warm);">Managed Properties</div>` +
+    props.map(p => `<div onclick="selectTenantProp('${p.address.replace(/'/g,"&#39;")}')"
+      style="padding:9px 14px;cursor:pointer;font-size:0.82rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;"
+      onmouseover="this.style.background='var(--warm)'" onmouseout="this.style.background=''">
+      <span style="color:var(--muted);flex-shrink:0;">🏠</span>
+      <span>${p.address}</span>
+    </div>`).join('');
+  box.style.display = 'block';
+}
+
+function tenantPropSearch(val) {
+  const box = document.getElementById('tenantPropSuggestions');
+  clearTimeout(tenantPropTimer);
+  if (!val || val.length < 1) { showTenantPropSuggestions(); return; }
+
+  // First filter managed props
+  const managed = getManagedProps().filter(p => (p.address||'').toLowerCase().includes(val.toLowerCase()));
+
+  if (val.length < 4) {
+    // Just show filtered managed props
+    if (!managed.length) { box.style.display = 'none'; return; }
+    box.innerHTML = managed.map(p => `<div onclick="selectTenantProp('${p.address.replace(/'/g,"&#39;")}')"
+      style="padding:9px 14px;cursor:pointer;font-size:0.82rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;"
+      onmouseover="this.style.background='var(--warm)'" onmouseout="this.style.background=''">
+      <span style="color:var(--muted);">🏠</span><span>${p.address}</span></div>`).join('');
+    box.style.display = 'block';
+    return;
+  }
+
+  // Also search Nominatim for addresses not in managed list
+  tenantPropTimer = setTimeout(async () => {
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&countrycodes=au&format=json&addressdetails=1&limit=5`;
+      const res = await fetch(url, { headers: { 'Accept-Language': 'en', 'User-Agent': 'VicRentalPro/1.0' } });
+      const data = await res.json();
+      const nominatimResults = data.filter(r => !managed.find(p => p.address.toLowerCase() === r.display_name.toLowerCase()));
+      const managedHtml = managed.map(p => `<div onclick="selectTenantProp('${p.address.replace(/'/g,"&#39;")}')"
+        style="padding:9px 14px;cursor:pointer;font-size:0.82rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;"
+        onmouseover="this.style.background='var(--warm)'" onmouseout="this.style.background=''">
+        <span style="color:var(--muted);">🏠</span><span>${p.address}</span></div>`).join('');
+      const nominatimHtml = nominatimResults.map(r => `<div onclick="selectTenantProp('${r.display_name.replace(/'/g,"&#39;")}')"
+        style="padding:9px 14px;cursor:pointer;font-size:0.82rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;"
+        onmouseover="this.style.background='var(--warm)'" onmouseout="this.style.background=''">
+        <span style="color:var(--muted);">📍</span><span>${r.display_name}</span></div>`).join('');
+      const combined = managedHtml + (nominatimResults.length ? '<div style="padding:5px 14px;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);background:var(--warm);">Other Addresses</div>' + nominatimHtml : '');
+      if (!combined) { box.style.display = 'none'; return; }
+      box.innerHTML = combined;
+      box.style.display = 'block';
+    } catch(e) {}
+  }, 350);
+}
+
+function selectTenantProp(address) {
+  document.getElementById('newTenantProperty').value = address;
+  document.getElementById('tenantPropSuggestions').style.display = 'none';
+}
+
+
 document.addEventListener('click', e => {
-  const box = document.getElementById('propAddressSuggestions');
-  const inp = document.getElementById('newPropAddress');
-  if (box && inp && !inp.contains(e.target) && !box.contains(e.target)) box.style.display = 'none';
+  const box1 = document.getElementById('propAddressSuggestions');
+  const inp1 = document.getElementById('newPropAddress');
+  if (box1 && inp1 && !inp1.contains(e.target) && !box1.contains(e.target)) box1.style.display = 'none';
+  const box2 = document.getElementById('tenantPropSuggestions');
+  const inp2 = document.getElementById('newTenantProperty');
+  if (box2 && inp2 && !inp2.contains(e.target) && !box2.contains(e.target)) box2.style.display = 'none';
 });
 
 // ─── Manage Properties ────────────────────────────────────────────────────────
