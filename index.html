@@ -3594,9 +3594,9 @@ function renderProperties() {
 
             <td style="padding:13px 16px;vertical-align:middle;text-align:center;">
               <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:6px;">
-                <div title="Issues open" style="width:13px;height:13px;border-radius:50%;background:${s.reported>0?'#dc2626':'#e5e7eb'};box-shadow:${s.reported>0?'0 0 6px #dc262670':''};"></div>
-                <div title="In progress" style="width:13px;height:13px;border-radius:50%;background:${s.assigned>0?'#d97706':'#e5e7eb'};box-shadow:${s.assigned>0?'0 0 6px #d9770670':''};"></div>
-                <div title="Compliant" style="width:13px;height:13px;border-radius:50%;background:${s.reported===0&&s.assigned===0&&(s.total>0||s.lastInspScore!=null)?'#16a34a':'#e5e7eb'};box-shadow:${s.reported===0&&s.assigned===0&&(s.total>0||s.lastInspScore!=null)?'0 0 6px #16a34a70':''};"></div>
+                <div title="Issues open" style="width:13px;height:13px;border-radius:50%;background:${s.reported>0?'#dc2626':'#fca5a5'};opacity:${s.reported>0?1:0.35};"></div>
+                <div title="In progress" style="width:13px;height:13px;border-radius:50%;background:${s.assigned>0?'#d97706':'#fcd34d'};opacity:${s.assigned>0?1:0.35};"></div>
+                <div title="Compliant" style="width:13px;height:13px;border-radius:50%;background:#16a34a;opacity:${s.reported===0&&s.assigned===0?1:0.25};box-shadow:${s.reported===0&&s.assigned===0?'0 0 6px #16a34a90':''};"></div>
               </div>
               <span style="background:${rag.bg};color:${rag.color};border-radius:6px;padding:2px 9px;font-size:0.68rem;font-weight:700;">${rag.label}</span>
               ${inspBadge}
