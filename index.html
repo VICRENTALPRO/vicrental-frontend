@@ -1815,19 +1815,17 @@ window.addEventListener('DOMContentLoaded', function() {
         </div>
 
         <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;">
-          <div class="kpi-card kpi-red"><div class="kpi-label">Non-Compliant</div><div class="kpi-value" id="pNC">0</div><div class="kpi-sub">Open issues</div><div class="kpi-icon">⚠️</div></div>
-          <div class="kpi-card kpi-amber"><div class="kpi-label">In Progress</div><div class="kpi-value" id="pIP">0</div><div class="kpi-sub">Work orders active</div><div class="kpi-icon">🔨</div></div>
-          <div class="kpi-card" style="border-left:3px solid #2563eb;"><div class="kpi-label">Resolved</div><div class="kpi-value" id="pOK" style="color:#2563eb;">0</div><div class="kpi-sub">Work orders done</div><div class="kpi-icon">🔵</div></div>
-          <div class="kpi-card kpi-green"><div class="kpi-label">Compliant</div><div class="kpi-value" id="pCompliant">0</div><div class="kpi-sub">Inspection reports</div><div class="kpi-icon">📋</div></div>
-          <div class="kpi-card kpi-slate"><div class="kpi-label">Total Issues</div><div class="kpi-value" id="pTotal">0</div><div class="kpi-sub">All records</div><div class="kpi-icon">📊</div></div>
+          <div class="kpi-card kpi-red"><div class="kpi-label">Non-Compliant</div><div class="kpi-value" id="pNC">0</div><div class="kpi-icon">⚠️</div></div>
+          <div class="kpi-card kpi-amber"><div class="kpi-label">In Progress</div><div class="kpi-value" id="pIP">0</div><div class="kpi-icon">🔨</div></div>
+          <div class="kpi-card kpi-green"><div class="kpi-label">Resolved</div><div class="kpi-value" id="pOK">0</div><div class="kpi-icon">✅</div></div>
+          <div class="kpi-card kpi-slate"><div class="kpi-label">Total Issues</div><div class="kpi-value" id="pTotal">0</div><div class="kpi-icon">📋</div></div>
         </div>
 
         <div class="filter-row" id="portalFilterRow">
           <div class="filter-pill fp-all active" onclick="setPortalFilter('all')">All Issues</div>
           <div class="filter-pill fp-nc" onclick="setPortalFilter('nc')">Non-Compliant</div>
           <div class="filter-pill fp-ip" onclick="setPortalFilter('ip')">In Progress</div>
-          <div class="filter-pill fp-ok" onclick="setPortalFilter('ok')" style="color:#2563eb;">Resolved</div>
-          <div class="filter-pill" onclick="setPortalFilter('compliant')" id="fpCompliant" style="color:#16a34a;border-color:#86efac;">✅ Compliant</div>
+          <div class="filter-pill fp-ok" onclick="setPortalFilter('ok')">Resolved</div>
         </div>
 
         <div id="portalContent"></div>
@@ -1910,6 +1908,31 @@ window.addEventListener('DOMContentLoaded', function() {
 
         <!-- Category Accordions -->
         <div id="clCategories" style="margin-top:16px;"></div>
+
+        <!-- ── Finalise Compliance ── -->
+        <div style="margin-top:24px;background:#fff;border:2px solid var(--navy);border-radius:14px;padding:22px 24px;" id="clFinaliseSection">
+          <div style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-bottom:6px;">📋 Finalise Compliance Report</div>
+          <div style="font-size:0.78rem;color:var(--muted);margin-bottom:16px;">Complete all checklist items above, then finalise to lock the report and save it to the property record.</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+            <div>
+              <label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Date Finalised *</label>
+              <input type="date" id="clFinaliseDate" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+            </div>
+            <div>
+              <label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Inspector Name *</label>
+              <input type="text" id="clFinaliseInspector" placeholder="Full name" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+            </div>
+          </div>
+          <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:18px;background:var(--warm);padding:12px 14px;border-radius:9px;">
+            <input type="checkbox" id="clFinaliseConfirm" style="margin-top:3px;width:16px;height:16px;flex-shrink:0;accent-color:var(--navy);">
+            <span style="font-size:0.82rem;color:var(--text);line-height:1.6;">
+              I confirm that the information recorded in this inspection report is <strong>true and correct</strong> as at the date shown above, and has been completed in accordance with the <em>Residential Tenancies Act 1997</em> (Victoria).
+            </span>
+          </label>
+          <button onclick="finaliseChecklist()" style="padding:11px 30px;background:var(--navy);color:#fff;border:none;border-radius:9px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:700;">
+            ✅ Finalise &amp; Save Compliance Report
+          </button>
+        </div>
 
         <div class="disclaimer">
           This checklist is a general guide based on Victoria's rental minimum standards under the <em>Residential Tenancies Act 1997</em> (effective 29 March 2021). Not legal advice. Visit Consumer Affairs Victoria for official guidance.
@@ -2460,6 +2483,62 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 </div>
+
+<!-- EDIT PROPERTY MODAL -->
+<div id="editPropertyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;padding:28px 32px;width:640px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.25);max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div style="font-size:1rem;font-weight:700;color:var(--navy);">Edit Property</div>
+      <button onclick="closeEditProperty()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);">X</button>
+    </div>
+    <input type="hidden" id="editPropertyId">
+    <div style="margin-bottom:16px;">
+      <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">Property</div>
+      <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Address *</label>
+      <input type="text" id="editPropAddress" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+    </div>
+    <div style="margin-bottom:16px;">
+      <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">Owner</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Name</label>
+          <input type="text" id="editPropOwner" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        </div>
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Email</label>
+          <input type="email" id="editPropOwnerEmail" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        </div>
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Phone</label>
+          <input type="text" id="editPropOwnerPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        </div>
+      </div>
+    </div>
+    <div style="margin-bottom:16px;">
+      <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">Tenant</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Name</label>
+          <input type="text" id="editPropTenant" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        </div>
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Email</label>
+          <input type="email" id="editPropTenantEmail" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        </div>
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Phone</label>
+          <input type="text" id="editPropTenantPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        </div>
+      </div>
+    </div>
+    <div id="editPropertyError" style="display:none;margin-top:10px;color:var(--red);font-size:0.8rem;"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+      <button onclick="closeEditProperty()" class="btn btn-ghost">Cancel</button>
+      <button onclick="saveEditProperty()" class="btn btn-primary">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 
 
 <!-- ══════════════════════ DETAIL PANEL ══════════════════════ -->
@@ -4158,6 +4237,75 @@ function confirmCreateWO() {
   skipWOPrompt();
 }
 
+function finaliseChecklist() {
+  const dateVal   = document.getElementById('clFinaliseDate')?.value;
+  const inspector = (document.getElementById('clFinaliseInspector')?.value || '').trim();
+  const confirmed = document.getElementById('clFinaliseConfirm')?.checked;
+  const prop      = (document.getElementById('clPropAddress')?.value || '').trim();
+
+  if (!dateVal)    { alert('Please enter the date finalised.'); return; }
+  if (!inspector)  { alert('Please enter the inspector name.'); return; }
+  if (!confirmed)  { alert('Please tick the confirmation box before finalising.'); return; }
+  if (!prop)       { alert('Please enter the property address at the top of the checklist.'); return; }
+
+  const score  = document.getElementById('clScoreVal')?.textContent || '—';
+  const grade  = document.getElementById('clScoreGrade')?.textContent || '';
+  const dateStr = new Date(dateVal + 'T12:00:00').toLocaleDateString('en-AU', {day:'2-digit', month:'long', year:'numeric'});
+
+  // Save result back to managed property record
+  const props  = getManagedProps();
+  const idx    = props.findIndex(p => p.address && p.address.toLowerCase() === prop.toLowerCase());
+  if (idx !== -1) {
+    const num = parseInt(score) || null;
+    props[idx].lastInspectionDate  = dateVal;
+    props[idx].lastInspectionScore = num;
+    props[idx].lastInspectionGrade = grade;
+    props[idx].lastInspectionColor = num >= 80 ? '#16a34a' : num >= 50 ? '#d97706' : '#dc2626';
+    saveManagedProps(props);
+  }
+
+  // Populate and show the vault popup
+  document.getElementById('vaultPopupProp').textContent  = prop;
+  document.getElementById('vaultPopupDate').textContent  = dateStr;
+  document.getElementById('vaultPopupInspector').textContent = inspector;
+  document.getElementById('vaultPopupScore').textContent = score + (grade ? ' — ' + grade : '');
+  document.getElementById('vaultPopupModal').style.display = 'flex';
+
+  if (typeof logActivity === 'function') logActivity('Inspection finalised: ' + prop + ' ' + score, '#0ea5e9');
+  if (typeof updateSidebarBadges === 'function') updateSidebarBadges();
+}
+
+function closeVaultPopup() {
+  document.getElementById('vaultPopupModal').style.display = 'none';
+}
+
+function saveToVault() {
+  const prop      = (document.getElementById('clPropAddress')?.value || '').trim();
+  const dateVal   = document.getElementById('clFinaliseDate')?.value || new Date().toISOString().split('T')[0];
+  const inspector = (document.getElementById('clFinaliseInspector')?.value || '').trim();
+  const score     = document.getElementById('clScoreVal')?.textContent || '—';
+  const grade     = document.getElementById('clScoreGrade')?.textContent || '';
+
+  const vault = S.get('vicrental_vault', []);
+  vault.unshift({
+    id:          'INS-' + Date.now(),
+    name:        'Inspection Report — ' + prop,
+    type:        'inspection',
+    property:    prop,
+    date:        dateVal,
+    inspector:   inspector,
+    score:       score,
+    grade:       grade,
+    uploadedAt:  new Date().toISOString(),
+    ownerVisible: true
+  });
+  S.set('vicrental_vault', vault);
+  closeVaultPopup();
+  if (typeof showToast === 'function') showToast('Saved to Document Vault', 'ok');
+  if (typeof renderVault === 'function') renderVault();
+  downloadInspectionReport();
+}
+
 function resetChecklist() {
   if (!confirm('Reset the checklist? All statuses, photos, and notes will be cleared.')) return;
   clStatuses = {};
@@ -5040,7 +5188,6 @@ function ackTenantReq(id) {
   reqs[idx].status = 'inprogress';
   reqs[idx].updatedAt = new Date().toISOString();
   S.set(KEY_TREQS, reqs);
-  if (currentPage === 'dashboard') renderDashboard();
   // Sync status to backend so tenant portal sees it
   fetch(`${BACKEND}/tenant-requests/${id}/status`, {
     method: 'PATCH', headers: getAuthHeaders(),
@@ -5059,7 +5206,6 @@ function completeTenantReq(id) {
   reqs[idx].status = 'completed';
   reqs[idx].updatedAt = new Date().toISOString();
   S.set(KEY_TREQS, reqs);
-  if (typeof currentPage !== 'undefined' && currentPage === 'dashboard') renderDashboard();
   // Sync status to backend so tenant portal sees it
   fetch(`${BACKEND}/tenant-requests/${id}/status`, {
     method: 'PATCH', headers: getAuthHeaders(),
@@ -5696,16 +5842,8 @@ function saveEditProp() {
     updatedAt:   new Date().toISOString()
   };
   saveManagedProps(props);
-  // Also update local tenants if tenant email changed
-  const t = props[idx];
-  if (t.tenantEmail && t.tenant) {
-    const nameParts = t.tenant.split(' ');
-    addLocalTenant(nameParts[0]||'', nameParts.slice(1).join(' ')||'', t.tenantEmail, t.tenantPhone||'', t.address);
-  }
   closeEditPropModal();
   renderManagedProps();
-  if (typeof showToast === 'function') showToast('Property updated', 'ok');
-  if (typeof updateSidebarBadges === 'function') updateSidebarBadges();
 }
 
 function goToProperty(address) {
@@ -5855,6 +5993,120 @@ function seedDemo() {}
     </div>
   </div>
 </div>
+
+<!-- ── Finalise Inspection — Save to Vault Popup ── -->
+<div id="vaultPopupModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9500;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:18px;padding:32px;width:100%;max-width:520px;box-shadow:0 24px 64px rgba(0,0,0,0.3);text-align:center;">
+    <div style="font-size:3rem;margin-bottom:10px;">✅</div>
+    <div style="font-size:1.1rem;font-weight:800;color:var(--navy);margin-bottom:6px;">Inspection Report Finalised</div>
+    <div style="background:var(--warm);border-radius:10px;padding:14px 18px;margin:16px 0;font-size:0.83rem;color:var(--text);line-height:1.8;text-align:left;">
+      <div><strong>Property:</strong> <span id="vaultPopupProp"></span></div>
+      <div><strong>Date:</strong> <span id="vaultPopupDate"></span></div>
+      <div><strong>Inspector:</strong> <span id="vaultPopupInspector"></span></div>
+      <div><strong>Result:</strong> <span id="vaultPopupScore"></span></div>
+    </div>
+    <div style="font-size:0.83rem;color:var(--muted);margin-bottom:22px;line-height:1.6;">
+      Would you like to save this report to the <strong>Document Vault</strong> for this property?<br>
+      It will also appear on the <strong>Owner Portal</strong> marked as Compliant.
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button onclick="closeVaultPopup()" style="padding:10px 22px;border:1px solid var(--border);border-radius:9px;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;color:var(--text);">Not now</button>
+      <button onclick="saveToVault()" style="padding:10px 28px;background:var(--navy);color:#fff;border:none;border-radius:9px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:700;">📁 Save to Vault &amp; Download</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Vault Popup Modal ── -->
+<div id="vaultPopupModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9500;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:18px;padding:32px;width:100%;max-width:500px;box-shadow:0 24px 64px rgba(0,0,0,0.3);text-align:center;">
+    <div style="font-size:3rem;margin-bottom:12px;">✅</div>
+    <div style="font-size:1.1rem;font-weight:800;color:var(--navy);margin-bottom:8px;">Report Finalised</div>
+    <div style="font-size:0.85rem;color:var(--muted);margin-bottom:20px;line-height:1.7;">
+      Property: <strong id="vaultPopupProp" style="color:var(--navy);"></strong><br>
+      Date: <strong id="vaultPopupDate"></strong><br>
+      Result: <strong id="vaultPopupScore"></strong>
+    </div>
+    <div style="background:var(--warm);border-radius:10px;padding:14px 18px;margin-bottom:22px;font-size:0.83rem;color:var(--text);line-height:1.6;text-align:left;">
+      📁 Save this report to the <strong>Document Vault</strong> for this property?<br>
+      It will also appear on the <strong>Owner Portal</strong> marked as <strong style="color:#16a34a;">Compliant</strong>.
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button onclick="closeVaultPopup()" style="padding:10px 22px;border:1px solid var(--border);border-radius:9px;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;">Not now</button>
+      <button onclick="saveToVault()" style="padding:10px 28px;background:var(--navy);color:#fff;border:none;border-radius:9px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:700;">📁 Save to Vault &amp; Download</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function finaliseChecklist() {
+  const dateVal   = document.getElementById('clFinaliseDate')?.value;
+  const inspector = (document.getElementById('clFinaliseInspector')?.value || '').trim();
+  const confirmed = document.getElementById('clFinaliseConfirm')?.checked;
+
+  if (!dateVal) { alert('Please enter the date finalised.'); return; }
+  if (!confirmed) { alert('Please check the confirmation box before finalising.'); return; }
+
+  const prop  = (document.getElementById('clPropAddress')?.value || '').trim() || 'Unknown property';
+  const score = document.getElementById('clScoreVal')?.textContent || '—';
+  const grade = document.getElementById('clScoreGrade')?.textContent || '';
+  const dateStr = new Date(dateVal).toLocaleDateString('en-AU', { day:'2-digit', month:'long', year:'numeric' });
+
+  // Save inspection result back to managed property record
+  if (typeof getManagedProps === 'function') {
+    const props = getManagedProps();
+    const idx = props.findIndex(p => p.address && prop && p.address.toLowerCase() === prop.toLowerCase());
+    if (idx !== -1) {
+      const numScore = parseInt(score) || null;
+      props[idx].lastInspectionDate  = dateVal;
+      props[idx].lastInspectionScore = numScore;
+      props[idx].lastInspectionGrade = grade;
+      props[idx].lastInspectionColor = numScore >= 80 ? '#16a34a' : numScore >= 50 ? '#d97706' : '#dc2626';
+      saveManagedProps(props);
+    }
+  }
+
+  // Populate and show vault popup
+  document.getElementById('vaultPopupProp').textContent  = prop;
+  document.getElementById('vaultPopupDate').textContent  = dateStr;
+  document.getElementById('vaultPopupScore').textContent = score + (grade ? ' — ' + grade : '');
+  document.getElementById('vaultPopupModal').style.display = 'flex';
+
+  if (typeof logActivity === 'function') logActivity('Inspection finalised: ' + prop + ' — ' + score, '#0ea5e9');
+  if (typeof updateSidebarBadges === 'function') updateSidebarBadges();
+}
+
+function closeVaultPopup() {
+  document.getElementById('vaultPopupModal').style.display = 'none';
+}
+
+function saveToVault() {
+  const prop   = (document.getElementById('clPropAddress')?.value || '').trim() || 'Unknown';
+  const dateVal= document.getElementById('clFinaliseDate')?.value || new Date().toISOString().split('T')[0];
+  const score  = document.getElementById('clScoreVal')?.textContent || '—';
+  const grade  = document.getElementById('clScoreGrade')?.textContent || '';
+  const inspector = (document.getElementById('clFinaliseInspector')?.value || '').trim();
+
+  const KEY_VAULT = 'vicrental_vault';
+  const vault = S.get(KEY_VAULT, []);
+  vault.unshift({
+    id:           'INS-' + Date.now(),
+    name:         'Inspection Report — ' + prop,
+    type:         'inspection',
+    property:     prop,
+    date:         dateVal,
+    score:        score,
+    grade:        grade,
+    inspector:    inspector,
+    uploadedAt:   new Date().toISOString(),
+    ownerVisible: true
+  });
+  S.set(KEY_VAULT, vault);
+  closeVaultPopup();
+  if (typeof showToast === 'function') showToast('Report saved to Document Vault ✅', 'ok');
+  if (typeof renderVault === 'function') renderVault();
+  if (typeof downloadInspectionReport === 'function') downloadInspectionReport();
+}
+</script>
 
 </body>
 </html>
