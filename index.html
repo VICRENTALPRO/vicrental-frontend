@@ -1753,10 +1753,10 @@ window.addEventListener('DOMContentLoaded', function() {
       <!-- ═══ DASHBOARD ═══ -->
       <div class="page active" id="page-dashboard">
         <div class="kpi-grid">
-          <div class="kpi-card kpi-red"><div class="kpi-label">Non-Compliant</div><div class="kpi-value" id="dashNC">0</div><div class="kpi-sub">Open issues</div><div class="kpi-icon">⚠️</div></div>
-          <div class="kpi-card kpi-amber"><div class="kpi-label">In Progress</div><div class="kpi-value" id="dashIP">0</div><div class="kpi-sub">Repairs underway</div><div class="kpi-icon">🔨</div></div>
-          <div class="kpi-card kpi-green"><div class="kpi-label">Resolved</div><div class="kpi-value" id="dashOK">0</div><div class="kpi-sub">Completed repairs</div><div class="kpi-icon">✅</div></div>
-          <div class="kpi-card kpi-gold"><div class="kpi-label">Overdue</div><div class="kpi-value" id="dashOverdue">0</div><div class="kpi-sub">Past due date</div><div class="kpi-icon">⏰</div></div>
+          <div class="kpi-card kpi-red" style="cursor:pointer;" onclick="goToPropertiesFiltered('nc')"><div class="kpi-label">Non-Compliant</div><div class="kpi-value" id="dashNC">0</div><div class="kpi-sub">Open issues</div><div class="kpi-icon">⚠️</div></div>
+          <div class="kpi-card kpi-amber" style="cursor:pointer;" onclick="goToPropertiesFiltered('ip')"><div class="kpi-label">In Progress</div><div class="kpi-value" id="dashIP">0</div><div class="kpi-sub">Repairs underway</div><div class="kpi-icon">🔨</div></div>
+          <div class="kpi-card kpi-green" style="cursor:pointer;" onclick="goToPropertiesFiltered('ok')"><div class="kpi-label">Resolved</div><div class="kpi-value" id="dashOK">0</div><div class="kpi-sub">Completed repairs</div><div class="kpi-icon">✅</div></div>
+          <div class="kpi-card kpi-gold" style="cursor:pointer;" onclick="goToPropertiesFiltered('overdue')"><div class="kpi-label">Overdue</div><div class="kpi-value" id="dashOverdue">0</div><div class="kpi-sub">Past due date</div><div class="kpi-icon">⏰</div></div>
           <div class="kpi-card" style="background:linear-gradient(135deg,#1d4f91,#2d6dbf);cursor:pointer;" onclick="showPage('tenantreqs')"><div class="kpi-label" style="color:rgba(255,255,255,0.7);">New Requests</div><div class="kpi-value" style="color:#fff;" id="dashNewTR">0</div><div class="kpi-sub" style="color:rgba(255,255,255,0.6);">Awaiting review</div><div class="kpi-icon">🏡</div></div>
         </div>
 
@@ -1854,6 +1854,13 @@ window.addEventListener('DOMContentLoaded', function() {
 
       <!-- ═══ PROPERTIES ═══ -->
       <div class="page" id="page-properties">
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;" id="propFilterBar">
+          <button id="pfBtn-all"     onclick="goToPropertiesFiltered('all')"     style="padding:6px 16px;border-radius:20px;border:2px solid var(--navy);background:var(--navy);color:#fff;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:inherit;">All</button>
+          <button id="pfBtn-nc"      onclick="goToPropertiesFiltered('nc')"      style="padding:6px 16px;border-radius:20px;border:1px solid #fca5a5;background:#fff;color:#dc2626;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:inherit;">⚠ Non-Compliant</button>
+          <button id="pfBtn-ip"      onclick="goToPropertiesFiltered('ip')"      style="padding:6px 16px;border-radius:20px;border:1px solid #fcd34d;background:#fff;color:#d97706;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:inherit;">🔨 In Progress</button>
+          <button id="pfBtn-ok"      onclick="goToPropertiesFiltered('ok')"      style="padding:6px 16px;border-radius:20px;border:1px solid #86efac;background:#fff;color:#16a34a;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:inherit;">✅ Resolved</button>
+          <button id="pfBtn-overdue" onclick="goToPropertiesFiltered('overdue')" style="padding:6px 16px;border-radius:20px;border:1px solid #fcd34d;background:#fff;color:#b45309;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:inherit;">⏰ Overdue</button>
+        </div>
         <div id="propsGrid" class="props-grid"></div>
       </div>
 
@@ -3478,6 +3485,31 @@ function clearPortalData() {
 // ═══════════════════════════════════════════════
 // PROPERTIES
 // ═══════════════════════════════════════════════
+let activePropFilter = 'all';
+
+function goToPropertiesFiltered(filter) {
+  activePropFilter = filter;
+  showPage('properties');
+  setTimeout(() => {
+    const colors = { nc:'#dc2626', ip:'#d97706', ok:'#16a34a', overdue:'#b45309', all:'var(--navy)' };
+    const borders = { nc:'#fca5a5', ip:'#fcd34d', ok:'#86efac', overdue:'#fcd34d', all:'var(--navy)' };
+    ['all','nc','ip','ok','overdue'].forEach(f => {
+      const btn = document.getElementById('pfBtn-' + f);
+      if (!btn) return;
+      if (f === filter) {
+        btn.style.background = f === 'all' ? 'var(--navy)' : colors[f];
+        btn.style.color = '#fff';
+        btn.style.borderColor = colors[f];
+      } else {
+        btn.style.background = '#fff';
+        btn.style.color = colors[f];
+        btn.style.borderColor = borders[f];
+      }
+    });
+    renderProperties();
+  }, 50);
+}
+
 function renderProperties() {
   const wos  = getWOs();
   const grid = document.getElementById('propsGrid');
@@ -3515,7 +3547,18 @@ function renderProperties() {
     return;
   }
 
-  const rows = Object.entries(propStats).sort((a,b) => a[0].localeCompare(b[0]));
+  let rows = Object.entries(propStats).sort((a,b) => a[0].localeCompare(b[0]));
+
+  // Apply active filter
+  if (activePropFilter === 'nc')      rows = rows.filter(([,s]) => s.reported > 0);
+  else if (activePropFilter === 'ip') rows = rows.filter(([,s]) => s.assigned > 0);
+  else if (activePropFilter === 'ok') rows = rows.filter(([,s]) => s.completed > 0 && s.reported === 0 && s.assigned === 0);
+  else if (activePropFilter === 'overdue') rows = rows.filter(([,s]) => s.overdue > 0);
+
+  if (!rows.length) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>No properties match this filter</h3><p>Try a different filter above.</p></div>`;
+    return;
+  }
 
   // Shorten Nominatim verbose address
   function shortAddr(full) {
@@ -5017,67 +5060,87 @@ function renderTenantReqs() {
   const fmtTime    = iso => new Date(iso).toLocaleString('en-AU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
 
   container.innerHTML = reqs.map(req => {
-    const firstCat = req.categories?.[0];
-    const icon     = TREQ_CAT_ICONS[firstCat] || '🔧';
-    const priColor = priColors[req.priority] || 'var(--muted)';
-    const priLabel = priLabels[req.priority] || req.priority;
-    const stColor  = stColors[req.status] || 'var(--muted)';
-    const stLabel  = stLabels[req.status] || req.status;
-    const isNew    = req.status === 'submitted';
+    const priColor  = priColors[req.priority]  || '#6b7280';
+    const priLabel  = priLabels[req.priority]  || (req.priority||'').toUpperCase();
+    const stColor   = stColors[req.status]     || 'var(--muted)';
+    const stLabel   = stLabels[req.status]     || req.status;
+
+    // Priority badge background
+    const priBg = req.priority === 'emergency' ? '#fee2e2'
+                : req.priority === 'urgent'    ? '#fef3c7'
+                : '#dcfce7';
 
     const photosHtml = req.photos?.length ? `
-      <div style="padding:0 14px 12px;display:flex;gap:6px;flex-wrap:wrap;">
-        ${req.photos.map(p => `<div style="width:56px;height:56px;border-radius:7px;overflow:hidden;cursor:pointer;" onclick="openTRPhoto('${p.dataUrl}')"><img src="${p.dataUrl}" style="width:100%;height:100%;object-fit:cover;"></div>`).join('')}
+      <div style="padding:0 16px 14px;display:flex;gap:6px;flex-wrap:wrap;">
+        ${req.photos.map(p => `<div style="width:60px;height:60px;border-radius:8px;overflow:hidden;cursor:pointer;" onclick="openTRPhoto('${p.dataUrl}')"><img src="${p.dataUrl}" style="width:100%;height:100%;object-fit:cover;"></div>`).join('')}
       </div>` : '';
 
     const responseHtml = req.pmResponse ? `
-      <div style="background:var(--sky-pale,#eef5fc);border-top:1px solid var(--border);padding:10px 14px;font-size:0.77rem;display:flex;gap:8px;">
+      <div style="background:#eef5fc;border-top:1px solid var(--border);padding:10px 16px;font-size:0.77rem;display:flex;gap:8px;">
         <span>💬</span>
         <div><strong>PM Response:</strong> ${escHtmlVault(req.pmResponse.message)} <span style="color:var(--muted);font-size:0.65rem;"> · ${fmtTime(req.pmResponse.time)}</span></div>
       </div>` : '';
 
-    return `<div class="panel" style="margin-bottom:10px;border-left:3px solid ${priColor};padding:0;overflow:hidden;">
-      <div style="display:grid;grid-template-columns:auto 1fr auto;gap:14px;padding:15px 16px;align-items:start;">
-        <div style="width:46px;height:46px;border-radius:11px;background:#f5f7fa;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">${icon}</div>
-        <div>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
-            <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">${req.id}</span>
-            ${isNew ? '<span style="font-size:0.58rem;font-weight:700;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;padding:1px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:0.05em;">New</span>' : ''}
-          </div>
-          <div style="font-size:0.9rem;font-weight:600;margin-bottom:3px;line-height:1.35;">${escHtmlVault(req.description.substring(0,90))}${req.description.length>90?'…':''}</div>
-          <div style="font-size:0.72rem;color:var(--muted);margin-bottom:6px;">${(req.categoryLabels||[]).join(' · ')}</div>
-          <div style="display:flex;flex-wrap:wrap;gap:10px;font-size:0.71rem;color:var(--muted);">
-            <span>👤 <strong>${escHtmlVault(req.tenantName||'')}</strong></span>
-            <span>📍 <strong>${escHtmlVault(req.property||'')}</strong></span>
-            <span>📅 ${fmtDate(req.submittedAt)}</span>
-            ${req.contact ? `<span>⏰ ${escHtmlVault(req.contact)}</span>` : ''}
-            ${req.photos?.length ? `<span>📎 ${req.photos.length} photo${req.photos.length>1?'s':''}</span>` : ''}
-          </div>
-          ${req.notes ? `<div style="margin-top:6px;font-size:0.73rem;color:var(--muted);font-style:italic;">📝 ${escHtmlVault(req.notes)}</div>` : ''}
-          ${(req.make || req.model || req.serial || req.age || req.location) ? `
-          <div style="margin-top:8px;padding:8px 12px;background:#f0f7ff;border-radius:7px;border:1px solid rgba(15,76,129,0.12);display:flex;flex-wrap:wrap;gap:10px;font-size:0.71rem;color:var(--muted);">
-            <span style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;width:100%;margin-bottom:-4px;">🏷️ Equipment Details</span>
-            ${req.make     ? `<span>Make: <strong style="color:var(--text);">${escHtmlVault(req.make)}</strong></span>` : ''}
-            ${req.model    ? `<span>Model: <strong style="color:var(--text);">${escHtmlVault(req.model)}</strong></span>` : ''}
-            ${req.serial   ? `<span>Serial: <strong style="color:var(--text);">${escHtmlVault(req.serial)}</strong></span>` : ''}
-            ${req.age      ? `<span>Age: <strong style="color:var(--text);">${escHtmlVault(req.age)}</strong></span>` : ''}
-            ${req.location ? `<span>Location: <strong style="color:var(--text);">${escHtmlVault(req.location)}</strong></span>` : ''}
-          </div>` : ''}
+    // Tenant details from cached tenants
+    const tenant = (typeof cachedTenants !== 'undefined' ? cachedTenants : [])
+      .find(t => t.email && req.tenantName && (t.firstName+' '+t.lastName).trim().toLowerCase() === req.tenantName.toLowerCase());
+    const tenantPhone = tenant?.phone || req.phone || '';
+    const tenantEmail = tenant?.email || req.tenantEmail || '';
+
+    return `<div class="panel" style="margin-bottom:12px;padding:0;overflow:hidden;border:1px solid var(--border);border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+
+      <!-- Card header: priority top-left, job number + date top-right -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;border-bottom:1px solid var(--border);background:var(--warm);">
+        <span style="background:${priBg};color:${priColor};border:1px solid ${priColor}40;border-radius:6px;padding:3px 12px;font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;">${priLabel}</span>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:0.72rem;font-weight:700;color:var(--navy);">${req.id}</span>
+          <span style="font-size:0.72rem;color:var(--muted);">📅 ${fmtDate(req.submittedAt)}</span>
+          <span style="background:${stColor}20;color:${stColor};border:1px solid ${stColor}40;border-radius:5px;padding:2px 9px;font-size:0.68rem;font-weight:700;">${stLabel}</span>
         </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;min-width:160px;">
-          <span class="pill" style="background:${priColor}20;color:${priColor};border:1px solid ${priColor}30;font-size:0.6rem;">${priLabel}</span>
-          <span class="pill" style="background:${stColor}15;color:${stColor};border:1px solid ${stColor}25;font-size:0.6rem;">${stLabel}</span>
-          <div style="display:flex;flex-direction:column;gap:5px;width:100%;">
-            ${req.status === 'submitted' ? `
-              <button class="btn btn-primary" style="font-size:0.72rem;padding:5px 10px;width:100%;" onclick="ackTenantReq('${req.id}')">✓ Acknowledge</button>
-              <button class="btn btn-secondary" style="font-size:0.72rem;padding:5px 10px;width:100%;" onclick="convertTenantReqToWO('${req.id}')">🔧 Create WO</button>
-            ` : ''}
-            ${req.status === 'inprogress' ? `
-              <button class="btn btn-primary" style="font-size:0.72rem;padding:5px 10px;width:100%;background:var(--green);" onclick="completeTenantReq('${req.id}')">✅ Mark Complete</button>
-            ` : ''}
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr auto;gap:16px;padding:14px 16px;">
+        <div>
+          <!-- Issue description -->
+          <div style="font-size:0.95rem;font-weight:700;color:var(--navy);margin-bottom:4px;line-height:1.4;">${escHtmlVault(req.description)}</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-bottom:12px;">${(req.categoryLabels||[]).join(' · ')}</div>
+
+          <!-- Property address -->
+          <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;">
+            <span style="font-size:1rem;flex-shrink:0;">🏠</span>
+            <div>
+              <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:2px;">Property</div>
+              <div style="font-size:0.85rem;font-weight:600;color:var(--navy);">${escHtmlVault(req.property||'—')}</div>
+            </div>
           </div>
+
+          <!-- Tenant details -->
+          <div style="display:flex;align-items:flex-start;gap:8px;background:#f8fafc;border-radius:8px;padding:10px 12px;">
+            <span style="font-size:1rem;flex-shrink:0;">👤</span>
+            <div style="flex:1;">
+              <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:3px;">Tenant</div>
+              <div style="font-size:0.88rem;font-weight:700;color:var(--navy);margin-bottom:2px;">${escHtmlVault(req.tenantName||'—')}</div>
+              <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:0.76rem;color:var(--muted);">
+                ${tenantPhone ? `<a href="tel:${tenantPhone}" style="color:var(--navy);text-decoration:none;">📞 ${tenantPhone}</a>` : ''}
+                ${tenantEmail ? `<a href="mailto:${tenantEmail}" style="color:var(--navy);text-decoration:none;">✉ ${tenantEmail}</a>` : ''}
+              </div>
+            </div>
+          </div>
+
+          ${req.notes ? `<div style="margin-top:10px;font-size:0.75rem;color:var(--muted);font-style:italic;padding:8px 12px;background:#fffbeb;border-radius:7px;border:1px solid #fcd34d40;">📝 ${escHtmlVault(req.notes)}</div>` : ''}
+        </div>
+
+        <!-- Actions column -->
+        <div style="display:flex;flex-direction:column;gap:7px;min-width:150px;">
+          ${req.status === 'submitted' ? `
+            <button class="btn btn-primary" style="font-size:0.73rem;padding:7px 12px;width:100%;" onclick="ackTenantReq('${req.id}')">✓ Acknowledge</button>
+            <button class="btn btn-secondary" style="font-size:0.73rem;padding:7px 12px;width:100%;" onclick="convertTenantReqToWO('${req.id}')">🔧 Create Work Order</button>
+          ` : ''}
+          ${req.status === 'inprogress' ? `
+            <button class="btn btn-primary" style="font-size:0.73rem;padding:7px 12px;width:100%;background:var(--green);" onclick="completeTenantReq('${req.id}')">✅ Mark Complete</button>
+          ` : ''}
           ${!req.pmResponse && req.status !== 'completed' ? `
-            <button class="btn btn-ghost" style="font-size:0.68rem;padding:4px 8px;width:100%;" onclick="respondToTenantReq('${req.id}')">💬 Send Response</button>
+            <button class="btn btn-ghost" style="font-size:0.71rem;padding:6px 10px;width:100%;" onclick="respondToTenantReq('${req.id}')">💬 Send Response</button>
           ` : ''}
         </div>
       </div>
