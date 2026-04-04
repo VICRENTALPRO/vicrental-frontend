@@ -2459,61 +2459,6 @@ window.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- EDIT PROPERTY MODAL -->
-<div id="editPropertyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center;">
-  <div style="background:#fff;border-radius:16px;padding:28px 32px;width:640px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.25);max-height:90vh;overflow-y:auto;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <div style="font-size:1rem;font-weight:700;color:var(--navy);">Edit Property</div>
-      <button onclick="closeEditProperty()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);">X</button>
-    </div>
-    <input type="hidden" id="editPropertyId">
-    <div style="margin-bottom:16px;">
-      <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">Property</div>
-      <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Address *</label>
-      <input type="text" id="editPropAddress" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
-    </div>
-    <div style="margin-bottom:16px;">
-      <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">Owner</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
-        <div>
-          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Name</label>
-          <input type="text" id="editPropOwner" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
-        </div>
-        <div>
-          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Email</label>
-          <input type="email" id="editPropOwnerEmail" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
-        </div>
-        <div>
-          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Phone</label>
-          <input type="text" id="editPropOwnerPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
-        </div>
-      </div>
-    </div>
-    <div style="margin-bottom:16px;">
-      <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">Tenant</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
-        <div>
-          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Name</label>
-          <input type="text" id="editPropTenant" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
-        </div>
-        <div>
-          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Email</label>
-          <input type="email" id="editPropTenantEmail" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
-        </div>
-        <div>
-          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Phone</label>
-          <input type="text" id="editPropTenantPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
-        </div>
-      </div>
-    </div>
-    <div id="editPropertyError" style="display:none;margin-top:10px;color:var(--red);font-size:0.8rem;"></div>
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
-      <button onclick="closeEditProperty()" class="btn btn-ghost">Cancel</button>
-      <button onclick="saveEditProperty()" class="btn btn-primary">Save Changes</button>
-    </div>
-  </div>
-</div>
-
 
 
 <!-- ══════════════════════ DETAIL PANEL ══════════════════════ -->
