@@ -2167,7 +2167,7 @@ window.addEventListener('DOMContentLoaded', function() {
         <!-- Property List FIRST -->
         <div class="panel" style="margin-bottom:20px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Managed Properties — A to Z</div>
+            <div></div>
             <div style="display:flex;gap:8px;">
               <input type="text" id="propSearch" placeholder="🔍 Search address or owner…" oninput="renderManagedProps()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'DM Sans',sans-serif;font-size:0.8rem;width:220px;">
               <button class="btn btn-primary" onclick="togglePropForm()" style="font-size:0.75rem;padding:5px 14px;">+ Add Property</button>
@@ -2350,10 +2350,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
         <!-- Filter & Search -->
         <div class="filter-row" style="margin-bottom:12px;">
-          <input type="text" class="search-input" placeholder="🔍 Search documents…" id="vaultSearch" oninput="renderVault()" style="max-width:240px;">
-          <select class="filter-select" id="vaultPropFilter" onchange="renderVault()" style="max-width:240px;">
-            <option value="all">All properties</option>
-          </select>
+          <input type="text" class="search-input" placeholder="🔍 Search documents…" id="vaultSearch" oninput="renderVault()" style="max-width:280px;">
           <select class="filter-select" id="vaultCatFilter" onchange="renderVault()">
             <option value="all">All categories</option>
             <option value="Compliance Certificate">Compliance Certificates</option>
@@ -3574,9 +3571,8 @@ function renderProperties() {
             onmouseover="this.style.background='#f5f2eb'"
             onmouseout="this.style.background='${rowBg}'">
 
-            <td style="padding:13px 16px;vertical-align:middle;">
-              <div style="font-weight:700;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${line1}</div>
-              ${line2 ? `<div style="font-size:0.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${line2}</div>` : ''}
+            <td style="padding:13px 16px;vertical-align:middle;cursor:pointer;" onclick="openPropertySummaryByAddr('${safeProp}')">
+              <div style="font-weight:800;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:underline;text-underline-offset:3px;">${line1}${line2 ? ', '+line2 : ''}</div>
             </td>
 
             <td style="padding:13px 16px;vertical-align:middle;">
@@ -5675,12 +5671,11 @@ function renderManagedProps() {
       const line2 = parts.slice(1).join(',').trim();
       const cardId = 'propcard_' + (p.id||p.address).replace(/[^a-zA-Z0-9]/g,'_');
       return `<div id="${cardId}" style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;flex-direction:column;gap:12px;">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+        <div style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="openPropertySummary('${propId}')">
+          ${p.lastInspectionScore ? `<span style="background:${gradeColor};color:#fff;border-radius:6px;padding:4px 10px;font-size:0.72rem;font-weight:700;white-space:nowrap;flex-shrink:0;">${p.lastInspectionScore}% · ${p.lastInspectionGrade||''}</span>` : ''}
           <div style="flex:1;min-width:0;">
-            <div style="font-weight:700;font-size:0.95rem;color:var(--navy);line-height:1.3;">🏠 ${line1}</div>
-            ${line2 ? `<div style="font-size:0.76rem;color:var(--muted);margin-top:2px;">${line2}</div>` : ''}
+            <div style="font-weight:800;font-size:0.95rem;color:var(--navy);line-height:1.3;text-decoration:underline;text-underline-offset:3px;">${line1}${line2 ? ', '+line2 : ''}</div>
           </div>
-          ${p.lastInspectionScore ? `<span style="background:${gradeColor};color:#fff;border-radius:6px;padding:3px 9px;font-size:0.7rem;font-weight:700;white-space:nowrap;flex-shrink:0;">${p.lastInspectionScore}% · ${p.lastInspectionGrade||''}</span>` : ''}
         </div>
         <div style="background:var(--warm);border-radius:9px;padding:10px 12px;">
           <div style="font-size:0.67rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px;">👤 Owner</div>
@@ -5827,8 +5822,8 @@ function renderTenantsList() {
           <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--navy-mid,#2d5a8e));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.9rem;flex-shrink:0;">${initials}</div>
           <div style="flex:1;min-width:0;">
             <div style="font-weight:700;font-size:0.95rem;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${fullName}</div>
+            <div style="font-size:0.72rem;color:var(--muted);">${t.source==='property'?'From property':t.source==='import'?'Imported':'Registered'}</div>
           </div>
-          <button onclick="openEditTenantModal('${t.id||t.email}')" style="flex-shrink:0;padding:5px 12px;background:#fff;border:1px solid var(--border);border-radius:7px;font-size:0.72rem;font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit;">✏️ Edit</button>
         </div>
         <div style="display:flex;flex-direction:column;gap:5px;font-size:0.8rem;">
           ${t.email ? `<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--muted);">✉</span><a href="mailto:${t.email}" style="color:var(--navy);text-decoration:none;">${t.email}</a></div>` : ''}
@@ -5896,26 +5891,6 @@ function seedDemo() {}
         <input type="text" id="editPropTenantPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
       </div>
     </div>
-
-    <!-- Compliance Expiry Dates -->
-    <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border);">
-      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:12px;">🔒 Compliance Expiry Dates</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
-        <div>
-          <label style="font-size:0.73rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">🔴 Smoke Alarm Expiry</label>
-          <input type="date" id="editPropSmokeExpiry" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;box-sizing:border-box;">
-        </div>
-        <div>
-          <label style="font-size:0.73rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">🔵 Gas Safety (GSC) Expiry</label>
-          <input type="date" id="editPropGscExpiry" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;box-sizing:border-box;">
-        </div>
-        <div>
-          <label style="font-size:0.73rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">🟡 Electrical Safety (ESC) Expiry</label>
-          <input type="date" id="editPropEscExpiry" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;box-sizing:border-box;">
-        </div>
-      </div>
-    </div>
-
     <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
       <button onclick="closeEditPropModal()" style="padding:9px 20px;border:1px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;">Cancel</button>
       <button onclick="saveEditProp()" style="padding:9px 24px;background:var(--navy);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;">Save Changes</button>
@@ -5923,163 +5898,116 @@ function seedDemo() {}
   </div>
 </div>
 
+<!-- Property Summary Modal -->
+<div id="propSummaryModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9200;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:18px;width:100%;max-width:680px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.25);">
+    <!-- Header -->
+    <div style="background:var(--navy);color:#fff;border-radius:18px 18px 0 0;padding:22px 26px;display:flex;align-items:flex-start;justify-content:space-between;">
+      <div>
+        <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;opacity:0.6;margin-bottom:6px;">Property Summary</div>
+        <div style="font-size:1.1rem;font-weight:800;line-height:1.3;" id="psmAddress">—</div>
+      </div>
+      <button onclick="closePropSummary()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:1.1rem;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:16px;">✕</button>
+    </div>
+    <div style="padding:22px 26px;display:flex;flex-direction:column;gap:16px;">
+
+      <!-- Compliance card -->
+      <div id="psmCompliance" style="border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+        <div style="background:var(--warm);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="showPage('portal')">
+          <div>
+            <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);">📋 Compliance</div>
+            <div id="psmComplianceStatus" style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-top:3px;">—</div>
+          </div>
+          <div style="font-size:0.75rem;color:var(--muted);">View certificates in vault →</div>
+        </div>
+        <div id="psmComplianceDocs" style="padding:12px 16px;font-size:0.8rem;color:var(--muted);"></div>
+      </div>
+
+      <!-- Work Orders card -->
+      <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+        <div style="background:var(--warm);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" id="psmWOHeader">
+          <div>
+            <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);">🔧 Work Orders</div>
+            <div id="psmWOStatus" style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-top:3px;">—</div>
+          </div>
+          <div style="font-size:0.75rem;color:var(--muted);">View all work orders →</div>
+        </div>
+        <div id="psmWOList" style="padding:12px 16px;font-size:0.8rem;"></div>
+      </div>
+
+      <!-- Tenant Requests card -->
+      <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+        <div style="background:var(--warm);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" id="psmTRHeader">
+          <div>
+            <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);">🏡 Tenant Requests</div>
+            <div id="psmTRStatus" style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-top:3px;">—</div>
+          </div>
+          <div style="font-size:0.75rem;color:var(--muted);">View all requests →</div>
+        </div>
+        <div id="psmTRList" style="padding:12px 16px;font-size:0.8rem;"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <script>
-// ─── Edit Tenant Modal ────────────────────────────────────────────────────────
-function openEditTenantModal(idOrEmail) {
-  const tenants = getLocalTenants();
-  const t = tenants.find(x => (x.id||x.email) === idOrEmail || x.email === idOrEmail);
-  if (!t) return;
-  document.getElementById('editTenantId').value       = t.id || t.email;
-  document.getElementById('editTenantFirst').value    = t.firstName || '';
-  document.getElementById('editTenantLast').value     = t.lastName  || '';
-  document.getElementById('editTenantEmail').value    = t.email     || '';
-  document.getElementById('editTenantPhone').value    = t.phone     || '';
-  document.getElementById('editTenantProperty').value = t.property  || '';
-  document.getElementById('editTenantPassword').value = '';
-  const errEl = document.getElementById('editTenantError');
-  if (errEl) errEl.style.display = 'none';
-  document.getElementById('editTenantModal').style.display = 'flex';
-}
-
-function closeEditTenant() {
-  document.getElementById('editTenantModal').style.display = 'none';
-}
-
-function saveEditTenant() {
-  const idOrEmail = document.getElementById('editTenantId').value;
-  const firstName = (document.getElementById('editTenantFirst').value||'').trim();
-  const lastName  = (document.getElementById('editTenantLast').value||'').trim();
-  const email     = (document.getElementById('editTenantEmail').value||'').trim();
-  const phone     = (document.getElementById('editTenantPhone').value||'').trim();
-  const property  = (document.getElementById('editTenantProperty').value||'').trim();
-  const errEl = document.getElementById('editTenantError');
-  if (!firstName || !email) {
-    if (errEl) { errEl.textContent = 'First name and email are required.'; errEl.style.display = ''; }
-    return;
-  }
-  const tenants = getLocalTenants();
-  const idx = tenants.findIndex(x => (x.id||x.email) === idOrEmail || x.email === idOrEmail);
-  if (idx !== -1) {
-    tenants[idx] = { ...tenants[idx], firstName, lastName, email, phone, property, updatedAt: new Date().toISOString() };
-    saveLocalTenants(tenants);
-    // Also update cachedTenants
-    if (typeof cachedTenants !== 'undefined') {
-      const cidx = cachedTenants.findIndex(x => (x.id||x.email) === idOrEmail || x.email === idOrEmail);
-      if (cidx !== -1) cachedTenants[cidx] = { ...cachedTenants[cidx], firstName, lastName, email, phone, property };
-    }
-  }
-  closeEditTenant();
-  renderTenantsList();
-  if (typeof showToast === 'function') showToast('Tenant updated', 'ok');
-}
-
-// ─── Compliance Expiry: load/save in openEditPropModal / saveEditProp ─────────
-const _origOpenEditPropModal = window.openEditPropModal;
-window.openEditPropModal = function(propId) {
-  _origOpenEditPropModal && _origOpenEditPropModal(propId);
+// ─── Property Summary Modal ───────────────────────────────────────────────────
+function openPropertySummary(propId) {
   const props = getManagedProps();
   const p = props.find(x => (x.id||x.address).replace(/'/g,"&#39;") === propId || (x.id||x.address) === propId);
-  if (p) {
-    document.getElementById('editPropSmokeExpiry').value = p.smokeExpiry || '';
-    document.getElementById('editPropGscExpiry').value   = p.gscExpiry   || '';
-    document.getElementById('editPropEscExpiry').value   = p.escExpiry   || '';
-  }
-};
+  if (!p) return;
+  openPropertySummaryByAddr(p.address);
+}
 
-const _origSaveEditProp = window.saveEditProp;
-window.saveEditProp = function() {
-  const propId = document.getElementById('editPropId').value;
+function openPropertySummaryByAddr(address) {
+  const dec = address.replace(/&#39;/g,"'");
+
+  // Clean address for display
+  const cleanParts = dec.split(',').map(x=>x.trim()).filter(Boolean)
+    .filter(x => x !== 'Australia' && !/^(City|Shire|Municipality|Borough) of /i.test(x));
+  document.getElementById('psmAddress').textContent = cleanParts.join(', ') || dec;
+
+  // Compliance
   const props  = getManagedProps();
-  const idx    = props.findIndex(x => (x.id||x.address) === propId);
-  if (idx !== -1) {
-    props[idx].smokeExpiry = document.getElementById('editPropSmokeExpiry').value || '';
-    props[idx].gscExpiry   = document.getElementById('editPropGscExpiry').value   || '';
-    props[idx].escExpiry   = document.getElementById('editPropEscExpiry').value   || '';
-    saveManagedProps(props);
-  }
-  _origSaveEditProp && _origSaveEditProp();
-  // Check for upcoming expiries after save
-  checkComplianceExpiries();
-};
+  const prop   = props.find(p => p.address && p.address.toLowerCase() === dec.toLowerCase());
+  const vault  = S.get(KEY_VAULT, []);
+  const propDocs = vault.filter(d => d.property && d.property.toLowerCase() === dec.toLowerCase());
+  const lastInsp = prop?.lastInspectionScore != null
+    ? `${prop.lastInspectionScore}% — ${prop.lastInspectionGrade || ''} (${prop.lastInspectionDate ? new Date(prop.lastInspectionDate).toLocaleDateString('en-AU') : ''})`
+    : 'No inspection recorded';
+  document.getElementById('psmComplianceStatus').textContent = lastInsp;
+  document.getElementById('psmComplianceDocs').innerHTML = propDocs.length
+    ? propDocs.slice(0,4).map(d => `<div style="padding:4px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;"><span>${d.name}</span><span style="color:var(--muted);">${new Date(d.uploadedAt).toLocaleDateString('en-AU')}</span></div>`).join('')
+    : '<div style="color:var(--muted);font-style:italic;">No vault documents for this property.</div>';
 
-// ─── Compliance Expiry Alerts ─────────────────────────────────────────────────
-function checkComplianceExpiries() {
-  const props = getManagedProps();
-  const now   = new Date();
-  const soon  = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days
-  const alerts = [];
-  props.forEach(p => {
-    [['smokeExpiry','Smoke Alarm','🔴'],['gscExpiry','Gas Safety (GSC)','🔵'],['escExpiry','Electrical Safety (ESC)','🟡']].forEach(([key, label, icon]) => {
-      if (!p[key]) return;
-      const exp = new Date(p[key]);
-      if (exp <= soon && exp >= now) {
-        const days = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
-        alerts.push({ prop: p.address, label, icon, days, expStr: exp.toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'}),
-          owner: p.owner, ownerEmail: p.ownerEmail, tenant: p.tenant, tenantEmail: p.tenantEmail });
-      }
-    });
-  });
-  if (alerts.length) showComplianceExpiryAlert(alerts);
+  // Work Orders
+  const wos = getWOs().filter(w => w.property && w.property.toLowerCase() === dec.toLowerCase());
+  const ncWOs = wos.filter(w => w.status !== 'completed' && w.status !== 'cancelled');
+  document.getElementById('psmWOStatus').textContent = `${ncWOs.length} open · ${wos.filter(w=>w.status==='completed').length} completed`;
+  document.getElementById('psmWOList').innerHTML = wos.slice(0,4).map(w =>
+    `<div style="padding:5px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+      <span style="font-size:0.7rem;padding:2px 8px;border-radius:5px;font-weight:700;background:${w.status==='completed'?'#dcfce7':w.status==='inprogress'?'#fef3c7':'#fee2e2'};color:${w.status==='completed'?'#16a34a':w.status==='inprogress'?'#d97706':'#dc2626'};">${w.status}</span>
+      <span style="flex:1;">${w.issue||w.category||'—'}</span>
+    </div>`).join('') || '<div style="color:var(--muted);font-style:italic;">No work orders for this property.</div>';
+  document.getElementById('psmWOHeader').onclick = () => { closePropSummary(); filterWOsByProp(dec); };
+
+  // Tenant Requests
+  const reqs = S.get(KEY_TREQS, []).filter(r => r.property && r.property.toLowerCase() === dec.toLowerCase());
+  document.getElementById('psmTRStatus').textContent = `${reqs.filter(r=>r.status==='submitted').length} new · ${reqs.length} total`;
+  document.getElementById('psmTRList').innerHTML = reqs.slice(0,4).map(r =>
+    `<div style="padding:5px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+      <span style="font-size:0.7rem;padding:2px 8px;border-radius:5px;font-weight:700;background:${r.priority==='emergency'?'#fee2e2':r.priority==='urgent'?'#fef3c7':'#dcfce7'};color:${r.priority==='emergency'?'#dc2626':r.priority==='urgent'?'#d97706':'#16a34a'};">${(r.priority||'routine').toUpperCase()}</span>
+      <span style="flex:1;">${(r.description||'').substring(0,60)}${(r.description||'').length>60?'…':''}</span>
+    </div>`).join('') || '<div style="color:var(--muted);font-style:italic;">No tenant requests for this property.</div>';
+  document.getElementById('psmTRHeader').onclick = () => { closePropSummary(); showPage('tenantreqs'); };
+
+  document.getElementById('propSummaryModal').style.display = 'flex';
 }
 
-function showComplianceExpiryAlert(alerts) {
-  const existing = document.getElementById('complianceExpiryAlert');
-  if (existing) existing.remove();
-  const div = document.createElement('div');
-  div.id = 'complianceExpiryAlert';
-  div.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;background:#fff;border:2px solid #d97706;border-radius:14px;padding:20px 24px;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,0.18);';
-  div.innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-      <span style="font-size:1.5rem;">⚠️</span>
-      <div style="font-weight:700;color:#92400e;font-size:0.95rem;">Compliance Expiry Alert</div>
-      <button onclick="this.closest('#complianceExpiryAlert').remove()" style="margin-left:auto;background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);">✕</button>
-    </div>
-    ${alerts.map(a => `
-      <div style="background:#fffbeb;border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:0.82rem;">
-        <div style="font-weight:700;color:var(--navy);">${a.icon} ${a.label} — ${a.prop}</div>
-        <div style="color:#92400e;margin-top:2px;">Expires ${a.expStr} (${a.days} day${a.days!==1?'s':''})</div>
-        ${a.ownerEmail || a.tenantEmail ? `<button onclick="sendComplianceEmail(${JSON.stringify(a).replace(/"/g,'&quot;')})" style="margin-top:8px;padding:5px 14px;background:#d97706;color:#fff;border:none;border-radius:6px;font-size:0.75rem;cursor:pointer;font-family:inherit;">📧 Send Alert Email</button>` : ''}
-      </div>`).join('')}
-  `;
-  document.body.appendChild(div);
+function closePropSummary() {
+  document.getElementById('propSummaryModal').style.display = 'none';
 }
-
-function sendComplianceEmail(alert) {
-  const subject = encodeURIComponent(`${alert.label} Compliance Due — ${alert.prop}`);
-  const body = encodeURIComponent(
-    `Dear ${alert.owner || 'Owner'},\n\nThis is a reminder that the ${alert.label} compliance certificate for the property at ${alert.prop} is due for renewal on ${alert.expStr}.\n\nOur trades team will be in contact with the tenant (${alert.tenant || 'the occupant'}) to arrange a suitable time to attend.\n\nPlease do not hesitate to contact us if you have any questions.\n\nKind regards,\nProperty Management Team`
-  );
-  const emails = [alert.ownerEmail, alert.tenantEmail].filter(Boolean).join(',');
-  window.open(`mailto:${emails}?subject=${subject}&body=${body}`);
-}
-
-// ─── Vault property filter ────────────────────────────────────────────────────
-const _origRenderVault = window.renderVault;
-window.renderVault = function() {
-  // Populate property dropdown
-  const propSel = document.getElementById('vaultPropFilter');
-  if (propSel) {
-    const docs = typeof getVaultDocs === 'function' ? getVaultDocs() : [];
-    const props = [...new Set(docs.map(d => d.property).filter(Boolean))].sort();
-    const cur = propSel.value;
-    propSel.innerHTML = '<option value="all">All properties</option>' +
-      props.map(p => `<option value="${p}" ${p===cur?'selected':''}>${p}</option>`).join('');
-  }
-  // Apply property filter before calling original
-  const propFilter = propSel?.value || 'all';
-  if (propFilter !== 'all' && typeof getVaultDocs === 'function') {
-    // Temporarily override to filter
-    const origGet = window.getVaultDocs;
-    window.getVaultDocs = () => origGet().filter(d => d.property === propFilter);
-    _origRenderVault && _origRenderVault();
-    window.getVaultDocs = origGet;
-  } else {
-    _origRenderVault && _origRenderVault();
-  }
-};
-
-// Check expiries on page load
-document.addEventListener('DOMContentLoaded', () => setTimeout(checkComplianceExpiries, 1500));
 </script>
 
 </body>
