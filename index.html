@@ -3615,8 +3615,7 @@ function renderProperties() {
             onmouseout="this.style.background='${rowBg}'">
 
             <td style="padding:13px 16px;vertical-align:middle;">
-              <div style="font-weight:700;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${line1}</div>
-              ${line2 ? `<div style="font-size:0.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${line2}</div>` : ''}
+              <div style="font-weight:800;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;text-decoration:underline;text-underline-offset:3px;" onclick="showPage('properties')">${line1}${line2 ? ', '+line2 : ''}</div>
             </td>
 
             <td style="padding:13px 16px;vertical-align:middle;">
@@ -5710,15 +5709,17 @@ function renderManagedProps() {
     props.map(p => {
       const propId = (p.id || p.address).replace(/'/g,"&#39;");
       const gradeColor = p.lastInspectionColor || '#6b7280';
-      const parts = (p.address||'').split(',');
-      const line1 = parts[0] || '—';
-      const line2 = parts.slice(1).join(',').trim();
+      const rawParts = (p.address||'').split(',').map(x=>x.trim()).filter(Boolean)
+        .filter(x => x !== 'Australia' && !/^(City|Shire|Municipality|Borough) of /i.test(x));
+      const line1 = rawParts[0] || '—';
+      const line2 = rawParts.slice(1).join(', ').trim();
       const cardId = 'propcard_' + (p.id||p.address).replace(/[^a-zA-Z0-9]/g,'_');
+      const safeAddrClick = (p.address||'').replace(/'/g,"&#39;");
       return `<div id="${cardId}" style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;flex-direction:column;gap:12px;">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
-          <div style="flex:1;min-width:0;">
-            <div style="font-weight:700;font-size:0.95rem;color:var(--navy);line-height:1.3;">🏠 ${line1}</div>
-            ${line2 ? `<div style="font-size:0.76rem;color:var(--muted);margin-top:2px;">${line2}</div>` : ''}
+          <div style="flex:1;min-width:0;cursor:pointer;" onclick="showPage('properties')">
+            <div style="font-weight:800;font-size:0.97rem;color:var(--navy);line-height:1.3;text-decoration:underline;text-underline-offset:3px;">🏠 ${line1}${line2 ? ', '+line2 : ''}</div>
+            <div style="font-size:0.7rem;color:var(--muted);margin-top:2px;">Click to view property →</div>
           </div>
           ${p.lastInspectionScore ? `<span style="background:${gradeColor};color:#fff;border-radius:6px;padding:3px 9px;font-size:0.7rem;font-weight:700;white-space:nowrap;flex-shrink:0;">${p.lastInspectionScore}% · ${p.lastInspectionGrade||''}</span>` : ''}
         </div>
@@ -5874,11 +5875,16 @@ function renderTenantsList() {
           ${t.email ? `<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--muted);">✉</span><a href="mailto:${t.email}" style="color:var(--navy);text-decoration:none;">${t.email}</a></div>` : ''}
           ${t.phone ? `<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--muted);">📞</span><a href="tel:${t.phone}" style="color:var(--navy);text-decoration:none;">${t.phone}</a></div>` : ''}
         </div>
-        ${t.property ? `<div style="background:var(--warm);border-radius:9px;padding:10px 12px;cursor:pointer;" onclick="goToProperty('${(t.property||'').replace(/'/g,"&#39;")}')">
-          <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px;">🏠 Property</div>
-          <div style="font-size:0.82rem;font-weight:600;color:var(--navy);">${t.property}</div>
-          ${score ? `<span style="background:${gradeColor};color:#fff;border-radius:5px;padding:2px 8px;font-size:0.7rem;font-weight:600;display:inline-block;margin-top:5px;">${score}% · ${grade}</span>` : '<div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">Click to view property →</div>'}
-        </div>` : '<div style="font-size:0.78rem;color:var(--muted);font-style:italic;">No property assigned</div>'}
+        ${t.property ? (() => {
+          const tpParts = (t.property||'').split(',').map(x=>x.trim()).filter(Boolean)
+            .filter(x => x !== 'Australia' && !/^(City|Shire|Municipality|Borough) of /i.test(x));
+          const tpFull = tpParts.join(', ');
+          return `<div style="background:var(--warm);border-radius:9px;padding:10px 12px;cursor:pointer;" onclick="showPage('properties')">
+            <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px;">🏠 Property</div>
+            <div style="font-size:0.85rem;font-weight:800;color:var(--navy);text-decoration:underline;text-underline-offset:3px;">${tpFull}</div>
+            ${score ? `<span style="background:${gradeColor};color:#fff;border-radius:5px;padding:2px 8px;font-size:0.7rem;font-weight:600;display:inline-block;margin-top:5px;">${score}% · ${grade}</span>` : '<div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">Click to view property →</div>'}
+          </div>`;
+        })() : '<div style="font-size:0.78rem;color:var(--muted);font-style:italic;">No property assigned</div>'}
       </div>`;
     }).join('') + '</div>';
 }
