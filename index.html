@@ -1815,19 +1815,17 @@ window.addEventListener('DOMContentLoaded', function() {
         </div>
 
         <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;">
-          <div class="kpi-card kpi-red"><div class="kpi-label">Non-Compliant</div><div class="kpi-value" id="pNC">0</div><div class="kpi-sub">Open issues</div><div class="kpi-icon">⚠️</div></div>
-          <div class="kpi-card kpi-amber"><div class="kpi-label">In Progress</div><div class="kpi-value" id="pIP">0</div><div class="kpi-sub">Work orders active</div><div class="kpi-icon">🔨</div></div>
-          <div class="kpi-card" style="border:1px solid #93c5fd;border-left:4px solid #2563eb;background:#fff;border-radius:12px;"><div class="kpi-label" style="color:#2563eb;">Resolved</div><div class="kpi-value" id="pOK" style="color:#2563eb;">0</div><div class="kpi-sub" style="color:#2563eb;">Work orders done</div><div class="kpi-icon">🔵</div></div>
-          <div class="kpi-card" style="border:1px solid #86efac;border-left:4px solid #16a34a;background:#fff;border-radius:12px;"><div class="kpi-label" style="color:#16a34a;">Compliant</div><div class="kpi-value" id="pCompliant" style="color:#16a34a;">0</div><div class="kpi-sub" style="color:#16a34a;">Inspection reports</div><div class="kpi-icon">📋</div></div>
-          <div style="display:none"><span id="pTotal"></span></div>
+          <div class="kpi-card kpi-red"><div class="kpi-label">Non-Compliant</div><div class="kpi-value" id="pNC">0</div><div class="kpi-icon">⚠️</div></div>
+          <div class="kpi-card kpi-amber"><div class="kpi-label">In Progress</div><div class="kpi-value" id="pIP">0</div><div class="kpi-icon">🔨</div></div>
+          <div class="kpi-card kpi-green"><div class="kpi-label">Resolved</div><div class="kpi-value" id="pOK">0</div><div class="kpi-icon">✅</div></div>
+          <div class="kpi-card kpi-slate"><div class="kpi-label">Total Issues</div><div class="kpi-value" id="pTotal">0</div><div class="kpi-icon">📋</div></div>
         </div>
 
         <div class="filter-row" id="portalFilterRow">
           <div class="filter-pill fp-all active" onclick="setPortalFilter('all')">All Issues</div>
           <div class="filter-pill fp-nc" onclick="setPortalFilter('nc')">Non-Compliant</div>
           <div class="filter-pill fp-ip" onclick="setPortalFilter('ip')">In Progress</div>
-          <div class="filter-pill fp-ok" onclick="setPortalFilter('ok')" style="color:#2563eb;border-color:#93c5fd;">Resolved</div>
-          <div class="filter-pill" id="fpCompliant" onclick="setPortalFilter('compliant')" style="color:#16a34a;border-color:#86efac;">✅ Compliant</div>
+          <div class="filter-pill fp-ok" onclick="setPortalFilter('ok')">Resolved</div>
         </div>
 
         <div id="portalContent"></div>
@@ -1875,7 +1873,7 @@ window.addEventListener('DOMContentLoaded', function() {
             </div>
             <div>
               <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Inspection Date</label>
-              <input type="date" id="clDate" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;" oninput="saveChecklistMeta();updateFinaliseDate()">
+              <input type="date" id="clDate" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;" oninput="saveChecklistMeta()">
             </div>
             <div>
               <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Owner Name</label>
@@ -1911,44 +1909,7 @@ window.addEventListener('DOMContentLoaded', function() {
         <!-- Category Accordions -->
         <div id="clCategories" style="margin-top:16px;"></div>
 
-        <!-- Finalise Section -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px;">
-
-          <!-- Box 1: Compliant Report -->
-          <div style="background:#fff;border:2px solid #16a34a;border-radius:14px;padding:22px 24px;">
-            <div style="font-size:0.9rem;font-weight:700;color:#16a34a;margin-bottom:6px;">✅ Save Compliant Report</div>
-            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:14px;">Property address, owner name, inspector and date must be completed above before finalising.</div>
-            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:14px;">
-              <input type="checkbox" id="clFinaliseConfirm" style="margin-top:3px;width:15px;height:15px;flex-shrink:0;accent-color:#16a34a;">
-              <span style="font-size:0.8rem;color:var(--text);line-height:1.6;">
-                I confirm this report is <strong>true and correct</strong> as at <span id="clFinaliseDate" style="font-weight:700;color:var(--navy);">—</span>,
-                completed in accordance with the <em>Residential Tenancies Act 1997</em> (Victoria).
-              </span>
-            </label>
-            <button class="btn" onclick="finaliseChecklist('compliant')" style="width:100%;padding:10px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">
-              ✅ Finalise &amp; Save Compliant Report
-            </button>
-          </div>
-
-          <!-- Box 2: Non-Compliant Report -->
-          <div style="background:#fff;border:2px solid #dc2626;border-radius:14px;padding:22px 24px;">
-            <div style="font-size:0.9rem;font-weight:700;color:#dc2626;margin-bottom:6px;">⚠️ Save Non-Compliant Report</div>
-            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:14px;">Use this when one or more items have failed. The report will be pushed to the Properties tab and Owner Portal with a Non-Compliant status.</div>
-            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:14px;">
-              <input type="checkbox" id="clNonCompliantConfirm" style="margin-top:3px;width:15px;height:15px;flex-shrink:0;accent-color:#dc2626;">
-              <span style="font-size:0.8rem;color:var(--text);line-height:1.6;">
-                I confirm this report is <strong>true and correct</strong> as at <span id="clFinaliseDate2" style="font-weight:700;color:var(--navy);">—</span>,
-                completed in accordance with the <em>Residential Tenancies Act 1997</em> (Victoria).
-              </span>
-            </label>
-            <button class="btn" onclick="finaliseChecklist('noncompliant')" style="width:100%;padding:10px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">
-              ⚠️ Finalise &amp; Save Non-Compliant Report
-            </button>
-          </div>
-
-        </div>
-
-        <div class="disclaimer" style="margin-top:16px;">
+        <div class="disclaimer">
           This checklist is a general guide based on Victoria's rental minimum standards under the <em>Residential Tenancies Act 1997</em> (effective 29 March 2021). Not legal advice. Visit Consumer Affairs Victoria for official guidance.
         </div>
       </div>
@@ -2206,7 +2167,7 @@ window.addEventListener('DOMContentLoaded', function() {
         <!-- Property List FIRST -->
         <div class="panel" style="margin-bottom:20px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Managed Properties — A to Z</div>
+            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);"></div>
             <div style="display:flex;gap:8px;">
               <input type="text" id="propSearch" placeholder="🔍 Search address or owner…" oninput="renderManagedProps()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'DM Sans',sans-serif;font-size:0.8rem;width:220px;">
               <button class="btn btn-primary" onclick="togglePropForm()" style="font-size:0.75rem;padding:5px 14px;">+ Add Property</button>
@@ -3425,11 +3386,7 @@ function renderPortal() {
   document.getElementById('pNC').textContent = nc;
   document.getElementById('pIP').textContent = ip;
   document.getElementById('pOK').textContent = ok;
-  if (document.getElementById('pTotal')) document.getElementById('pTotal').textContent = total;
-  // Count compliant inspection reports from vault
-  const vaultDocs = S.get(KEY_VAULT, []);
-  const compliantCount = vaultDocs.filter(d => d.type === 'inspection' && d.result !== 'noncompliant').length;
-  if (document.getElementById('pCompliant')) document.getElementById('pCompliant').textContent = compliantCount;
+  document.getElementById('pTotal').textContent = total;
 
   let filtered = withStatus;
   if (portalFilter === 'nc') filtered = withStatus.filter(i => i.es === 'nc');
@@ -3615,7 +3572,7 @@ function renderProperties() {
             onmouseout="this.style.background='${rowBg}'">
 
             <td style="padding:13px 16px;vertical-align:middle;">
-              <div style="font-weight:800;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;text-decoration:underline;text-underline-offset:3px;" onclick="showPage('properties')">${line1}${line2 ? ', '+line2 : ''}</div>
+              <div style="font-weight:800;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;text-decoration:underline;text-underline-offset:3px;" onclick="openPropertySummaryByAddr('${prop}')">${line1}${line2?', '+line2:''}</div>
             </td>
 
             <td style="padding:13px 16px;vertical-align:middle;">
@@ -5709,19 +5666,17 @@ function renderManagedProps() {
     props.map(p => {
       const propId = (p.id || p.address).replace(/'/g,"&#39;");
       const gradeColor = p.lastInspectionColor || '#6b7280';
-      const rawParts = (p.address||'').split(',').map(x=>x.trim()).filter(Boolean)
-        .filter(x => x !== 'Australia' && !/^(City|Shire|Municipality|Borough) of /i.test(x));
-      const line1 = rawParts[0] || '—';
-      const line2 = rawParts.slice(1).join(', ').trim();
+      const parts = (p.address||'').split(',');
+      const line1 = parts[0] || '—';
+      const line2 = parts.slice(1).join(',').trim();
       const cardId = 'propcard_' + (p.id||p.address).replace(/[^a-zA-Z0-9]/g,'_');
-      const safeAddrClick = (p.address||'').replace(/'/g,"&#39;");
+      const cleanParts = (p.address||'').split(',').map(x=>x.trim()).filter(Boolean)
+        .filter(x => x !== 'Australia' && !/^(City|Shire|Municipality|Borough) of /i.test(x));
+      const fullAddr = cleanParts.join(', ') || '—';
       return `<div id="${cardId}" style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;flex-direction:column;gap:12px;">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
-          <div style="flex:1;min-width:0;cursor:pointer;" onclick="showPage('properties')">
-            <div style="font-weight:800;font-size:0.97rem;color:var(--navy);line-height:1.3;text-decoration:underline;text-underline-offset:3px;">🏠 ${line1}${line2 ? ', '+line2 : ''}</div>
-            <div style="font-size:0.7rem;color:var(--muted);margin-top:2px;">Click to view property →</div>
-          </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           ${p.lastInspectionScore ? `<span style="background:${gradeColor};color:#fff;border-radius:6px;padding:3px 9px;font-size:0.7rem;font-weight:700;white-space:nowrap;flex-shrink:0;">${p.lastInspectionScore}% · ${p.lastInspectionGrade||''}</span>` : ''}
+          <div style="font-weight:800;font-size:0.95rem;color:var(--navy);line-height:1.3;cursor:pointer;text-decoration:underline;text-underline-offset:3px;" onclick="openPropertySummary('${propId}')">${fullAddr}</div>
         </div>
         <div style="background:var(--warm);border-radius:9px;padding:10px 12px;">
           <div style="font-size:0.67rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px;">👤 Owner</div>
@@ -5875,16 +5830,11 @@ function renderTenantsList() {
           ${t.email ? `<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--muted);">✉</span><a href="mailto:${t.email}" style="color:var(--navy);text-decoration:none;">${t.email}</a></div>` : ''}
           ${t.phone ? `<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--muted);">📞</span><a href="tel:${t.phone}" style="color:var(--navy);text-decoration:none;">${t.phone}</a></div>` : ''}
         </div>
-        ${t.property ? (() => {
-          const tpParts = (t.property||'').split(',').map(x=>x.trim()).filter(Boolean)
-            .filter(x => x !== 'Australia' && !/^(City|Shire|Municipality|Borough) of /i.test(x));
-          const tpFull = tpParts.join(', ');
-          return `<div style="background:var(--warm);border-radius:9px;padding:10px 12px;cursor:pointer;" onclick="showPage('properties')">
-            <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px;">🏠 Property</div>
-            <div style="font-size:0.85rem;font-weight:800;color:var(--navy);text-decoration:underline;text-underline-offset:3px;">${tpFull}</div>
-            ${score ? `<span style="background:${gradeColor};color:#fff;border-radius:5px;padding:2px 8px;font-size:0.7rem;font-weight:600;display:inline-block;margin-top:5px;">${score}% · ${grade}</span>` : '<div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">Click to view property →</div>'}
-          </div>`;
-        })() : '<div style="font-size:0.78rem;color:var(--muted);font-style:italic;">No property assigned</div>'}
+        ${t.property ? `<div style="background:var(--warm);border-radius:9px;padding:10px 12px;cursor:pointer;" onclick="goToProperty('${(t.property||'').replace(/'/g,"&#39;")}')">
+          <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px;">🏠 Property</div>
+          <div style="font-size:0.82rem;font-weight:600;color:var(--navy);">${t.property}</div>
+          ${score ? `<span style="background:${gradeColor};color:#fff;border-radius:5px;padding:2px 8px;font-size:0.7rem;font-weight:600;display:inline-block;margin-top:5px;">${score}% · ${grade}</span>` : '<div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">Click to view property →</div>'}
+        </div>` : '<div style="font-size:0.78rem;color:var(--muted);font-style:italic;">No property assigned</div>'}
       </div>`;
     }).join('') + '</div>';
 }
@@ -5949,162 +5899,145 @@ function seedDemo() {}
   </div>
 </div>
 
-<!-- Finalise — Save to Vault Popup -->
-<div id="vaultPopupModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9500;align-items:center;justify-content:center;padding:20px;">
-  <div style="background:#fff;border-radius:18px;padding:32px;width:100%;max-width:500px;box-shadow:0 24px 64px rgba(0,0,0,0.3);text-align:center;">
-    <div id="vaultPopupIcon" style="font-size:3rem;margin-bottom:12px;">✅</div>
-    <div style="font-size:1.15rem;font-weight:800;color:var(--navy);margin-bottom:8px;" id="vaultPopupTitle">Report Finalised</div>
-    <div style="font-size:0.85rem;color:var(--muted);margin-bottom:20px;line-height:1.7;">
-      <strong id="vaultPopupProp" style="color:var(--navy);display:block;"></strong>
-      Owner: <strong id="vaultPopupOwner"></strong><br>
-      Inspector: <strong id="vaultPopupInspector"></strong><br>
-      Date: <strong id="vaultPopupDate"></strong><br>
-      Result: <strong id="vaultPopupScore"></strong>
+<!-- Property Summary Modal -->
+<div id="propSummaryModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9200;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closePropSummary()">
+  <div style="background:#fff;border-radius:18px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.25);">
+    <!-- Header -->
+    <div style="background:var(--navy);border-radius:18px 18px 0 0;padding:22px 26px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+      <div>
+        <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:rgba(255,255,255,0.55);margin-bottom:4px;">Property Summary</div>
+        <div id="psmAddress" style="font-size:1rem;font-weight:800;color:#fff;line-height:1.4;"></div>
+      </div>
+      <button onclick="closePropSummary()" style="background:rgba(255,255,255,0.12);border:none;border-radius:8px;width:32px;height:32px;font-size:1rem;cursor:pointer;color:#fff;flex-shrink:0;">✕</button>
     </div>
-    <div id="vaultPopupMsg" style="background:var(--warm);border-radius:10px;padding:14px 18px;margin-bottom:22px;font-size:0.83rem;color:var(--text);line-height:1.7;text-align:left;"></div>
-    <div style="display:flex;gap:10px;justify-content:center;">
-      <button onclick="dismissVaultPopup()" style="padding:10px 22px;border:1px solid var(--border);border-radius:9px;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;">Not now</button>
-      <button id="vaultSaveBtn" onclick="saveToVaultAndReset()" style="padding:10px 28px;background:var(--navy);color:#fff;border:none;border-radius:9px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:700;">📁 Save to Vault &amp; Download</button>
+
+    <div style="padding:22px 26px;display:flex;flex-direction:column;gap:16px;">
+
+      <!-- Compliance -->
+      <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--warm);cursor:pointer;" onclick="closePropSummaryAndGo('vault')">
+          <div>
+            <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);">Compliance</div>
+            <div id="psmCompliance" style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-top:3px;">—</div>
+            <div id="psmComplianceSub" style="font-size:0.75rem;color:var(--muted);margin-top:2px;"></div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:0.72rem;color:var(--muted);">View certificates →</div>
+            <div style="font-size:0.68rem;color:var(--muted);margin-top:2px;">Document Vault</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Work Orders -->
+      <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;" onclick="closePropSummaryAndGo('workorders')">
+          <div>
+            <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);">Work Orders</div>
+            <div id="psmWO" style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-top:3px;">—</div>
+            <div id="psmWOSub" style="font-size:0.75rem;color:var(--muted);margin-top:2px;"></div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:0.72rem;color:var(--muted);">View work orders →</div>
+            <div style="font-size:0.68rem;color:var(--muted);margin-top:2px;">Work Orders page</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tenant Requests -->
+      <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;" onclick="closePropSummaryAndGo('tenantreqs')">
+          <div>
+            <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);">Tenant Requests</div>
+            <div id="psmTR" style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-top:3px;">—</div>
+            <div id="psmTRSub" style="font-size:0.75rem;color:var(--muted);margin-top:2px;"></div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:0.72rem;color:var(--muted);">View requests →</div>
+            <div style="font-size:0.68rem;color:var(--muted);margin-top:2px;">Tenant Requests page</div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
 
 <script>
-// ─── Update date in finalise confirmation text ────────────────────────────────
-function updateFinaliseDate() {
-  const val = document.getElementById('clDate')?.value;
-  const str = val ? new Date(val).toLocaleDateString('en-AU', {day:'2-digit', month:'long', year:'numeric'}) : '—';
-  const el1 = document.getElementById('clFinaliseDate');
-  const el2 = document.getElementById('clFinaliseDate2');
-  if (el1) el1.textContent = str;
-  if (el2) el2.textContent = str;
-}
+let _psmProp = '';
 
-// Run on page load to show today's date
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(updateFinaliseDate, 500);
-});
-
-// ─── Validate mandatory fields ────────────────────────────────────────────────
-function checklistMandatory() {
-  const prop     = (document.getElementById('clPropAddress')?.value || '').trim();
-  const owner    = (document.getElementById('clOwnerName')?.value || '').trim();
-  const date     = (document.getElementById('clDate')?.value || '').trim();
-  const inspector= (document.getElementById('clInspector')?.value || '').trim();
-  const missing  = [];
-  if (!prop)      missing.push('Property Address');
-  if (!owner)     missing.push('Owner Name');
-  if (!date)      missing.push('Inspection Date');
-  if (!inspector) missing.push('Report Completed By (Inspector)');
-  return missing;
-}
-
-// ─── Finalise Checklist ───────────────────────────────────────────────────────
-function finaliseChecklist(type) {
-  const isNC     = type === 'noncompliant';
-  const confirmId= isNC ? 'clNonCompliantConfirm' : 'clFinaliseConfirm';
-  const confirmed= document.getElementById(confirmId)?.checked;
-
-  if (!confirmed) {
-    alert('Please tick the confirmation box before finalising.');
-    return;
-  }
-
-  // Validate mandatory fields
-  const missing = checklistMandatory();
-  if (missing.length) {
-    alert('Please complete the following fields before finalising:\n\n• ' + missing.join('\n• '));
-    return;
-  }
-
-  const prop     = document.getElementById('clPropAddress').value.trim();
-  const owner    = document.getElementById('clOwnerName').value.trim();
-  const inspector= document.getElementById('clInspector').value.trim();
-  const dateVal  = document.getElementById('clDate').value;
-  const score    = document.getElementById('clScoreVal')?.textContent || '—';
-  const grade    = document.getElementById('clScoreGrade')?.textContent || '';
-  const dateStr  = new Date(dateVal).toLocaleDateString('en-AU', {day:'2-digit', month:'long', year:'numeric'});
-  const numScore = parseInt(score) || null;
-
-  // Save inspection result to managed property
+function openPropertySummary(propId) {
   const props = getManagedProps();
-  const pidx = props.findIndex(p => p.address && p.address.toLowerCase() === prop.toLowerCase());
-  if (pidx !== -1) {
-    props[pidx].lastInspectionDate  = dateVal;
-    props[pidx].lastInspectionScore = numScore;
-    props[pidx].lastInspectionGrade = isNC ? '❌ Non-Compliant' : grade;
-    props[pidx].lastInspectionColor = isNC ? '#dc2626' : (numScore >= 80 ? '#16a34a' : numScore >= 50 ? '#d97706' : '#dc2626');
-    saveManagedProps(props);
+  const p = props.find(x => (x.id||x.address).replace(/'/g,"&#39;") === propId || (x.id||x.address) === propId);
+  if (!p) return;
+  openPropertySummaryByAddr(p.address);
+}
+
+function openPropertySummaryByAddr(address) {
+  _psmProp = address;
+  const cleanParts = (address||'').split(',').map(x=>x.trim()).filter(Boolean)
+    .filter(x => x !== 'Australia' && !/^(City|Shire|Municipality|Borough) of /i.test(x));
+  document.getElementById('psmAddress').textContent = cleanParts.join(', ') || address;
+
+  // Compliance
+  const props = getManagedProps();
+  const p = props.find(x => (x.address||'').toLowerCase() === (address||'').toLowerCase());
+  const score = p?.lastInspectionScore;
+  const grade = p?.lastInspectionGrade || '';
+  const inspDate = p?.lastInspectionDate ? new Date(p.lastInspectionDate).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'}) : null;
+  const compEl = document.getElementById('psmCompliance');
+  const compSub = document.getElementById('psmComplianceSub');
+  if (score != null) {
+    compEl.textContent = score + '% — ' + grade;
+    compEl.style.color = p.lastInspectionColor || '#16a34a';
+    compSub.textContent = inspDate ? 'Last inspection: ' + inspDate : '';
+  } else {
+    compEl.textContent = 'No inspection data';
+    compEl.style.color = '#6b7280';
+    compSub.textContent = 'Run an inspection checklist to generate a report';
   }
 
-  // Store pending vault data
-  window._pendingVault = { prop, owner, inspector, dateVal, dateStr, score, grade, isNC };
+  // Work Orders
+  const wos = getWOs().filter(w => (w.property||'').toLowerCase() === (address||'').toLowerCase());
+  const open = wos.filter(w => w.status !== 'completed' && w.status !== 'cancelled').length;
+  const done = wos.filter(w => w.status === 'completed' || w.status === 'cancelled').length;
+  document.getElementById('psmWO').textContent = wos.length + ' total';
+  document.getElementById('psmWOSub').textContent = open + ' open · ' + done + ' completed';
 
-  // Populate popup
-  document.getElementById('vaultPopupIcon').textContent      = isNC ? '⚠️' : '✅';
-  document.getElementById('vaultPopupTitle').textContent     = isNC ? 'Non-Compliant Report Finalised' : 'Compliant Report Finalised';
-  document.getElementById('vaultPopupProp').textContent      = prop;
-  document.getElementById('vaultPopupOwner').textContent     = owner;
-  document.getElementById('vaultPopupInspector').textContent = inspector;
-  document.getElementById('vaultPopupDate').textContent      = dateStr;
-  document.getElementById('vaultPopupScore').textContent     = score + (grade ? ' — ' + grade : '');
-  document.getElementById('vaultPopupScore').style.color     = isNC ? '#dc2626' : '#16a34a';
-  document.getElementById('vaultPopupMsg').innerHTML         = isNC
-    ? '⚠️ This report will be saved to the <strong>Document Vault</strong> and pushed to the <strong>Properties tab</strong> and <strong>Owner Portal</strong> with a <strong style="color:#dc2626;">Non-Compliant</strong> status.'
-    : '📁 Save this report to the <strong>Document Vault</strong>. It will appear on the <strong>Properties tab</strong> and <strong>Owner Portal</strong> marked as <strong style="color:#16a34a;">Compliant</strong>.';
+  // Tenant Requests
+  const trs = S.get(KEY_TREQS, []).filter(r => (r.property||'').toLowerCase() === (address||'').toLowerCase());
+  const newTR = trs.filter(r => r.status === 'submitted').length;
+  const inProg = trs.filter(r => r.status === 'inprogress').length;
+  document.getElementById('psmTR').textContent = trs.length + ' total';
+  document.getElementById('psmTRSub').textContent = newTR + ' new · ' + inProg + ' in progress';
 
-  document.getElementById('vaultPopupModal').style.display = 'flex';
-  if (typeof logActivity === 'function') logActivity((isNC ? '⚠️ Non-compliant' : '✅ Compliant') + ' inspection finalised: ' + prop, isNC ? '#dc2626' : '#16a34a');
+  document.getElementById('propSummaryModal').style.display = 'flex';
 }
 
-function dismissVaultPopup() {
-  document.getElementById('vaultPopupModal').style.display = 'none';
-  downloadInspectionReport();
-  setTimeout(() => resetChecklistSilent(), 500);
+function closePropSummary() {
+  document.getElementById('propSummaryModal').style.display = 'none';
 }
 
-function saveToVaultAndReset() {
-  document.getElementById('vaultPopupModal').style.display = 'none';
-  const v = window._pendingVault || {};
-  const vault = S.get(KEY_VAULT, []);
-  vault.unshift({
-    id:           'INS-' + Date.now(),
-    name:         (v.isNC ? '⚠️ Non-Compliant' : '✅ Compliant') + ' Inspection — ' + (v.prop || 'Property'),
-    type:         'inspection',
-    result:       v.isNC ? 'noncompliant' : 'compliant',
-    property:     v.prop || '',
-    owner:        v.owner || '',
-    inspector:    v.inspector || '',
-    date:         v.dateVal || new Date().toISOString().split('T')[0],
-    score:        v.score || '—',
-    grade:        v.grade || '',
-    uploadedAt:   new Date().toISOString(),
-    ownerVisible: true,
-    fileType:     'pdf'
-  });
-  S.set(KEY_VAULT, vault);
-
-  if (typeof showToast === 'function') showToast('Report saved to Document Vault', 'ok');
-  if (typeof renderVault === 'function') renderVault();
-  if (typeof renderPortal === 'function') renderPortal();
-  if (typeof renderProperties === 'function') renderProperties();
-
-  downloadInspectionReport();
-  setTimeout(() => resetChecklistSilent(), 500);
-}
-
-function resetChecklistSilent() {
-  if (typeof clStatuses !== 'undefined') { for (const k in clStatuses) delete clStatuses[k]; }
-  if (typeof clPhotos   !== 'undefined') { for (const k in clPhotos)   delete clPhotos[k];   }
-  if (typeof clInited   !== 'undefined') window.clInited = false;
-  if (typeof S          !== 'undefined') S.del(KEY_CL);
-  ['clPropAddress','clInspector','clOwnerName'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-  const dt = document.getElementById('clDate');
-  if (dt) dt.value = new Date().toISOString().split('T')[0];
-  ['clFinaliseConfirm','clNonCompliantConfirm'].forEach(id => { const cb = document.getElementById(id); if (cb) cb.checked = false; });
-  updateFinaliseDate();
-  if (typeof initChecklist === 'function') initChecklist();
-  if (typeof showToast === 'function') showToast('Checklist reset', 'ok');
+function closePropSummaryAndGo(page) {
+  closePropSummary();
+  if (page === 'vault') {
+    showPage('vault');
+  } else if (page === 'workorders') {
+    showPage('workorders');
+    setTimeout(() => {
+      const s = document.getElementById('woSearch');
+      if (s) { s.value = _psmProp; if(typeof renderWOs==='function') renderWOs(); }
+    }, 200);
+  } else if (page === 'tenantreqs') {
+    showPage('tenantreqs');
+    setTimeout(() => {
+      const s = document.getElementById('trPropFilter');
+      if (s) {
+        // Find matching option
+        Array.from(s.options).forEach(o => { if (o.value.toLowerCase() === _psmProp.toLowerCase()) s.value = o.value; });
+        if(typeof renderTenantReqs==='function') renderTenantReqs();
+      }
+    }, 200);
+  }
 }
 </script>
 
