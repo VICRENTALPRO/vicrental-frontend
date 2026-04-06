@@ -5020,7 +5020,11 @@ function openDocPreview(docId) {
 
   if (doc.isImage) {
     body.innerHTML = `<img src="${doc.dataUrl}" alt="${doc.name}" style="max-width:100%;max-height:60vh;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.15);">`;
+    dlLink.href = doc.dataUrl;
+    dlLink.download = doc.fileName;
   } else if (doc.isHtml) {
+    // Use Blob for reliable download
+    const fname = doc.fileName || 'certificate.html';
     body.innerHTML = `<div style="text-align:center;padding:28px;">
       <div style="font-size:3rem;margin-bottom:12px;">📜</div>
       <div style="font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:6px;">${escHtmlVault(doc.name)}</div>
@@ -5028,9 +5032,12 @@ function openDocPreview(docId) {
       <div style="font-size:0.82rem;color:var(--muted);margin-bottom:20px;">${doc.date ? 'Inspected: ' + new Date(doc.date).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'}) : ''}</div>
       <div style="display:flex;gap:10px;justify-content:center;">
         <button onclick="openCertInWindow('${doc.id}')" class="btn btn-primary">👁 View Certificate</button>
-        <a class="btn btn-secondary" href="${doc.dataUrl}" download="${doc.fileName||'certificate.html'}">⬇ Download</a>
+        <button onclick="downloadVaultDoc('${doc.id}')" class="btn btn-secondary">⬇ Download</button>
       </div>
     </div>`;
+    // Hide the header download link for HTML certs — use the button above
+    dlLink.href = '#'; dlLink.download = '';
+    dlLink.onclick = (e) => { e.preventDefault(); downloadVaultDoc(doc.id); };
   } else if (doc.isPDF) {
     body.innerHTML = `<div style="text-align:center;padding:32px;">
       <div style="font-size:4rem;margin-bottom:16px;">📄</div>
@@ -5038,6 +5045,8 @@ function openDocPreview(docId) {
       <div style="font-size:0.82rem;color:var(--muted);margin-bottom:20px;">PDF document — click Download to open</div>
       <a class="btn btn-primary" href="${doc.dataUrl}" download="${doc.fileName}">⬇ Download PDF</a>
     </div>`;
+    dlLink.href = doc.dataUrl;
+    dlLink.download = doc.fileName;
   } else {
     body.innerHTML = `<div style="text-align:center;padding:32px;">
       <div style="font-size:4rem;margin-bottom:16px;">${VAULT_ICONS[doc.category] || '📁'}</div>
@@ -5045,10 +5054,10 @@ function openDocPreview(docId) {
       <div style="font-size:0.82rem;color:var(--muted);margin-bottom:20px;">Click Download to save this file</div>
       <a class="btn btn-primary" href="${doc.dataUrl}" download="${doc.fileName}">⬇ Download</a>
     </div>`;
+    dlLink.href = doc.dataUrl;
+    dlLink.download = doc.fileName;
   }
 
-  dlLink.href = doc.dataUrl;
-  dlLink.download = doc.fileName;
   document.getElementById('docLightbox').classList.add('open');
 }
 
@@ -5059,11 +5068,25 @@ function closeDocLightbox() {
 function downloadVaultDoc(docId) {
   const doc = getVaultDocs().find(d => String(d.id) === String(docId));
   if (!doc) return;
+  if (doc.isHtml && doc.dataUrl) {
+    // Decode and re-blob to avoid data URL length limits
+    try {
+      const html = decodeURIComponent(doc.dataUrl.replace('data:text/html;charset=utf-8,', ''));
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url; a.download = doc.fileName || 'certificate.html'; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      if (typeof toast === 'function') toast('Downloading ' + (doc.fileName||'certificate.html'), 'success');
+    } catch(e) { alert('Could not download certificate. Try the View button instead.'); }
+    return;
+  }
+  if (!doc.dataUrl) { alert('File content not available. This document may need to be re-generated.'); return; }
   const a = document.createElement('a');
   a.href = doc.dataUrl;
-  a.download = doc.fileName;
+  a.download = doc.fileName || 'document';
   a.click();
-  toast(`Downloading ${doc.fileName}`, 'success');
+  if (typeof toast === 'function') toast('Downloading ' + doc.fileName, 'success');
 }
 
 function toggleOwnerVis(docId) {
