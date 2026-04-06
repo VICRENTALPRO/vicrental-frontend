@@ -2107,14 +2107,11 @@ window.addEventListener('DOMContentLoaded', function() {
       <div class="page" id="page-owners">
 
         <!-- Owners List FIRST -->
-        <div class="panel" style="margin-bottom:20px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Owners — A to Z</div>
-            <div style="display:flex;gap:8px;">
-              <input type="text" id="ownerSearch" placeholder="🔍 Search owners…" oninput="filterOwners()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'Montserrat', sans-serif;font-size:0.8rem;width:220px;">
-              <button class="btn btn-ghost" onclick="loadOwners()" style="font-size:0.75rem;padding:5px 12px;">↺ Refresh</button>
-              <button class="btn btn-primary" onclick="toggleOwnerForm()" style="font-size:0.75rem;padding:5px 14px;">+ Add Owner</button>
-            </div>
+        <div style="margin-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:14px;gap:8px;">
+            <input type="text" id="ownerSearch" placeholder="🔍 Search owners…" oninput="filterOwners()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'Montserrat', sans-serif;font-size:0.8rem;width:220px;background:#fff;">
+            <button class="btn btn-ghost" onclick="loadOwners()" style="font-size:0.75rem;padding:5px 12px;">↺ Refresh</button>
+            <button class="btn btn-primary" onclick="toggleOwnerForm()" style="font-size:0.75rem;padding:5px 14px;">+ Add Owner</button>
           </div>
           <div id="ownersList"><div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">Loading owners…</div></div>
         </div>
@@ -2148,14 +2145,11 @@ window.addEventListener('DOMContentLoaded', function() {
       <div class="page" id="page-tenants">
 
         <!-- Tenant List FIRST -->
-        <div class="panel" style="margin-bottom:20px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Registered Tenants — A to Z</div>
-            <div style="display:flex;gap:8px;">
-              <input type="text" id="tenantSearch" placeholder="🔍 Search name, email or property…" oninput="renderTenantsList()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'Montserrat', sans-serif;font-size:0.8rem;width:260px;">
-              <button class="btn btn-ghost" onclick="loadTenants()" style="font-size:0.75rem;padding:5px 12px;">↺ Refresh</button>
-              <button class="btn btn-primary" onclick="toggleTenantForm()" style="font-size:0.75rem;padding:5px 14px;">+ Add Tenant</button>
-            </div>
+        <div style="margin-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:14px;gap:8px;">
+            <input type="text" id="tenantSearch" placeholder="🔍 Search name, email or property…" oninput="renderTenantsList()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'Montserrat', sans-serif;font-size:0.8rem;width:260px;background:#fff;">
+            <button class="btn btn-ghost" onclick="loadTenants()" style="font-size:0.75rem;padding:5px 12px;">↺ Refresh</button>
+            <button class="btn btn-primary" onclick="toggleTenantForm()" style="font-size:0.75rem;padding:5px 14px;">+ Add Tenant</button>
           </div>
           <div id="tenantsList"><div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">Loading tenants…</div></div>
         </div>
