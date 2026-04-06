@@ -5964,20 +5964,14 @@ function closePropSummary() {
 function goToVaultForProp(prop) {
   showPage('vault');
   setTimeout(() => {
-    const sel = document.getElementById('vaultPropFilter');
-    if (sel) {
-      // Find matching option
-      const opt = Array.from(sel.options).find(o => o.value === prop);
-      if (opt) { sel.value = prop; }
-      else {
-        // Add it if missing
-        const o = document.createElement('option');
-        o.value = prop; o.textContent = prop; o.selected = true;
-        sel.appendChild(o);
-      }
+    const search = document.getElementById('vaultSearch');
+    if (search) {
+      // Use just the street part for a clean filter
+      const streetPart = prop.split(',')[0].trim();
+      search.value = streetPart;
       if (typeof renderVault === 'function') renderVault();
     }
-  }, 300);
+  }, 200);
 }
 
 // ─── Edit Tenant Modal ────────────────────────────────────────────────────────
