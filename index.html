@@ -3466,13 +3466,8 @@ function renderProperties() {
   function shortAddr(full) {
     if (!full) return '—';
     const parts = full.split(',').map(p => p.trim()).filter(Boolean);
-    const filtered = parts.filter(p =>
-      p !== 'Australia' &&
-      p !== 'Melbourne' &&
-      !/^(City|Shire|Municipality|Borough|Region) of /i.test(p) &&
-      !/^Greater /i.test(p)
-    );
-    return filtered.join(', ') || full;
+    const filtered = parts.filter(p => p !== 'Australia' && !/^(City|Shire|Municipality|Borough) of /i.test(p));
+    return filtered.length >= 3 ? filtered.slice(0,3).join(', ') : filtered.join(', ');
   }
 
   // RAG overall status: red if any reported, amber if any assigned, green if all complete
@@ -5616,22 +5611,16 @@ function renderManagedProps() {
     props.map(p => {
       const propId = (p.id || p.address).replace(/'/g,"&#39;");
       const gradeColor = p.lastInspectionColor || '#6b7280';
-      // Clean address: strip Australia, Melbourne, City/Shire of X — keep street + suburb + state + postcode
-      const cleanedParts = (p.address||'').split(',').map(x=>x.trim()).filter(Boolean)
-        .filter(x => x !== 'Australia'
-          && x !== 'Melbourne'
-          && !/^(City|Shire|Municipality|Borough|Region) of /i.test(x)
-          && !/^Greater /i.test(x));
-      const addrDisplay = cleanedParts.join(', ') || p.address || '—';
+      const parts = (p.address||'').split(',');
+      const line1 = parts[0] || '—';
+      const line2 = parts.slice(1).join(',').trim();
       const cardId = 'propcard_' + (p.id||p.address).replace(/[^a-zA-Z0-9]/g,'_');
-      const gradeLabel = p.lastInspectionScore === 100 ? '100% Fully Compliant'
-                       : p.lastInspectionScore != null ? p.lastInspectionScore + '% · ' + (p.lastInspectionGrade||'') : null;
       return `<div id="${cardId}" style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;flex-direction:column;gap:12px;">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;cursor:pointer;" onclick="openPropertySummary('${propId}')">
+        <div style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="openPropertySummary('${propId}')">
+          ${p.lastInspectionScore ? `<span style="background:${gradeColor};color:#fff;border-radius:6px;padding:4px 10px;font-size:0.72rem;font-weight:700;white-space:nowrap;flex-shrink:0;">${p.lastInspectionScore}% · ${p.lastInspectionGrade||''}</span>` : ''}
           <div style="flex:1;min-width:0;">
-            <div style="font-weight:800;font-size:0.97rem;color:var(--navy);line-height:1.4;text-decoration:underline;text-underline-offset:3px;">${addrDisplay}</div>
+            <div style="font-weight:800;font-size:0.95rem;color:var(--navy);line-height:1.3;text-decoration:underline;text-underline-offset:3px;">${line1}${line2 ? ', '+line2 : ''}</div>
           </div>
-          ${gradeLabel ? `<span style="background:${gradeColor};color:#fff;border-radius:6px;padding:4px 11px;font-size:0.72rem;font-weight:700;white-space:nowrap;flex-shrink:0;">${gradeLabel}</span>` : ''}
         </div>
         <div style="background:var(--warm);border-radius:9px;padding:10px 12px;">
           <div style="font-size:0.67rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px;">👤 Owner</div>
@@ -5787,7 +5776,7 @@ function renderTenantsList() {
         </div>
         ${t.property ? `<div style="background:var(--warm);border-radius:9px;padding:10px 12px;cursor:pointer;" onclick="goToProperty('${(t.property||'').replace(/'/g,"&#39;")}')">
           <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px;">🏠 Property</div>
-          <div style="font-size:0.85rem;font-weight:800;color:var(--navy);">${(t.property||'').split(',').map(x=>x.trim()).filter(x=>x&&x!=='Australia'&&x!=='Melbourne'&&!/^(City|Shire|Municipality|Borough|Region) of /i.test(x)&&!/^Greater /i.test(x)).join(', ')}</div>
+          <div style="font-size:0.82rem;font-weight:600;color:var(--navy);">${t.property}</div>
           ${score ? `<span style="background:${gradeColor};color:#fff;border-radius:5px;padding:2px 8px;font-size:0.7rem;font-weight:600;display:inline-block;margin-top:5px;">${score}% · ${grade}</span>` : '<div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">Click to view property →</div>'}
         </div>` : '<div style="font-size:0.78rem;color:var(--muted);font-style:italic;">No property assigned</div>'}
       </div>`;
@@ -5869,7 +5858,7 @@ function seedDemo() {}
 
       <!-- Compliance card -->
       <div id="psmCompliance" style="border:1px solid var(--border);border-radius:12px;overflow:hidden;">
-        <div style="background:var(--warm);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="showPage('portal')">
+        <div style="background:var(--warm);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="closePropSummary(); goToVaultForProp(document.getElementById('psmAddress').textContent)">
           <div>
             <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);">📋 Compliance</div>
             <div id="psmComplianceStatus" style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-top:3px;">—</div>
@@ -5963,6 +5952,66 @@ function openPropertySummaryByAddr(address) {
 
 function closePropSummary() {
   document.getElementById('propSummaryModal').style.display = 'none';
+}
+
+function goToVaultForProp(prop) {
+  closePropSummary();
+  showPage('vault');
+  setTimeout(() => {
+    const search = document.getElementById('vaultSearch');
+    if (search) {
+      const streetPart = (prop || '').split(',')[0].trim();
+      search.value = streetPart;
+      if (typeof renderVault === 'function') renderVault();
+    }
+  }, 200);
+}
+
+function openEditTenantModal(idOrEmail) {
+  const tenants = getLocalTenants();
+  const t = tenants.find(x => (x.id||x.email) === idOrEmail || x.email === idOrEmail);
+  if (!t) { if (typeof showToast==='function') showToast('Tenant not found','err'); return; }
+  document.getElementById('editTenantId').value       = t.id || t.email;
+  document.getElementById('editTenantFirst').value    = t.firstName || '';
+  document.getElementById('editTenantLast').value     = t.lastName  || '';
+  document.getElementById('editTenantEmail').value    = t.email     || '';
+  document.getElementById('editTenantPhone').value    = t.phone     || '';
+  document.getElementById('editTenantProperty').value = t.property  || '';
+  document.getElementById('editTenantPassword').value = '';
+  const errEl = document.getElementById('editTenantError');
+  if (errEl) errEl.style.display = 'none';
+  document.getElementById('editTenantModal').style.display = 'flex';
+}
+
+function closeEditTenant() {
+  document.getElementById('editTenantModal').style.display = 'none';
+}
+
+function saveEditTenant() {
+  const idOrEmail = document.getElementById('editTenantId').value;
+  const firstName = (document.getElementById('editTenantFirst').value||'').trim();
+  const lastName  = (document.getElementById('editTenantLast').value||'').trim();
+  const email     = (document.getElementById('editTenantEmail').value||'').trim();
+  const phone     = (document.getElementById('editTenantPhone').value||'').trim();
+  const property  = (document.getElementById('editTenantProperty').value||'').trim();
+  const errEl = document.getElementById('editTenantError');
+  if (!firstName || !email) {
+    if (errEl) { errEl.textContent = 'First name and email are required.'; errEl.style.display = ''; }
+    return;
+  }
+  const tenants = getLocalTenants();
+  const idx = tenants.findIndex(x => (x.id||x.email) === idOrEmail || x.email === idOrEmail);
+  if (idx !== -1) {
+    tenants[idx] = { ...tenants[idx], firstName, lastName, email, phone, property, updatedAt: new Date().toISOString() };
+    saveLocalTenants(tenants);
+    if (typeof cachedTenants !== 'undefined') {
+      const ci = cachedTenants.findIndex(x => (x.id||x.email) === idOrEmail || x.email === idOrEmail);
+      if (ci !== -1) cachedTenants[ci] = { ...cachedTenants[ci], firstName, lastName, email, phone, property };
+    }
+  }
+  closeEditTenant();
+  if (typeof renderTenantsList === 'function') renderTenantsList();
+  if (typeof showToast === 'function') showToast('Tenant updated ✅', 'ok');
 }
 </script>
 
