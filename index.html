@@ -2213,13 +2213,10 @@ window.addEventListener('DOMContentLoaded', function() {
       <div class="page" id="page-manageprops">
 
         <!-- Property List FIRST -->
-        <div class="panel" style="margin-bottom:20px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div></div>
-            <div style="display:flex;gap:8px;">
-              <input type="text" id="propSearch" placeholder="🔍 Search address or owner…" oninput="renderManagedProps()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'Montserrat', sans-serif;font-size:0.8rem;width:220px;">
-              <button class="btn btn-primary" onclick="togglePropForm()" style="font-size:0.75rem;padding:5px 14px;">+ Add Property</button>
-            </div>
+        <div style="margin-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:14px;gap:8px;">
+            <input type="text" id="propSearch" placeholder="🔍 Search address or owner…" oninput="renderManagedProps()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'Montserrat', sans-serif;font-size:0.8rem;width:220px;background:#fff;">
+            <button class="btn btn-primary" onclick="togglePropForm()" style="font-size:0.75rem;padding:5px 14px;">+ Add Property</button>
           </div>
           <div id="managedPropsList"></div>
         </div>
