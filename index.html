@@ -5,19 +5,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VicRental Pro — Victoria Rental Compliance Platform</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════════
    DESIGN TOKENS
 ═══════════════════════════════════════════════ */
 :root {
-  --navy:       #0c1b35;
-  --navy-mid:   #152645;
-  --navy-soft:  #1e3460;
-  --gold:       #c9973a;
-  --gold-light: #e8b84b;
-  --gold-pale:  #fdf5e0;
-  --gold-dim:   rgba(201,151,58,0.18);
+  --navy:       #0A2F5C;
+  --navy-mid:   #0d3870;
+  --navy-soft:  #1a4d8a;
+  --gold:       #5BB8F5;
+  --gold-light: #7ECBF8;
+  --gold-pale:  #eaf6fe;
+  --gold-dim:   rgba(91,184,245,0.18);
   --cream:      #faf7f2;
   --warm:       #f4efe6;
   --white:      #ffffff;
@@ -46,7 +46,7 @@
 html, body { height: 100%; }
 
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   background: var(--cream);
   color: var(--text);
   overflow: hidden;
@@ -76,20 +76,10 @@ body {
   border-bottom: 1px solid var(--border-dark);
 }
 
-.brand-emblem {
-  width: 38px;
-  height: 38px;
-  background: linear-gradient(135deg, var(--gold), var(--gold-light));
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  margin-bottom: 10px;
-}
+.brand-emblem { display: none; }
 
 .brand-name {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 1.1rem;
   color: #fff;
   line-height: 1.2;
@@ -131,7 +121,7 @@ body {
 }
 
 .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
-.nav-item.active { background: var(--gold-dim); color: var(--gold-light); }
+.nav-item.active { background: rgba(91,184,245,0.15); color: #5BB8F5; }
 .nav-item.active::before {
   content: '';
   position: absolute;
@@ -175,7 +165,7 @@ body {
   color: rgba(255,255,255,0.5);
 }
 
-.sidebar-prop-count strong { color: var(--gold-light); font-size: 1rem; font-family: 'DM Serif Display', serif; }
+.sidebar-prop-count strong { color: var(--gold-light); font-size: 1rem; font-family: 'Montserrat', sans-serif; }
 
 /* ═══════════════════════════════════════════════
    MAIN AREA
@@ -200,14 +190,14 @@ body {
 }
 
 .topbar-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 1.2rem;
   color: var(--navy);
   flex: 1;
 }
 
 .topbar-subtitle {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 0.72rem;
   font-weight: 400;
   color: var(--muted);
@@ -227,13 +217,13 @@ body {
   font-weight: 600;
   cursor: pointer;
   border: none;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   transition: all 0.15s;
   text-decoration: none;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  background: linear-gradient(135deg, var(--navy), var(--navy-mid));
   color: var(--navy);
 }
 .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(201,151,58,0.35); }
@@ -289,7 +279,7 @@ body {
 }
 
 .panel-header h3 {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 0.95rem;
   flex: 1;
 }
@@ -346,7 +336,7 @@ body {
 }
 
 .kpi-value {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 2rem;
   line-height: 1;
   margin-bottom: 3px;
@@ -433,7 +423,7 @@ body {
   padding: 8px 14px;
   color: var(--text);
   font-size: 0.82rem;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   flex: 1;
   min-width: 200px;
   transition: border-color 0.15s;
@@ -447,7 +437,7 @@ body {
   padding: 8px 12px;
   color: var(--text);
   font-size: 0.82rem;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   cursor: pointer;
 }
 .filter-select:focus { outline: none; }
@@ -475,7 +465,7 @@ body {
   color: var(--muted);
 }
 .empty-icon { font-size: 3rem; margin-bottom: 14px; }
-.empty h3 { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--text); margin-bottom: 8px; }
+.empty h3 { font-family: 'Montserrat', sans-serif; font-size: 1.2rem; color: var(--text); margin-bottom: 8px; }
 .empty p { font-size: 0.83rem; line-height: 1.6; max-width: 340px; margin: 0 auto; }
 
 /* ─ Activity ─ */
@@ -537,7 +527,7 @@ body {
 }
 
 .prop-group-header h2 {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 0.95rem;
   color: #fff;
   flex: 1;
@@ -683,7 +673,7 @@ body {
 }
 
 .detail-header h3 {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 1rem;
   color: #fff;
   flex: 1;
@@ -748,7 +738,7 @@ body {
   padding: 8px 12px;
   color: var(--text);
   font-size: 0.82rem;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   transition: border-color 0.15s;
 }
 .detail-field input:focus,
@@ -869,7 +859,7 @@ body {
   font-weight: 700;
   cursor: pointer;
   border: none;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   transition: all 0.15s;
 }
 .btn-save { background: var(--navy); color: #fff; }
@@ -903,7 +893,7 @@ body {
 }
 
 .score-value {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 3rem;
   color: var(--gold-light);
   line-height: 1;
@@ -1003,7 +993,7 @@ body {
   cursor: pointer;
   border: 1.5px solid;
   transition: all 0.12s;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   white-space: nowrap;
 }
 
@@ -1050,7 +1040,7 @@ body {
   background: var(--white);
   color: var(--muted);
   transition: all 0.12s;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
 }
 .upload-btn:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-pale); }
 
@@ -1073,7 +1063,7 @@ body {
   color: #fff;
 }
 
-.urgent-header h3 { font-family: 'DM Serif Display', serif; font-size: 0.95rem; flex: 1; }
+.urgent-header h3 { font-family: 'Montserrat', sans-serif; font-size: 0.95rem; flex: 1; }
 
 .urgent-item {
   display: flex;
@@ -1132,7 +1122,7 @@ body {
 }
 
 .prop-stat { text-align: center; }
-.prop-stat-val { font-family: 'DM Serif Display', serif; font-size: 1.3rem; font-weight: 700; line-height: 1; margin-bottom: 2px; }
+.prop-stat-val { font-family: 'Montserrat', sans-serif; font-size: 1.3rem; font-weight: 700; line-height: 1; margin-bottom: 2px; }
 .prop-stat-val.red { color: var(--red); }
 .prop-stat-val.amber { color: var(--amber); }
 .prop-stat-val.green { color: var(--green); }
@@ -1159,7 +1149,7 @@ body {
 .report-card:hover { border-color: var(--gold); }
 
 .report-icon { font-size: 2.2rem; margin-bottom: 12px; }
-.report-card h4 { font-family: 'DM Serif Display', serif; font-size: 0.95rem; margin-bottom: 6px; }
+.report-card h4 { font-family: 'Montserrat', sans-serif; font-size: 0.95rem; margin-bottom: 6px; }
 .report-card p { font-size: 0.75rem; color: var(--muted); line-height: 1.6; margin-bottom: 14px; }
 
 .report-table-wrap { overflow-x: auto; }
@@ -1224,7 +1214,7 @@ body {
   background: var(--navy);
 }
 
-.modal-header h3 { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: #fff; flex: 1; }
+.modal-header h3 { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; color: #fff; flex: 1; }
 
 .modal-body {
   padding: 20px;
@@ -1433,7 +1423,7 @@ body {
   border: 1px solid var(--border);
   background: var(--white);
   color: var(--navy);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   transition: all 0.12s;
   text-align: center;
 }
@@ -1479,7 +1469,7 @@ body {
   background: var(--navy);
   flex-shrink: 0;
 }
-.doc-lightbox-header h3 { font-family: 'DM Serif Display', serif; font-size: 1rem; color: #fff; flex: 1; }
+.doc-lightbox-header h3 { font-family: 'Montserrat', sans-serif; font-size: 1rem; color: #fff; flex: 1; }
 .doc-lightbox-body {
   flex: 1;
   overflow: auto;
@@ -1534,8 +1524,8 @@ body {
 .quote-property { font-size:0.75rem; color:var(--muted); margin-bottom:7px; }
 .quote-meta { display:flex; flex-wrap:wrap; gap:12px; font-size:0.71rem; color:var(--muted); align-items:center; }
 .quote-meta strong { color:var(--text); }
-.quote-amount { font-family:'DM Serif Display',serif; font-size:1.6rem; color:var(--navy); line-height:1; margin-bottom:6px; text-align:right; }
-.quote-amount span { font-family:'DM Sans',sans-serif; font-size:0.72rem; color:var(--muted); display:block; margin-bottom:2px; }
+.quote-amount { font-family:'Montserrat', sans-serif; font-size:1.6rem; color:var(--navy); line-height:1; margin-bottom:6px; text-align:right; }
+.quote-amount span { font-family:'Montserrat', sans-serif; font-size:0.72rem; color:var(--muted); display:block; margin-bottom:2px; }
 .quote-right { display:flex; flex-direction:column; align-items:flex-end; gap:8px; min-width:160px; }
 .quote-actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
 .quote-owner-response {
@@ -1590,21 +1580,29 @@ const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
   <div style="width:100%;max-width:420px;padding:20px;">
     <div style="background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(15,76,129,0.25);">
       <div style="background:linear-gradient(135deg,#0a3356,#0f4c81);padding:28px 32px;">
-        <div style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:#fff;font-weight:500;margin-bottom:4px;">🏠 VicRental Pro</div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 200" style="width:240px;height:auto;display:block;margin:0 auto 8px;">
+  <polygon points="30,10 73,10 105,175 62,175" fill="#fff" opacity="0.9"/>
+  <polygon points="80,10 123,10 91,175 48,175" fill="#5BB8F5"/>
+  <rect x="48" y="169" width="63" height="8" fill="#fff" opacity="0.9"/>
+  <text x="148" y="88" font-family="Montserrat,Arial,sans-serif" font-size="46" font-weight="700" fill="#fff" letter-spacing="-1">Vic<tspan fill="#5BB8F5">Rental</tspan></text>
+  <text x="150" y="128" font-family="Montserrat,Arial,sans-serif" font-size="22" font-weight="400" fill="#fff" letter-spacing="10">PRO</text>
+  <rect x="150" y="138" width="188" height="3" fill="#5BB8F5"/>
+  <text x="150" y="163" font-family="Montserrat,Arial,sans-serif" font-size="11" letter-spacing="1"><tspan fill="#fff" font-weight="700">REPORT</tspan><tspan fill="#5BB8F5"> · </tspan><tspan fill="#fff" font-weight="700">TRACK</tspan><tspan fill="#5BB8F5"> · </tspan><tspan fill="#fff" font-weight="700">COMPLY</tspan></text>
+</svg>
         <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.1em;">Property Management Platform</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:#fff;font-weight:500;margin-top:16px;">Property Manager <em style="font-style:italic;font-weight:300;">Login</em></div>
+        <div style="font-family:'Montserrat',sans-serif;font-size:1.8rem;color:#fff;font-weight:500;margin-top:16px;">Property Manager <em style="font-style:italic;font-weight:300;">Login</em></div>
       </div>
       <div style="padding:28px 32px;">
         <div style="margin-bottom:14px;">
           <label style="display:block;font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#6b7d96;margin-bottom:5px;">Email Address</label>
-          <input type="email" id="pmLoginEmail" placeholder="you@vicrentalpro.com.au" style="width:100%;background:#f5f7fa;border:1.5px solid #dde4ed;border-radius:8px;padding:11px 14px;font-size:0.88rem;font-family:'DM Sans',sans-serif;color:#1e2d42;">
+          <input type="email" id="pmLoginEmail" placeholder="you@vicrentalpro.com.au" style="width:100%;background:#f5f7fa;border:1.5px solid #dde4ed;border-radius:8px;padding:11px 14px;font-size:0.88rem;font-family:'Montserrat', sans-serif;color:#1e2d42;">
         </div>
         <div style="margin-bottom:16px;">
           <label style="display:block;font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#6b7d96;margin-bottom:5px;">Password</label>
-          <input type="password" id="pmLoginPassword" placeholder="Your password" style="width:100%;background:#f5f7fa;border:1.5px solid #dde4ed;border-radius:8px;padding:11px 14px;font-size:0.88rem;font-family:'DM Sans',sans-serif;color:#1e2d42;" onkeydown="if(event.key==='Enter')doPMLogin()">
+          <input type="password" id="pmLoginPassword" placeholder="Your password" style="width:100%;background:#f5f7fa;border:1.5px solid #dde4ed;border-radius:8px;padding:11px 14px;font-size:0.88rem;font-family:'Montserrat', sans-serif;color:#1e2d42;" onkeydown="if(event.key==='Enter')doPMLogin()">
         </div>
         <div id="pmLoginError" style="display:none;background:#fdf0ec;border:1px solid rgba(212,76,45,0.25);color:#d44c2d;border-radius:8px;padding:9px 13px;font-size:0.78rem;margin-bottom:12px;"></div>
-        <button onclick="doPMLogin()" id="pmLoginBtn" style="width:100%;background:linear-gradient(135deg,#0a3356,#0f4c81);color:#fff;border:none;border-radius:8px;padding:13px;font-size:0.88rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Sign In →</button>
+        <button onclick="doPMLogin()" id="pmLoginBtn" style="width:100%;background:linear-gradient(135deg,#0a3356,#0f4c81);color:#fff;border:none;border-radius:8px;padding:13px;font-size:0.88rem;font-weight:600;font-family:'Montserrat', sans-serif;cursor:pointer;">Sign In →</button>
       </div>
     </div>
   </div>
@@ -1659,10 +1657,22 @@ window.addEventListener('DOMContentLoaded', function() {
 <div class="app">
   <!-- ══════════════════════ SIDEBAR ══════════════════════ -->
   <aside class="sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-emblem">🏠</div>
-      <div class="brand-name">VicRental Pro</div>
-      <div class="brand-sub">Compliance Platform</div>
+    <div class="sidebar-brand" style="padding:16px 18px 14px;">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 200" style="width:100%;max-width:200px;height:auto;display:block;">
+        <polygon points="30,10 73,10 105,175 62,175" fill="#0A2F5C"/>
+        <polygon points="80,10 123,10 91,175 48,175" fill="#5BB8F5"/>
+        <rect x="48" y="169" width="63" height="8" fill="#0A2F5C"/>
+        <text x="148" y="88" font-family="Montserrat,Arial,sans-serif" font-size="46" font-weight="700" fill="#0A2F5C" letter-spacing="-1">Vic<tspan fill="#5BB8F5">Rental</tspan></text>
+        <text x="150" y="128" font-family="Montserrat,Arial,sans-serif" font-size="22" font-weight="400" fill="#0A2F5C" letter-spacing="10">PRO</text>
+        <rect x="150" y="138" width="188" height="3" fill="#5BB8F5"/>
+        <text x="150" y="163" font-family="Montserrat,Arial,sans-serif" font-size="11" letter-spacing="1">
+          <tspan fill="#0A2F5C" font-weight="700">REPORT</tspan>
+          <tspan fill="#5BB8F5"> · </tspan>
+          <tspan fill="#0A2F5C" font-weight="700">TRACK</tspan>
+          <tspan fill="#5BB8F5"> · </tspan>
+          <tspan fill="#0A2F5C" font-weight="700">COMPLY</tspan>
+        </text>
+      </svg>
     </div>
 
     <nav class="sidebar-nav">
@@ -1865,19 +1875,19 @@ window.addEventListener('DOMContentLoaded', function() {
           <div class="panel-body" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;">
             <div>
               <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Property Address</label>
-              <input type="text" id="clPropAddress" placeholder="123 Example St, Richmond VIC 3121" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;" oninput="saveChecklistMeta()">
+              <input type="text" id="clPropAddress" placeholder="123 Example St, Richmond VIC 3121" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;" oninput="saveChecklistMeta()">
             </div>
             <div>
               <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Inspector Name</label>
-              <input type="text" id="clInspector" placeholder="Inspector name" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;" oninput="saveChecklistMeta()">
+              <input type="text" id="clInspector" placeholder="Inspector name" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;" oninput="saveChecklistMeta()">
             </div>
             <div>
               <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Inspection Date</label>
-              <input type="date" id="clDate" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;" oninput="saveChecklistMeta()">
+              <input type="date" id="clDate" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;" oninput="saveChecklistMeta()">
             </div>
             <div>
               <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Owner Name</label>
-              <input type="text" id="clOwnerName" placeholder="Owner name" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;" oninput="saveChecklistMeta()">
+              <input type="text" id="clOwnerName" placeholder="Owner name" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;" oninput="saveChecklistMeta()">
             </div>
           </div>
         </div>
@@ -1988,31 +1998,31 @@ window.addEventListener('DOMContentLoaded', function() {
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
               <div>
                 <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Property Address *</label>
-                <input type="text" id="qProperty" placeholder="42 Sample Street, Richmond VIC 3121" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+                <input type="text" id="qProperty" placeholder="42 Sample Street, Richmond VIC 3121" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;">
               </div>
               <div>
                 <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Owner Name *</label>
-                <input type="text" id="qOwnerName" placeholder="Property owner's name" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+                <input type="text" id="qOwnerName" placeholder="Property owner's name" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;">
               </div>
               <div>
                 <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Repair Description *</label>
-                <input type="text" id="qDescription" placeholder="e.g. Replace smoke alarms on all storeys" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+                <input type="text" id="qDescription" placeholder="e.g. Replace smoke alarms on all storeys" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;">
               </div>
               <div>
                 <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Contractor / Trade</label>
-                <input type="text" id="qContractor" placeholder="e.g. Melbourne Electrical Pty Ltd" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+                <input type="text" id="qContractor" placeholder="e.g. Melbourne Electrical Pty Ltd" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;">
               </div>
               <div>
                 <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Quote Amount (AUD) *</label>
-                <input type="text" id="qAmount" placeholder="e.g. 450.00" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+                <input type="text" id="qAmount" placeholder="e.g. 450.00" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;">
               </div>
               <div>
                 <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Quote Expiry Date</label>
-                <input type="date" id="qExpiry" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+                <input type="date" id="qExpiry" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;">
               </div>
               <div>
                 <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Category</label>
-                <select id="qCategory" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;background:var(--white);">
+                <select id="qCategory" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;background:var(--white);">
                   <option>Smoke Alarms</option><option>Heating/Cooling</option><option>Plumbing</option>
                   <option>Electrical</option><option>Locks &amp; Security</option><option>Mould &amp; Dampness</option>
                   <option>Structural</option><option>General Maintenance</option><option>Appliances</option><option>Other</option>
@@ -2020,14 +2030,14 @@ window.addEventListener('DOMContentLoaded', function() {
               </div>
               <div>
                 <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Link to Work Order (optional)</label>
-                <select id="qLinkWO" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;background:var(--white);" id="qLinkWO">
+                <select id="qLinkWO" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;background:var(--white);" id="qLinkWO">
                   <option value="">— No linked work order —</option>
                 </select>
               </div>
             </div>
             <div>
               <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Notes for Owner</label>
-              <textarea id="qNotes" rows="2" placeholder="Any context or recommendations for the owner…" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;resize:vertical;margin-bottom:12px;"></textarea>
+              <textarea id="qNotes" rows="2" placeholder="Any context or recommendations for the owner…" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;resize:vertical;margin-bottom:12px;"></textarea>
             </div>
             <div id="qUploadZone" onclick="document.getElementById('qFileInput').click()" style="border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all 0.15s;background:var(--warm);margin-bottom:12px;">
               <div style="font-size:1.6rem;margin-bottom:6px;">📎</div>
@@ -2100,7 +2110,7 @@ window.addEventListener('DOMContentLoaded', function() {
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
             <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Owners — A to Z</div>
             <div style="display:flex;gap:8px;">
-              <input type="text" id="ownerSearch" placeholder="🔍 Search owners…" oninput="filterOwners()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'DM Sans',sans-serif;font-size:0.8rem;width:220px;">
+              <input type="text" id="ownerSearch" placeholder="🔍 Search owners…" oninput="filterOwners()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'Montserrat', sans-serif;font-size:0.8rem;width:220px;">
               <button class="btn btn-ghost" onclick="loadOwners()" style="font-size:0.75rem;padding:5px 12px;">↺ Refresh</button>
               <button class="btn btn-primary" onclick="toggleOwnerForm()" style="font-size:0.75rem;padding:5px 14px;">+ Add Owner</button>
             </div>
@@ -2117,11 +2127,11 @@ window.addEventListener('DOMContentLoaded', function() {
           <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;">
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Owner Full Name *</label>
-              <input type="text" id="newOwnerName" placeholder="e.g. Michael Chen" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+              <input type="text" id="newOwnerName" placeholder="e.g. Michael Chen" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
             </div>
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Password *</label>
-              <input type="text" id="newOwnerPassword" placeholder="e.g. owner123" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+              <input type="text" id="newOwnerPassword" placeholder="e.g. owner123" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
             </div>
             <button class="btn btn-primary" onclick="addOwner()" style="padding:9px 20px;white-space:nowrap;">+ Add Owner</button>
           </div>
@@ -2141,7 +2151,7 @@ window.addEventListener('DOMContentLoaded', function() {
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
             <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Registered Tenants — A to Z</div>
             <div style="display:flex;gap:8px;">
-              <input type="text" id="tenantSearch" placeholder="🔍 Search name, email or property…" oninput="renderTenantsList()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'DM Sans',sans-serif;font-size:0.8rem;width:260px;">
+              <input type="text" id="tenantSearch" placeholder="🔍 Search name, email or property…" oninput="renderTenantsList()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'Montserrat', sans-serif;font-size:0.8rem;width:260px;">
               <button class="btn btn-ghost" onclick="loadTenants()" style="font-size:0.75rem;padding:5px 12px;">↺ Refresh</button>
               <button class="btn btn-primary" onclick="toggleTenantForm()" style="font-size:0.75rem;padding:5px 14px;">+ Add Tenant</button>
             </div>
@@ -2158,15 +2168,15 @@ window.addEventListener('DOMContentLoaded', function() {
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">First Name *</label>
-              <input type="text" id="newTenantFirst" placeholder="e.g. John" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+              <input type="text" id="newTenantFirst" placeholder="e.g. John" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
             </div>
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Last Name *</label>
-              <input type="text" id="newTenantLast" placeholder="e.g. Smith" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+              <input type="text" id="newTenantLast" placeholder="e.g. Smith" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
             </div>
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Email Address *</label>
-              <input type="email" id="newTenantEmail" placeholder="e.g. john@email.com" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+              <input type="email" id="newTenantEmail" placeholder="e.g. john@email.com" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
             </div>
           </div>
           <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:12px;align-items:end;">
@@ -2174,16 +2184,16 @@ window.addEventListener('DOMContentLoaded', function() {
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Property Address *</label>
               <input type="text" id="newTenantProperty" placeholder="Select managed property or type address…" autocomplete="off"
                 onfocus="showTenantPropSuggestions()" oninput="tenantPropSearch(this.value)"
-                style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+                style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;box-sizing:border-box;">
               <div id="tenantPropSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:0 0 9px 9px;z-index:9999;box-shadow:0 6px 20px rgba(0,0,0,0.13);max-height:220px;overflow-y:auto;"></div>
             </div>
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Phone</label>
-              <input type="text" id="newTenantPhone" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+              <input type="text" id="newTenantPhone" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
             </div>
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Password <span style="font-weight:400;">(optional — needed for portal login)</span></label>
-              <input type="text" id="newTenantPassword" placeholder="e.g. tenant123" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+              <input type="text" id="newTenantPassword" placeholder="e.g. tenant123" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
             </div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
               <button class="btn btn-primary" onclick="addTenant()" style="padding:9px 20px;white-space:nowrap;">+ Add &amp; Register</button>
@@ -2206,7 +2216,7 @@ window.addEventListener('DOMContentLoaded', function() {
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
             <div></div>
             <div style="display:flex;gap:8px;">
-              <input type="text" id="propSearch" placeholder="🔍 Search address or owner…" oninput="renderManagedProps()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'DM Sans',sans-serif;font-size:0.8rem;width:220px;">
+              <input type="text" id="propSearch" placeholder="🔍 Search address or owner…" oninput="renderManagedProps()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'Montserrat', sans-serif;font-size:0.8rem;width:220px;">
               <button class="btn btn-primary" onclick="togglePropForm()" style="font-size:0.75rem;padding:5px 14px;">+ Add Property</button>
             </div>
           </div>
@@ -2224,38 +2234,38 @@ window.addEventListener('DOMContentLoaded', function() {
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Property Address *</label>
               <input type="text" id="newPropAddress" placeholder="Start typing an Australian address…" autocomplete="off"
                 oninput="nominatimSearch(this.value)"
-                style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+                style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;box-sizing:border-box;">
               <div id="propAddressSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:0 0 9px 9px;z-index:9999;box-shadow:0 6px 20px rgba(0,0,0,0.13);max-height:220px;overflow-y:auto;"></div>
             </div>
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Owner Name *</label>
-              <input type="text" id="newPropOwner" placeholder="e.g. Michael Chen" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+              <input type="text" id="newPropOwner" placeholder="e.g. Michael Chen" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
             </div>
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Owner Email</label>
-              <input type="email" id="newPropOwnerEmail" placeholder="owner@email.com" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+              <input type="email" id="newPropOwnerEmail" placeholder="owner@email.com" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
             </div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr auto;gap:12px;align-items:end;">
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Owner Phone</label>
-              <input type="text" id="newPropOwnerPhone" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+              <input type="text" id="newPropOwnerPhone" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
             </div>
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Tenant Name</label>
-              <input type="text" id="newPropTenant" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+              <input type="text" id="newPropTenant" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
             </div>
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Tenant Email</label>
-              <input type="email" id="newPropTenantEmail" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+              <input type="email" id="newPropTenantEmail" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
             </div>
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Tenant Phone</label>
-              <input type="text" id="newPropTenantPhone" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+              <input type="text" id="newPropTenantPhone" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
             </div>
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Tenant Password</label>
-              <input type="text" id="newPropTenantPassword" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+              <input type="text" id="newPropTenantPassword" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
             </div>
             <button class="btn btn-primary" onclick="addProperty()" style="padding:9px 20px;white-space:nowrap;">+ Add Property</button>
           </div>
@@ -2349,11 +2359,11 @@ window.addEventListener('DOMContentLoaded', function() {
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;margin-bottom:14px;">
               <div>
                 <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Document Name *</label>
-                <input type="text" id="vaultDocName" placeholder="e.g. Compliance Certificate — 42 Sample St" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+                <input type="text" id="vaultDocName" placeholder="e.g. Compliance Certificate — 42 Sample St" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;">
               </div>
               <div>
                 <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Category</label>
-                <select id="vaultDocCategory" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;background:var(--white);color:var(--text);">
+                <select id="vaultDocCategory" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;background:var(--white);color:var(--text);">
                   <option value="Compliance Certificate">Compliance Certificate</option>
                   <option value="Invoice">Invoice / Receipt</option>
                   <option value="Inspection Report">Inspection Report</option>
@@ -2366,11 +2376,11 @@ window.addEventListener('DOMContentLoaded', function() {
               </div>
               <div>
                 <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Property (optional)</label>
-                <input type="text" id="vaultDocProperty" placeholder="Link to a property address" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+                <input type="text" id="vaultDocProperty" placeholder="Link to a property address" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;">
               </div>
               <div>
                 <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Visible to Owner?</label>
-                <select id="vaultDocOwnerVisible" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;background:var(--white);color:var(--text);">
+                <select id="vaultDocOwnerVisible" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;background:var(--white);color:var(--text);">
                   <option value="yes">Yes — owner can view</option>
                   <option value="no">No — internal only</option>
                 </select>
@@ -2429,21 +2439,21 @@ window.addEventListener('DOMContentLoaded', function() {
     <div style="display:grid;gap:14px;">
       <div>
         <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Full Name *</label>
-        <input type="text" id="editOwnerName" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        <input type="text" id="editOwnerName" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div>
           <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Email</label>
-          <input type="email" id="editOwnerEmail" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+          <input type="email" id="editOwnerEmail" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
         </div>
         <div>
           <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Phone</label>
-          <input type="text" id="editOwnerPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+          <input type="text" id="editOwnerPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
         </div>
       </div>
       <div>
         <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">New Password (leave blank to keep existing)</label>
-        <input type="text" id="editOwnerPassword" placeholder="Enter new password to change" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        <input type="text" id="editOwnerPassword" placeholder="Enter new password to change" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
       </div>
     </div>
     <div id="editOwnerError" style="display:none;margin-top:10px;color:var(--red);font-size:0.8rem;"></div>
@@ -2465,27 +2475,27 @@ window.addEventListener('DOMContentLoaded', function() {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
       <div>
         <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">First Name *</label>
-        <input type="text" id="editTenantFirst" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        <input type="text" id="editTenantFirst" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
       </div>
       <div>
         <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Last Name *</label>
-        <input type="text" id="editTenantLast" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        <input type="text" id="editTenantLast" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
       </div>
       <div>
         <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Email *</label>
-        <input type="email" id="editTenantEmail" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        <input type="email" id="editTenantEmail" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
       </div>
       <div>
         <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Phone</label>
-        <input type="text" id="editTenantPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        <input type="text" id="editTenantPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
       </div>
       <div style="grid-column:1/-1;">
         <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Property Address</label>
-        <input type="text" id="editTenantProperty" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        <input type="text" id="editTenantProperty" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
       </div>
       <div style="grid-column:1/-1;">
         <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">New Password (leave blank to keep existing)</label>
-        <input type="text" id="editTenantPassword" placeholder="Enter new password to change" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;">
+        <input type="text" id="editTenantPassword" placeholder="Enter new password to change" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
       </div>
     </div>
     <div id="editTenantError" style="display:none;margin-top:10px;color:var(--red);font-size:0.8rem;"></div>
@@ -2589,10 +2599,10 @@ window.addEventListener('DOMContentLoaded', function() {
       <button class="btn-close" onclick="closeNewWOModal()">✕</button>
     </div>
     <div class="modal-body">
-      <div class="detail-field"><label>Property Address *</label><input type="text" id="nwoProperty" placeholder="123 Example St, Melbourne VIC 3000" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;"></div>
-      <div class="detail-field"><label>Issue Description *</label><input type="text" id="nwoIssue" placeholder="Describe the maintenance issue" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;"></div>
+      <div class="detail-field"><label>Property Address *</label><input type="text" id="nwoProperty" placeholder="123 Example St, Melbourne VIC 3000" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;"></div>
+      <div class="detail-field"><label>Issue Description *</label><input type="text" id="nwoIssue" placeholder="Describe the maintenance issue" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;"></div>
       <div class="detail-field"><label>Category</label>
-        <select id="nwoCategory" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+        <select id="nwoCategory" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;">
           <option>General Maintenance</option><option>Plumbing</option><option>Electrical</option>
           <option>Heating/Cooling</option><option>Structural</option><option>Locks &amp; Security</option>
           <option>Smoke Alarms</option><option>Mould &amp; Dampness</option><option>Appliances</option>
@@ -2600,15 +2610,15 @@ window.addEventListener('DOMContentLoaded', function() {
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div class="detail-field"><label>Priority</label>
-          <select id="nwoPriority" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+          <select id="nwoPriority" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;">
             <option value="high">High</option><option value="critical">Critical</option>
           </select>
         </div>
-        <div class="detail-field"><label>Due Date</label><input type="date" id="nwoDue" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;"></div>
+        <div class="detail-field"><label>Due Date</label><input type="date" id="nwoDue" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;"></div>
       </div>
-      <div class="detail-field"><label>Trade Required</label><input type="text" id="nwoTrade" placeholder="e.g. Plumber, Electrician" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;"></div>
-      <div class="detail-field"><label>Assigned To</label><input type="text" id="nwoAssigned" placeholder="Contractor name" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;"></div>
-      <div class="detail-field"><label>Notes</label><textarea id="nwoNotes" rows="2" placeholder="Additional details…" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;resize:vertical;"></textarea></div>
+      <div class="detail-field"><label>Trade Required</label><input type="text" id="nwoTrade" placeholder="e.g. Plumber, Electrician" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;"></div>
+      <div class="detail-field"><label>Assigned To</label><input type="text" id="nwoAssigned" placeholder="Contractor name" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;"></div>
+      <div class="detail-field"><label>Notes</label><textarea id="nwoNotes" rows="2" placeholder="Additional details…" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;resize:vertical;"></textarea></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeNewWOModal()">Cancel</button>
@@ -2630,11 +2640,11 @@ window.addEventListener('DOMContentLoaded', function() {
       <p style="font-size:0.82rem;color:var(--muted);line-height:1.6;margin-bottom:12px;">A failed compliance item has been detected. Create a work order so it can be tracked, assigned, and resolved — and automatically notify the Owner Portal.</p>
       <div class="detail-field">
         <label>Owner Name (for portal notification)</label>
-        <input type="text" id="woPromptOwner" placeholder="Property owner's name" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+        <input type="text" id="woPromptOwner" placeholder="Property owner's name" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;">
       </div>
       <div class="detail-field">
         <label>Due Date</label>
-        <input type="date" id="woPromptDue" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+        <input type="date" id="woPromptDue" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;">
       </div>
     </div>
     <div class="modal-footer">
@@ -4311,7 +4321,7 @@ function downloadInspectionReport() {
   const generated = new Date().toLocaleString('en-AU',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
 
   const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Inspection Report — ${address}</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 <style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:'DM Sans',Georgia,sans-serif;background:#faf8f3;color:#1a1a2e;}@media print{body{background:#fff;}}</style>
 <scr` + `ipt>
 const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
@@ -4331,7 +4341,7 @@ const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
     <div><div style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Date</div><div style="font-size:14px;font-weight:600;">${date}</div></div>
   </div>
   <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:20px 24px;display:flex;align-items:center;gap:28px;flex-wrap:wrap;">
-    <div style="text-align:center;"><div style="font-family:'DM Serif Display',serif;font-size:40px;color:#e8b84b;line-height:1;">${scoreText}</div><div style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-top:3px;">Compliance Score</div></div>
+    <div style="text-align:center;"><div style="font-family:'Montserrat', sans-serif;font-size:40px;color:#e8b84b;line-height:1;">${scoreText}</div><div style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-top:3px;">Compliance Score</div></div>
     <div style="flex:1;min-width:180px;">
       <div style="display:inline-block;padding:4px 14px;border-radius:20px;background:${gradeBg};color:${gradeColor};font-size:12px;font-weight:700;text-transform:uppercase;margin-bottom:10px;">${gradeLabel}</div>
       <div style="display:flex;gap:16px;flex-wrap:wrap;">
@@ -4345,7 +4355,7 @@ const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
 </div>
 <div style="max-width:860px;margin:0 auto;padding:36px 32px 60px;">
   ${urgentHtml}
-  <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#0c1b35;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #ddd9cc;">Detailed Checklist Results</div>
+  <div style="font-family:'Montserrat', sans-serif;font-size:20px;color:#0c1b35;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #ddd9cc;">Detailed Checklist Results</div>
   ${catResultsHtml}
   <div style="margin-top:32px;font-size:11px;color:#7a8099;line-height:1.8;border-top:1px solid #ddd9cc;padding-top:16px;">
     <strong>Disclaimer:</strong> This report is a general guide based on Victoria's rental minimum standards under the <em>Residential Tenancies Act 1997</em> (as amended, effective 29 March 2021). It is not legal advice. Visit Consumer Affairs Victoria for official guidance.
@@ -5850,36 +5860,36 @@ function seedDemo() {}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
       <div style="grid-column:1/-1;">
         <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Property Address *</label>
-        <input type="text" id="editPropAddress" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+        <input type="text" id="editPropAddress" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;box-sizing:border-box;">
       </div>
       <div>
         <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Owner Name *</label>
-        <input type="text" id="editPropOwner" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+        <input type="text" id="editPropOwner" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;box-sizing:border-box;">
       </div>
       <div>
         <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Owner Email</label>
-        <input type="email" id="editPropOwnerEmail" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+        <input type="email" id="editPropOwnerEmail" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;box-sizing:border-box;">
       </div>
       <div>
         <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Owner Phone</label>
-        <input type="text" id="editPropOwnerPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+        <input type="text" id="editPropOwnerPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;box-sizing:border-box;">
       </div>
       <div>
         <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Tenant Name</label>
-        <input type="text" id="editPropTenant" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+        <input type="text" id="editPropTenant" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;box-sizing:border-box;">
       </div>
       <div>
         <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Tenant Email</label>
-        <input type="email" id="editPropTenantEmail" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+        <input type="email" id="editPropTenantEmail" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;box-sizing:border-box;">
       </div>
       <div>
         <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Tenant Phone</label>
-        <input type="text" id="editPropTenantPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+        <input type="text" id="editPropTenantPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;box-sizing:border-box;">
       </div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
-      <button onclick="closeEditPropModal()" style="padding:9px 20px;border:1px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;">Cancel</button>
-      <button onclick="saveEditProp()" style="padding:9px 24px;background:var(--navy);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;">Save Changes</button>
+      <button onclick="closeEditPropModal()" style="padding:9px 20px;border:1px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;font-family:'Montserrat', sans-serif;font-size:0.85rem;">Cancel</button>
+      <button onclick="saveEditProp()" style="padding:9px 24px;background:var(--navy);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:'Montserrat', sans-serif;font-size:0.85rem;font-weight:600;">Save Changes</button>
     </div>
   </div>
 </div>
@@ -6161,8 +6171,8 @@ function resetChecklistSilent() {
     </div>
     <div id="vaultPopupMsg" style="font-size:0.83rem;color:var(--text);line-height:1.6;margin-bottom:22px;text-align:left;"></div>
     <div style="display:flex;gap:10px;justify-content:center;">
-      <button onclick="dismissVaultPopup()" style="padding:10px 22px;border:1px solid var(--border);border-radius:9px;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;">Not now</button>
-      <button onclick="saveToVaultAndReset()" style="padding:10px 28px;background:var(--navy);color:#fff;border:none;border-radius:9px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:700;">📁 Save to Vault &amp; Download</button>
+      <button onclick="dismissVaultPopup()" style="padding:10px 22px;border:1px solid var(--border);border-radius:9px;background:#fff;cursor:pointer;font-family:'Montserrat', sans-serif;font-size:0.85rem;">Not now</button>
+      <button onclick="saveToVaultAndReset()" style="padding:10px 28px;background:var(--navy);color:#fff;border:none;border-radius:9px;cursor:pointer;font-family:'Montserrat', sans-serif;font-size:0.85rem;font-weight:700;">📁 Save to Vault &amp; Download</button>
     </div>
   </div>
 </div>
