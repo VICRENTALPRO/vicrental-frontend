@@ -4061,28 +4061,25 @@ function generateComplianceCert(type, typeLabel) {
   if (!company)  { alert('Please enter the Company / Inspector name.'); return; }
 
   const fmtDate = iso => iso ? new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'}) : '—';
-  const freq = type === 'smoke' ? 'Every 12 months' : 'Every 2 years';
+  const freq  = type === 'smoke' ? 'Every 12 months' : 'Every 2 years';
   const today = new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});
   const color = type === 'electrical' ? '#f59e0b' : type === 'gas' ? '#5BB8F5' : '#dc2626';
+  const certId = 'CERT-' + type.toUpperCase() + '-' + Date.now();
 
-  // Generate PDF-style HTML and print
   const certHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8">
     <title>${typeLabel} Compliance Certificate</title>
     <style>
       body { font-family: Arial, sans-serif; margin: 40px; color: #1a1a2e; }
       .header { display:flex; align-items:center; justify-content:space-between; border-bottom:4px solid #0A2F5C; padding-bottom:16px; margin-bottom:24px; }
-      .logo-text { font-size:24px; font-weight:800; color:#0A2F5C; } 
+      .logo-text { font-size:24px; font-weight:800; color:#0A2F5C; }
       .logo-text span { color:#5BB8F5; }
       .badge { background:${color}; color:#fff; padding:6px 16px; border-radius:8px; font-weight:700; font-size:14px; }
-      h1 { font-size:20px; color:#0A2F5C; margin-bottom:4px; }
-      h2 { font-size:14px; font-weight:400; color:#555; margin-bottom:24px; }
       .section { background:#f0f4f8; border-radius:10px; padding:16px 20px; margin-bottom:16px; }
       .row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #e2e8f0; }
       .row:last-child { border-bottom:none; }
       .label { font-size:12px; color:#666; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; }
       .value { font-size:13px; font-weight:700; color:#0A2F5C; }
       .footer { margin-top:32px; border-top:2px solid #0A2F5C; padding-top:16px; font-size:11px; color:#888; }
-      .cert-num { font-size:11px; color:#888; }
       .compliant-box { background:#dcfce7; border:2px solid #16a34a; border-radius:10px; padding:16px; text-align:center; margin:20px 0; }
       .compliant-text { font-size:22px; font-weight:800; color:#16a34a; }
     </style>
@@ -4094,8 +4091,6 @@ function generateComplianceCert(type, typeLabel) {
       </div>
       <div class="badge">${typeLabel} Compliance Certificate</div>
     </div>
-    <h1>${typeLabel} Compliance Certificate</h1>
-    <h2>Issued in accordance with Victorian rental property compliance requirements · ${freq}</h2>
     <div class="compliant-box">
       <div class="compliant-text">✅ COMPLIANT</div>
       <div style="font-size:13px;color:#16a34a;margin-top:4px;">This property meets the required ${typeLabel.toLowerCase()} standards</div>
@@ -4112,28 +4107,29 @@ function generateComplianceCert(type, typeLabel) {
       <div class="row"><span class="label">Property Manager Inspector</span><span class="value">${inspector || '—'}</span></div>
     </div>
     <div class="footer">
-      <div>Certificate generated: ${today} via VicRental Pro</div>
-      <div class="cert-num">Cert ID: CERT-${type.toUpperCase()}-${Date.now()}</div>
-      <div style="margin-top:8px;">This certificate confirms the above property has undergone a ${typeLabel.toLowerCase()} inspection and was found to be compliant as at the date of inspection. This document should be retained by the property manager and shared with the owner and tenant.</div>
+      <div>Certificate generated: ${today} via VicRental Pro · ${certId}</div>
+      <div style="margin-top:8px;">This certificate confirms the above property has undergone a ${typeLabel.toLowerCase()} inspection and was found compliant as at the date of inspection. Retain this document and share with the owner and tenant.</div>
     </div>
   </body></html>`;
 
-  // Open print window
-  const win = window.open('', '_blank', 'width=800,height=900');
-  win.document.write(certHtml);
-  win.document.close();
-  win.focus();
-  setTimeout(() => win.print(), 500);
+  // Download as HTML file
+  const fileName = typeLabel.replace(/\s/g,'_') + '_Certificate_' + prop.replace(/[^a-z0-9]/gi,'_').substring(0,30) + '.html';
+  const blob = new Blob([certHtml], { type: 'text/html;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = fileName; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
 
-  // Store for vault save
-  window._pendingCert = { type, typeLabel, prop, owner, lastDate, nextDate, company, today, color };
+  // Store dataUrl for vault
+  const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(certHtml);
+  window._pendingCert = { type, typeLabel, prop, owner, lastDate, nextDate, company, today, certId, fileName, dataUrl };
 
   // Ask to save to vault
   setTimeout(() => {
     if (confirm(`Save this ${typeLabel} Compliance Certificate to the Document Vault under "${prop}"?`)) {
       saveComplianceCertToVault();
     }
-  }, 800);
+  }, 500);
 }
 
 function saveComplianceCertToVault() {
@@ -4141,10 +4137,11 @@ function saveComplianceCertToVault() {
   if (!v) return;
   const vault = S.get(KEY_VAULT, []);
   vault.unshift({
-    id:           'CERT-' + v.type.toUpperCase() + '-' + Date.now(),
+    id:           v.certId,
     name:         v.typeLabel + ' Compliance Certificate — ' + v.prop,
     type:         'compliance_cert',
     category:     'Compliance Certificate',
+    fileName:     v.fileName,
     property:     v.prop,
     owner:        v.owner || '',
     date:         v.lastDate,
@@ -4152,12 +4149,22 @@ function saveComplianceCertToVault() {
     company:      v.company,
     uploadedAt:   new Date().toISOString(),
     ownerVisible: true,
-    fileType:     'pdf',
-    fileName:     v.typeLabel.replace(/\s/g,'_') + '_Cert_' + v.prop.replace(/[^a-z0-9]/gi,'_') + '.pdf'
+    fileType:     'html',
+    isHtml:       true,
+    dataUrl:      v.dataUrl,
+    fileSize:     v.dataUrl.length
   });
   S.set(KEY_VAULT, vault);
   if (typeof showToast === 'function') showToast(v.typeLabel + ' certificate saved to vault ✅', 'ok');
   if (typeof renderVault === 'function') renderVault();
+}
+
+function openCertInWindow(docId) {
+  const doc = getVaultDocs().find(d => String(d.id) === String(docId));
+  if (!doc?.dataUrl) return;
+  const html = decodeURIComponent(doc.dataUrl.replace('data:text/html;charset=utf-8,',''));
+  const win = window.open('', '_blank', 'width=820,height=900');
+  if (win) { win.document.write(html); win.document.close(); }
 }
 
 function toggleCat(id) {
@@ -4969,6 +4976,8 @@ function renderVault() {
     const icon = VAULT_ICONS[doc.category] || '📁';
     const previewContent = doc.isImage
       ? `<img src="${doc.dataUrl}" alt="${doc.name}" loading="lazy">`
+      : doc.isHtml
+      ? `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px;"><span style="font-size:2.5rem;">📜</span><span style="font-size:0.65rem;font-weight:700;color:#0A2F5C;text-align:center;">COMPLIANCE<br>CERTIFICATE</span></div>`
       : `<span style="font-size:3rem;position:relative;z-index:1;">${icon}</span>`;
 
     return `<div class="vault-card">
@@ -5011,6 +5020,17 @@ function openDocPreview(docId) {
 
   if (doc.isImage) {
     body.innerHTML = `<img src="${doc.dataUrl}" alt="${doc.name}" style="max-width:100%;max-height:60vh;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.15);">`;
+  } else if (doc.isHtml) {
+    body.innerHTML = `<div style="text-align:center;padding:28px;">
+      <div style="font-size:3rem;margin-bottom:12px;">📜</div>
+      <div style="font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:6px;">${escHtmlVault(doc.name)}</div>
+      <div style="font-size:0.82rem;color:var(--muted);margin-bottom:6px;">${doc.property||''}</div>
+      <div style="font-size:0.82rem;color:var(--muted);margin-bottom:20px;">${doc.date ? 'Inspected: ' + new Date(doc.date).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'}) : ''}</div>
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button onclick="openCertInWindow('${doc.id}')" class="btn btn-primary">👁 View Certificate</button>
+        <a class="btn btn-secondary" href="${doc.dataUrl}" download="${doc.fileName||'certificate.html'}">⬇ Download</a>
+      </div>
+    </div>`;
   } else if (doc.isPDF) {
     body.innerHTML = `<div style="text-align:center;padding:32px;">
       <div style="font-size:4rem;margin-bottom:16px;">📄</div>
