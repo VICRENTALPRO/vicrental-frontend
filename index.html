@@ -3402,13 +3402,10 @@ function renderPortal() {
       </div>`;
     }).join('');
 
-    return `<div class="prop-group" data-prop="${prop}">
+    return `<div class="prop-group">
       <div class="prop-group-header">
         <div><h2>🏠 ${prop}</h2><small>${items.length} issue${items.length!==1?'s':''} · ${pNC} non-compliant · ${pIP} in progress · ${pOK} resolved</small></div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <button onclick="goToVaultForProp('${prop.replace(/'/g,"&#39;")}')" style="padding:5px 14px;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:7px;font-size:0.74rem;cursor:pointer;font-family:inherit;">📁 View certificates in vault</button>
-          ${propPill}
-        </div>
+        ${propPill}
       </div>
       <div>${cards}</div>
     </div>`;
@@ -5614,19 +5611,16 @@ function renderManagedProps() {
     props.map(p => {
       const propId = (p.id || p.address).replace(/'/g,"&#39;");
       const gradeColor = p.lastInspectionColor || '#6b7280';
-      const cleanPts = (p.address||'').split(',').map(x=>x.trim()).filter(Boolean)
-        .filter(x => x !== 'Australia' && !/^(City|Shire|Municipality|Borough) of /i.test(x));
-      const addrClean = cleanPts.join(', ') || '—';
+      const parts = (p.address||'').split(',');
+      const line1 = parts[0] || '—';
+      const line2 = parts.slice(1).join(',').trim();
       const cardId = 'propcard_' + (p.id||p.address).replace(/[^a-zA-Z0-9]/g,'_');
-      const gradeLabel = p.lastInspectionScore === 100 ? '100% Fully Compliant'
-                       : p.lastInspectionScore != null ? p.lastInspectionScore + '% · ' + (p.lastInspectionGrade||'') : null;
       return `<div id="${cardId}" style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;flex-direction:column;gap:12px;">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;cursor:pointer;" onclick="showPage('properties')">
+        <div style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="openPropertySummary('${propId}')">
+          ${p.lastInspectionScore ? `<span style="background:${gradeColor};color:#fff;border-radius:6px;padding:4px 10px;font-size:0.72rem;font-weight:700;white-space:nowrap;flex-shrink:0;">${p.lastInspectionScore}% · ${p.lastInspectionGrade||''}</span>` : ''}
           <div style="flex:1;min-width:0;">
-            <div style="font-weight:800;font-size:0.97rem;color:var(--navy);line-height:1.3;text-decoration:underline;text-underline-offset:3px;">🏠 ${addrClean}</div>
-            <div style="font-size:0.7rem;color:var(--muted);margin-top:2px;">Click to view property →</div>
+            <div style="font-weight:800;font-size:0.95rem;color:var(--navy);line-height:1.3;text-decoration:underline;text-underline-offset:3px;">${line1}${line2 ? ', '+line2 : ''}</div>
           </div>
-          ${gradeLabel ? `<span style="background:${gradeColor};color:#fff;border-radius:6px;padding:4px 11px;font-size:0.72rem;font-weight:700;white-space:nowrap;flex-shrink:0;">${gradeLabel}</span>` : ''}
         </div>
         <div style="background:var(--warm);border-radius:9px;padding:10px 12px;">
           <div style="font-size:0.67rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px;">👤 Owner</div>
@@ -5773,8 +5767,8 @@ function renderTenantsList() {
           <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--navy-mid,#2d5a8e));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.9rem;flex-shrink:0;">${initials}</div>
           <div style="flex:1;min-width:0;">
             <div style="font-weight:700;font-size:0.95rem;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${fullName}</div>
+            <div style="font-size:0.72rem;color:var(--muted);">${t.source==='property'?'From property':t.source==='import'?'Imported':'Registered'}</div>
           </div>
-          <button onclick="openEditTenantModal('${t.id||t.email}')" style="flex-shrink:0;padding:5px 12px;background:#fff;border:1px solid var(--border);border-radius:7px;font-size:0.72rem;font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit;">✏️ Edit</button>
         </div>
         <div style="display:flex;flex-direction:column;gap:5px;font-size:0.8rem;">
           ${t.email ? `<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--muted);">✉</span><a href="mailto:${t.email}" style="color:var(--navy);text-decoration:none;">${t.email}</a></div>` : ''}
@@ -5864,7 +5858,7 @@ function seedDemo() {}
 
       <!-- Compliance card -->
       <div id="psmCompliance" style="border:1px solid var(--border);border-radius:12px;overflow:hidden;">
-        <div style="background:var(--warm);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="showPage('portal')">
+        <div style="background:var(--warm);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="closePropSummary(); goToVaultForProp(document.getElementById('psmAddress').textContent)">
           <div>
             <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);">📋 Compliance</div>
             <div id="psmComplianceStatus" style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-top:3px;">—</div>
@@ -5960,21 +5954,19 @@ function closePropSummary() {
   document.getElementById('propSummaryModal').style.display = 'none';
 }
 
-// ─── Vault: go to vault filtered by property ──────────────────────────────────
 function goToVaultForProp(prop) {
+  closePropSummary();
   showPage('vault');
   setTimeout(() => {
     const search = document.getElementById('vaultSearch');
     if (search) {
-      // Use just the street part for a clean filter
-      const streetPart = prop.split(',')[0].trim();
+      const streetPart = (prop || '').split(',')[0].trim();
       search.value = streetPart;
       if (typeof renderVault === 'function') renderVault();
     }
   }, 200);
 }
 
-// ─── Edit Tenant Modal ────────────────────────────────────────────────────────
 function openEditTenantModal(idOrEmail) {
   const tenants = getLocalTenants();
   const t = tenants.find(x => (x.id||x.email) === idOrEmail || x.email === idOrEmail);
