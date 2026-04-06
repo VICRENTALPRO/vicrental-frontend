@@ -316,7 +316,7 @@ body {
 .kpi-amber::after { background: var(--amber); }
 .kpi-green::after { background: var(--green); }
 .kpi-blue::after { background: var(--blue); }
-.kpi-gold::after { background: var(--gold); }
+.kpi-gold::after { background: #f59e0b; }
 .kpi-slate::after { background: var(--slate); }
 
 .kpi-icon {
@@ -347,7 +347,7 @@ body {
 .kpi-amber .kpi-value { color: var(--amber); }
 .kpi-green .kpi-value { color: var(--green); }
 .kpi-blue .kpi-value { color: var(--blue); }
-.kpi-gold .kpi-value { color: var(--gold); }
+.kpi-gold .kpi-value { color: #d97706; }
 .kpi-slate .kpi-value { color: var(--slate); }
 
 .kpi-sub { font-size: 0.7rem; color: var(--muted); }
@@ -1768,7 +1768,7 @@ window.addEventListener('DOMContentLoaded', function() {
           <div class="kpi-card kpi-amber"><div class="kpi-label">In Progress</div><div class="kpi-value" id="dashIP">0</div><div class="kpi-sub">Repairs underway</div><div class="kpi-icon">🔨</div></div>
           <div class="kpi-card kpi-green"><div class="kpi-label">Resolved</div><div class="kpi-value" id="dashOK">0</div><div class="kpi-sub">Completed repairs</div><div class="kpi-icon">✅</div></div>
           <div class="kpi-card kpi-gold"><div class="kpi-label">Overdue</div><div class="kpi-value" id="dashOverdue">0</div><div class="kpi-sub">Past due date</div><div class="kpi-icon">⏰</div></div>
-          <div class="kpi-card" style="background:linear-gradient(135deg,#1d4f91,#2d6dbf);cursor:pointer;" onclick="showPage('tenantreqs')"><div class="kpi-label" style="color:#334155;">New Requests</div><div class="kpi-value" style="color:#fff;" id="dashNewTR">0</div><div class="kpi-sub" style="color:rgba(255,255,255,0.6);">Awaiting review</div><div class="kpi-icon">🏡</div></div>
+          <div class="kpi-card" style="background:linear-gradient(135deg,#0A2F5C,#1a4d8a);cursor:pointer;" onclick="showPage('tenantreqs')"><div class="kpi-label" style="color:rgba(255,255,255,0.75);">New Requests</div><div class="kpi-value" style="color:#fff;" id="dashNewTR">0</div><div class="kpi-sub" style="color:rgba(255,255,255,0.6);">Awaiting review</div><div class="kpi-icon">🏡</div></div>
         </div>
 
         <!-- Tenant Requests Panel -->
