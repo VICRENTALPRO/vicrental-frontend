@@ -3844,6 +3844,7 @@ const CATEGORIES = [
       { id:'sm4', label:'Alarms have been tested and working', sub:'Test by pressing test button — alarm sounds clearly.', legal:'RTA s 244A' },
     ]},
   { id:'general', icon:'📋', title:'General Habitability', subtitle:'Reasonable state of repair and cleanliness',
+    hasCleaningSection: true,
     items:[
       { id:'g1', label:'Property is reasonably clean at start of tenancy', sub:'', legal:'s 65' },
       { id:'g2', label:'All fixtures, fittings, and appliances provided are in working order', sub:'', legal:'s 65' },
@@ -3943,12 +3944,146 @@ function renderCategories() {
       <div class="cat-body" id="catbody-${cat.id}">
         ${cat.items.map(item => renderCheckItem(item, cat)).join('')}
         ${complianceSection}
+        ${cat.hasCleaningSection ? buildCleaningSection() : ''}
       </div>
     </div>`;
   }).join('');
   updateCatProgress();
-  // Restore saved compliance dates
   ['electrical','gas','smoke'].forEach(type => restoreComplianceDates(type));
+  restoreCleaningRecords();
+}
+
+function buildCleaningSection() {
+  return `<div style="margin:12px 16px 16px;background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:16px;">
+    <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:14px;">🧹 Cleaning Records</div>
+
+    <!-- Professional Clean -->
+    <div style="background:#fff;border:1px solid var(--border);border-radius:9px;padding:14px;margin-bottom:12px;">
+      <div style="font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:10px;">🏠 Professional Property Clean</div>
+      <div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:12px;align-items:center;margin-bottom:10px;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;font-weight:600;color:var(--text);cursor:pointer;">
+          <input type="checkbox" id="clean_prof_done" onchange="saveCleaningRecords()"
+            style="width:16px;height:16px;accent-color:#0A2F5C;">
+          Completed
+        </label>
+        <div>
+          <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Date of Clean</label>
+          <input type="date" id="clean_prof_date" onchange="saveCleaningRecords()"
+            style="width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Montserrat',sans-serif;font-size:0.82rem;background:#fff;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Company / Person</label>
+          <input type="text" id="clean_prof_company" placeholder="e.g. CleanPro Services" oninput="saveCleaningRecords()"
+            style="width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Montserrat',sans-serif;font-size:0.82rem;background:#fff;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Receipt / Invoice</label>
+          <label style="display:flex;align-items:center;gap:6px;padding:7px 12px;border:1px dashed var(--border);border-radius:7px;cursor:pointer;background:#fafafa;font-size:0.78rem;color:var(--muted);">
+            📎 Upload receipt
+            <input type="file" accept="image/*,.pdf" style="display:none;" onchange="handleCleaningReceipt(event,'prof')">
+          </label>
+          <div id="clean_prof_receipt_name" style="font-size:0.7rem;color:#16a34a;margin-top:3px;"></div>
+        </div>
+      </div>
+      <div id="clean_prof_receipt_preview" style="margin-top:6px;"></div>
+    </div>
+
+    <!-- Carpet Steam Clean -->
+    <div style="background:#fff;border:1px solid var(--border);border-radius:9px;padding:14px;">
+      <div style="font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:10px;">🪣 Carpet Steam Clean</div>
+      <div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:12px;align-items:center;margin-bottom:10px;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;font-weight:600;color:var(--text);cursor:pointer;">
+          <input type="checkbox" id="clean_carpet_done" onchange="saveCleaningRecords()"
+            style="width:16px;height:16px;accent-color:#0A2F5C;">
+          Completed
+        </label>
+        <div>
+          <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Date of Clean</label>
+          <input type="date" id="clean_carpet_date" onchange="saveCleaningRecords()"
+            style="width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Montserrat',sans-serif;font-size:0.82rem;background:#fff;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Company / Person</label>
+          <input type="text" id="clean_carpet_company" placeholder="e.g. Steam King Carpets" oninput="saveCleaningRecords()"
+            style="width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Montserrat',sans-serif;font-size:0.82rem;background:#fff;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Receipt / Invoice</label>
+          <label style="display:flex;align-items:center;gap:6px;padding:7px 12px;border:1px dashed var(--border);border-radius:7px;cursor:pointer;background:#fafafa;font-size:0.78rem;color:var(--muted);">
+            📎 Upload receipt
+            <input type="file" accept="image/*,.pdf" style="display:none;" onchange="handleCleaningReceipt(event,'carpet')">
+          </label>
+          <div id="clean_carpet_receipt_name" style="font-size:0.7rem;color:#16a34a;margin-top:3px;"></div>
+        </div>
+      </div>
+      <div id="clean_carpet_receipt_preview" style="margin-top:6px;"></div>
+    </div>
+  </div>`;
+}
+
+function handleCleaningReceipt(event, type) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    const nameEl    = document.getElementById('clean_' + type + '_receipt_name');
+    const previewEl = document.getElementById('clean_' + type + '_receipt_preview');
+    if (nameEl) nameEl.textContent = '✅ ' + file.name;
+    if (previewEl) {
+      if (file.type.startsWith('image/')) {
+        previewEl.innerHTML = `<img src="${dataUrl}" style="max-width:200px;max-height:120px;border-radius:6px;border:1px solid var(--border);">`;
+      } else {
+        previewEl.innerHTML = `<div style="font-size:0.78rem;color:var(--muted);padding:6px 10px;background:#f8fafc;border-radius:6px;border:1px solid var(--border);">📄 ${file.name}</div>`;
+      }
+    }
+    // Save to localStorage
+    const cleaning = JSON.parse(localStorage.getItem('vicrental_cleaning') || '{}');
+    cleaning[type + '_receipt'] = { name: file.name, dataUrl, type: file.type };
+    localStorage.setItem('vicrental_cleaning', JSON.stringify(cleaning));
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveCleaningRecords() {
+  const data = {
+    prof_done:    document.getElementById('clean_prof_done')?.checked    || false,
+    prof_date:    document.getElementById('clean_prof_date')?.value      || '',
+    prof_company: document.getElementById('clean_prof_company')?.value   || '',
+    carpet_done:  document.getElementById('clean_carpet_done')?.checked  || false,
+    carpet_date:  document.getElementById('clean_carpet_date')?.value    || '',
+    carpet_company: document.getElementById('clean_carpet_company')?.value || ''
+  };
+  const existing = JSON.parse(localStorage.getItem('vicrental_cleaning') || '{}');
+  localStorage.setItem('vicrental_cleaning', JSON.stringify({ ...existing, ...data }));
+}
+
+function restoreCleaningRecords() {
+  try {
+    const d = JSON.parse(localStorage.getItem('vicrental_cleaning') || '{}');
+    const set = (id, val) => { const el = document.getElementById(id); if (el) { if (typeof val === 'boolean') el.checked = val; else el.value = val; } };
+    set('clean_prof_done',    d.prof_done    || false);
+    set('clean_prof_date',    d.prof_date    || '');
+    set('clean_prof_company', d.prof_company || '');
+    set('clean_carpet_done',  d.carpet_done  || false);
+    set('clean_carpet_date',  d.carpet_date  || '');
+    set('clean_carpet_company', d.carpet_company || '');
+    // Restore receipt previews
+    ['prof','carpet'].forEach(type => {
+      const r = d[type + '_receipt'];
+      if (!r) return;
+      const nameEl    = document.getElementById('clean_' + type + '_receipt_name');
+      const previewEl = document.getElementById('clean_' + type + '_receipt_preview');
+      if (nameEl) nameEl.textContent = '✅ ' + r.name;
+      if (previewEl) {
+        if (r.type && r.type.startsWith('image/')) {
+          previewEl.innerHTML = `<img src="${r.dataUrl}" style="max-width:200px;max-height:120px;border-radius:6px;border:1px solid var(--border);">`;
+        } else {
+          previewEl.innerHTML = `<div style="font-size:0.78rem;color:var(--muted);padding:6px 10px;background:#f8fafc;border-radius:6px;border:1px solid var(--border);">📄 ${r.name}</div>`;
+        }
+      }
+    });
+  } catch(e) {}
 }
 
 function buildComplianceSection(cat) {
