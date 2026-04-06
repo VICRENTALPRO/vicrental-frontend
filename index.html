@@ -225,7 +225,7 @@ body {
 
 .btn-primary {
   background: linear-gradient(135deg, var(--navy), var(--navy-mid));
-  color: #ffffff;
+  color: var(--navy);
 }
 .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(10,47,92,0.4); }
 
@@ -683,7 +683,7 @@ body {
 .btn-close {
   background: rgba(255,255,255,0.1);
   border: none;
-  color: #334155;
+  color: rgba(255,255,255,0.7);
   width: 30px; height: 30px;
   border-radius: 6px;
   cursor: pointer;
@@ -905,7 +905,7 @@ body {
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: rgba(255,255,255,0.6);
+  color: #64748b;
   margin-bottom: 4px;
 }
 .score-grade {
@@ -1518,7 +1518,7 @@ body {
   border-radius: 11px;
   display: flex; align-items: center; justify-content: center;
   font-size: 1.4rem; flex-shrink: 0;
-  background: var(--gold-pale); border: 1px solid #5BB8F5;
+  background: var(--gold-pale); border: 1px solid #e8c86a;
 }
 .quote-cat { font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--gold); margin-bottom:3px; }
 .quote-desc { font-size:0.92rem; font-weight:600; margin-bottom:4px; line-height:1.4; }
@@ -1667,10 +1667,8 @@ window.addEventListener('DOMContentLoaded', function() {
         <text x="150" y="128" font-family="Montserrat,Arial,sans-serif" font-size="22" font-weight="400" fill="#0A2F5C" letter-spacing="10">PRO</text>
         <rect x="150" y="138" width="188" height="3" fill="#5BB8F5"/>
         <text x="150" y="163" font-family="Montserrat,Arial,sans-serif" font-size="11" letter-spacing="1">
-          <tspan fill="#0A2F5C" font-weight="700">REPORT</tspan>
-          <tspan fill="#5BB8F5"> · </tspan>
-          <tspan fill="#0A2F5C" font-weight="700">TRACK</tspan>
-          <tspan fill="#5BB8F5"> · </tspan>
+          <tspan fill="#0A2F5C" font-weight="700">REPORT</tspan><tspan fill="#5BB8F5"> · </tspan>
+          <tspan fill="#0A2F5C" font-weight="700">TRACK</tspan><tspan fill="#5BB8F5"> · </tspan>
           <tspan fill="#0A2F5C" font-weight="700">COMPLY</tspan>
         </text>
       </svg>
@@ -1919,43 +1917,6 @@ window.addEventListener('DOMContentLoaded', function() {
 
         <!-- Category Accordions -->
         <div id="clCategories" style="margin-top:16px;"></div>
-
-        <!-- Finalise Section: two boxes side by side -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px;">
-
-          <!-- Green: Compliant -->
-          <div style="background:#fff;border:2px solid #16a34a;border-radius:14px;padding:22px 24px;">
-            <div style="font-size:0.9rem;font-weight:700;color:#16a34a;margin-bottom:6px;">✅ Save Compliant Report</div>
-            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:14px;">Property address, owner name, inspector and date must be completed above before finalising.</div>
-            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:14px;">
-              <input type="checkbox" id="clFinaliseConfirm" style="margin-top:3px;width:15px;height:15px;flex-shrink:0;accent-color:#16a34a;">
-              <span style="font-size:0.8rem;color:var(--text);line-height:1.6;">
-                I confirm this report is <strong>true and correct</strong> as at <span id="clFinaliseDate" style="font-weight:700;color:var(--navy);">—</span>,
-                completed in accordance with the <em>Residential Tenancies Act 1997</em> (Victoria).
-              </span>
-            </label>
-            <button onclick="finaliseChecklist('compliant')" style="width:100%;padding:10px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">
-              ✅ Finalise &amp; Save Compliant Report
-            </button>
-          </div>
-
-          <!-- Red: Non-Compliant -->
-          <div style="background:#fff;border:2px solid #dc2626;border-radius:14px;padding:22px 24px;">
-            <div style="font-size:0.9rem;font-weight:700;color:#dc2626;margin-bottom:6px;">⚠️ Save Non-Compliant Report</div>
-            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:14px;">Use when one or more items have failed. Pushes Non-Compliant status to Properties tab and Owner Portal.</div>
-            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:14px;">
-              <input type="checkbox" id="clNonCompliantConfirm" style="margin-top:3px;width:15px;height:15px;flex-shrink:0;accent-color:#dc2626;">
-              <span style="font-size:0.8rem;color:var(--text);line-height:1.6;">
-                I confirm this report is <strong>true and correct</strong> as at <span id="clFinaliseDate2" style="font-weight:700;color:var(--navy);">—</span>,
-                completed in accordance with the <em>Residential Tenancies Act 1997</em> (Victoria).
-              </span>
-            </label>
-            <button onclick="finaliseChecklist('noncompliant')" style="width:100%;padding:10px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">
-              ⚠️ Finalise &amp; Save Non-Compliant Report
-            </button>
-          </div>
-
-        </div>
 
         <div class="disclaimer">
           This checklist is a general guide based on Victoria's rental minimum standards under the <em>Residential Tenancies Act 1997</em> (effective 29 March 2021). Not legal advice. Visit Consumer Affairs Victoria for official guidance.
@@ -3819,24 +3780,21 @@ const CATEGORIES = [
       { id:'st4', label:'Ceilings are intact and show no signs of imminent collapse', sub:'', legal:'Reg 5K' },
       { id:'st5', label:'All external windows and doors close properly', sub:'', legal:'Reg 5K' },
     ]},
-  { id:'electrical', icon:'⚡', title:'Electrical Safety', subtitle:'Safe electrical installations — required every 2 years',
-    complianceType:'electrical',
+  { id:'electrical', icon:'⚡', title:'Electrical Safety', subtitle:'Safe electrical installations — required every 2 years', complianceType:'electrical',
     items:[
       { id:'e1', label:'No exposed wiring visible in living areas', sub:'', legal:'General safety' },
       { id:'e2', label:'Power outlets are in good condition (no cracks, loose fittings, scorch marks)', sub:'', legal:'General safety' },
       { id:'e3', label:'Switchboard is accessible and in good order', sub:'Circuit breakers or fuses present and labelled.', legal:'General safety' },
       { id:'e4', label:'RCD (safety switch) installed for power circuits', sub:'Residual current device required for rental properties.', legal:'Electrical regs' },
     ]},
-  { id:'gas', icon:'🔵', title:'Gas Safety', subtitle:'Gas appliance safety check — required every 2 years',
-    complianceType:'gas',
+  { id:'gas', icon:'🔵', title:'Gas Safety', subtitle:'Gas appliance safety check — required every 2 years', complianceType:'gas',
     items:[
       { id:'ga1', label:'All gas appliances are in safe working condition', sub:'Gas heaters, stoves, hot water systems checked.', legal:'Gas Safety Act' },
       { id:'ga2', label:'Gas connections and flexible hoses are in good condition', sub:'No visible leaks, corrosion or damage.', legal:'Gas Safety Act' },
       { id:'ga3', label:'Gas meter is accessible and readable', sub:'', legal:'Gas Safety Act' },
-      { id:'ga4', label:'Carbon monoxide detector present (where gas appliances exist)', sub:'', legal:'Best practice' },
+      { id:'ga4', label:'Carbon monoxide detector present where gas appliances exist', sub:'', legal:'Best practice' },
     ]},
-  { id:'smoke', icon:'🔴', title:'Smoke Alarms', subtitle:'Compliant smoke alarm installation — required every 12 months',
-    complianceType:'smoke',
+  { id:'smoke', icon:'🔴', title:'Smoke Alarms', subtitle:'Compliant smoke alarm installation — required every 12 months', complianceType:'smoke',
     items:[
       { id:'sm1', label:'Working smoke alarm on every storey', sub:'At minimum one working alarm per level of the property.', legal:'Building Regs' },
       { id:'sm2', label:'Smoke alarm within 1m of each bedroom door (or inside bedroom)', sub:'', legal:'Building Regs' },
@@ -3929,7 +3887,7 @@ function saveChecklistState() {
 function renderCategories() {
   const container = document.getElementById('clCategories');
   container.innerHTML = CATEGORIES.map((cat, ci) => {
-    const complianceSection = cat.complianceType ? buildComplianceSection(cat) : '';
+    const compSection = cat.complianceType ? buildComplianceSection(cat) : '';
     return `<div class="cat-accordion ${ci===0?'open':''}" id="cacc-${cat.id}">
       <div class="cat-head" onclick="toggleCat('${cat.id}')">
         <span class="cat-icon">${cat.icon}</span>
@@ -3942,48 +3900,117 @@ function renderCategories() {
       </div>
       <div class="cat-body" id="catbody-${cat.id}">
         ${cat.items.map(item => renderCheckItem(item, cat)).join('')}
-        ${complianceSection}
+        ${compSection}
       </div>
     </div>`;
   }).join('');
   updateCatProgress();
-  // Restore saved compliance dates
-  ['electrical','gas','smoke'].forEach(type => restoreComplianceDates(type));
+  ['electrical','gas','smoke'].forEach(restoreComplianceDates);
 }
 
 function buildComplianceSection(cat) {
-  const type = cat.complianceType;
-  const freq = type === 'smoke' ? '12 months' : '2 years';
-  const freqLabel = type === 'smoke' ? 'Every 12 months' : 'Every 2 years';
-  const typeLabel = type === 'electrical' ? 'Electrical Safety' : type === 'gas' ? 'Gas Safety' : 'Smoke Alarm';
-  const color = type === 'electrical' ? '#f59e0b' : type === 'gas' ? '#5BB8F5' : '#dc2626';
-
+  const t = cat.complianceType;
+  const freq = t === 'smoke' ? 'Every 12 months' : 'Every 2 years';
+  const label = t === 'electrical' ? 'Electrical Safety' : t === 'gas' ? 'Gas Safety' : 'Smoke Alarm';
+  const col = t === 'electrical' ? '#f59e0b' : t === 'gas' ? '#5BB8F5' : '#dc2626';
   return `<div style="margin:12px 16px 16px;background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:16px;">
     <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:12px;">
-      📋 ${typeLabel} Compliance Record <span style="background:${color};color:#fff;border-radius:5px;padding:2px 8px;font-size:0.65rem;margin-left:6px;">${freqLabel}</span>
+      📋 ${label} Compliance Record
+      <span style="background:${col};color:#fff;border-radius:5px;padding:2px 8px;font-size:0.65rem;margin-left:6px;">${freq}</span>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;">
       <div>
         <label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Date of Last Inspection</label>
-        <input type="date" id="comp_last_${type}" onchange="autoCalcNextDate('${type}')"
+        <input type="date" id="comp_last_${t}" onchange="autoCalcNextDate('${t}')"
           style="width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Montserrat',sans-serif;font-size:0.82rem;background:#fff;box-sizing:border-box;">
       </div>
       <div>
         <label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Next Inspection Due</label>
-        <input type="date" id="comp_next_${type}"
+        <input type="date" id="comp_next_${t}"
           style="width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Montserrat',sans-serif;font-size:0.82rem;background:#fff;box-sizing:border-box;">
       </div>
       <div>
         <label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Company / Inspector</label>
-        <input type="text" id="comp_company_${type}" placeholder="e.g. Safe Gas Pty Ltd"
+        <input type="text" id="comp_company_${t}" placeholder="e.g. Safe Gas Pty Ltd" oninput="saveComplianceDates('${t}')"
           style="width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Montserrat',sans-serif;font-size:0.82rem;background:#fff;box-sizing:border-box;">
       </div>
     </div>
-    <button onclick="generateComplianceCert('${type}','${typeLabel}')"
+    <button onclick="generateComplianceCert('${t}','${label}')"
       style="padding:8px 20px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">
-      📜 Generate ${typeLabel} Compliance Certificate
+      📜 Generate ${label} Compliance Certificate
     </button>
   </div>`;
+}
+
+function autoCalcNextDate(t) {
+  const last = document.getElementById('comp_last_' + t)?.value;
+  const nextEl = document.getElementById('comp_next_' + t);
+  if (!last || !nextEl) return;
+  const d = new Date(last);
+  d.setMonth(d.getMonth() + (t === 'smoke' ? 12 : 24));
+  nextEl.value = d.toISOString().split('T')[0];
+  saveComplianceDates(t);
+}
+
+function saveComplianceDates(t) {
+  localStorage.setItem('vicrental_comp_' + t, JSON.stringify({
+    last: document.getElementById('comp_last_' + t)?.value || '',
+    next: document.getElementById('comp_next_' + t)?.value || '',
+    company: document.getElementById('comp_company_' + t)?.value || ''
+  }));
+}
+
+function restoreComplianceDates(t) {
+  try {
+    const d = JSON.parse(localStorage.getItem('vicrental_comp_' + t) || 'null');
+    if (!d) return;
+    ['last','next','company'].forEach(f => { const el = document.getElementById('comp_' + f + '_' + t); if (el && d[f]) el.value = d[f]; });
+  } catch(e) {}
+}
+
+function generateComplianceCert(type, typeLabel) {
+  const prop      = (document.getElementById('clPropAddress')?.value || '').trim();
+  const owner     = (document.getElementById('clOwnerName')?.value || '').trim();
+  const inspector = (document.getElementById('clInspector')?.value || '').trim();
+  const lastDate  = document.getElementById('comp_last_' + type)?.value || '';
+  const nextDate  = document.getElementById('comp_next_' + type)?.value || '';
+  const company   = document.getElementById('comp_company_' + type)?.value || '';
+  if (!prop)    { alert('Please enter the Property Address at the top of the checklist.'); return; }
+  if (!lastDate){ alert('Please enter the Date of Last Inspection for ' + typeLabel + '.'); return; }
+  if (!company) { alert('Please enter the Company / Inspector name.'); return; }
+  const fmt = iso => iso ? new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'}) : '—';
+  const freq = type === 'smoke' ? 'Every 12 months' : 'Every 2 years';
+  const today = new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});
+  const col = type === 'electrical' ? '#f59e0b' : type === 'gas' ? '#0A2F5C' : '#dc2626';
+  const certId = 'CERT-' + type.toUpperCase() + '-' + Date.now();
+  const certHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${typeLabel} Compliance Certificate</title>
+    <style>body{font-family:Arial,sans-serif;margin:40px;color:#1a1a2e;}.header{display:flex;align-items:center;justify-content:space-between;border-bottom:4px solid #0A2F5C;padding-bottom:16px;margin-bottom:24px;}.logo{font-size:22px;font-weight:800;color:#0A2F5C;}.logo span{color:#5BB8F5;}.badge{background:${col};color:#fff;padding:6px 16px;border-radius:8px;font-weight:700;font-size:13px;}.ok{background:#dcfce7;border:2px solid #16a34a;border-radius:10px;padding:16px;text-align:center;margin:20px 0;}.ok-text{font-size:22px;font-weight:800;color:#16a34a;}.section{background:#f0f4f8;border-radius:10px;padding:16px 20px;margin-bottom:16px;}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0;}.row:last-child{border-bottom:none;}.lbl{font-size:11px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;}.val{font-size:13px;font-weight:700;color:#0A2F5C;}.footer{margin-top:32px;border-top:2px solid #0A2F5C;padding-top:16px;font-size:11px;color:#888;}</style>
+    </head><body>
+    <div class="header"><div><div class="logo">Vic<span>Rental</span> PRO</div><div style="font-size:11px;color:#888;letter-spacing:0.1em;">REPORT · TRACK · COMPLY</div></div><div class="badge">${typeLabel} Compliance Certificate</div></div>
+    <div class="ok"><div class="ok-text">✅ COMPLIANT</div><div style="font-size:13px;color:#16a34a;margin-top:4px;">This property meets the required ${typeLabel.toLowerCase()} standards</div></div>
+    <div class="section"><div class="row"><span class="lbl">Property Address</span><span class="val">${prop}</span></div><div class="row"><span class="lbl">Owner</span><span class="val">${owner||'—'}</span></div></div>
+    <div class="section"><div class="row"><span class="lbl">Date of Inspection</span><span class="val">${fmt(lastDate)}</span></div><div class="row"><span class="lbl">Next Inspection Due</span><span class="val">${fmt(nextDate)}</span></div><div class="row"><span class="lbl">Frequency Required</span><span class="val">${freq}</span></div><div class="row"><span class="lbl">Inspecting Company / Inspector</span><span class="val">${company}</span></div><div class="row"><span class="lbl">Property Manager</span><span class="val">${inspector||'—'}</span></div></div>
+    <div class="footer"><div>Certificate generated: ${today} via VicRental Pro · ${certId}</div><div style="margin-top:8px;">This certificate confirms the above property was inspected and found compliant as at the date shown. Retain this document and share with owner and tenant.</div></div>
+  </body></html>`;
+  const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(certHtml);
+  const win = window.open('', '_blank', 'width=820,height=900');
+  if (win) { win.document.write(certHtml); win.document.close(); setTimeout(() => win.print(), 600); }
+  window._pendingCert = { type, typeLabel, prop, owner, lastDate, nextDate, company, certId, dataUrl, freq };
+  setTimeout(() => {
+    if (confirm('Save this ' + typeLabel + ' Compliance Certificate to the Document Vault under "' + prop + '"?')) saveCertToVault();
+  }, 900);
+}
+
+function saveCertToVault() {
+  const v = window._pendingCert; if (!v) return;
+  const vault = S.get(KEY_VAULT, []);
+  vault.unshift({ id:v.certId, name:v.typeLabel+' Compliance Certificate — '+v.prop, type:'compliance_cert', category:'Compliance Certificate',
+    fileName:v.typeLabel.replace(/\s/g,'_')+'_Certificate.html', property:v.prop, owner:v.owner||'', date:v.lastDate,
+    nextDue:v.nextDate, company:v.company, uploadedAt:new Date().toISOString(), ownerVisible:true, fileType:'html',
+    isHtml:true, dataUrl:v.dataUrl, fileSize:v.dataUrl.length });
+  S.set(KEY_VAULT, vault);
+  if (typeof showToast==='function') showToast(v.typeLabel+' certificate saved to vault ✅','ok');
+  if (typeof renderVault==='function') renderVault();
 }
 
 function renderCheckItem(item, cat) {
@@ -4009,155 +4036,6 @@ function renderCheckItem(item, cat) {
       </label>
     </div>
   </div>${photoHtml}`;
-}
-
-function autoCalcNextDate(type) {
-  const lastEl = document.getElementById('comp_last_' + type);
-  const nextEl = document.getElementById('comp_next_' + type);
-  if (!lastEl?.value || !nextEl) return;
-  const last = new Date(lastEl.value);
-  const months = type === 'smoke' ? 12 : 24;
-  last.setMonth(last.getMonth() + months);
-  nextEl.value = last.toISOString().split('T')[0];
-}
-
-function restoreComplianceDates(type) {
-  const saved = JSON.parse(localStorage.getItem('vicrental_comp_' + type) || 'null');
-  if (!saved) return;
-  ['last','next','company'].forEach(field => {
-    const el = document.getElementById('comp_' + field + '_' + type);
-    if (el && saved[field]) el.value = saved[field];
-  });
-}
-
-function saveComplianceDates(type) {
-  const data = {
-    last:    document.getElementById('comp_last_' + type)?.value || '',
-    next:    document.getElementById('comp_next_' + type)?.value || '',
-    company: document.getElementById('comp_company_' + type)?.value || ''
-  };
-  localStorage.setItem('vicrental_comp_' + type, JSON.stringify(data));
-}
-
-['electrical','gas','smoke'].forEach(type => {
-  document.addEventListener('change', e => {
-    if (e.target?.id?.startsWith('comp_') && e.target.id.endsWith('_' + type)) saveComplianceDates(type);
-  });
-  document.addEventListener('input', e => {
-    if (e.target?.id?.startsWith('comp_') && e.target.id.endsWith('_' + type)) saveComplianceDates(type);
-  });
-});
-
-function generateComplianceCert(type, typeLabel) {
-  const prop      = (document.getElementById('clPropAddress')?.value || '').trim();
-  const owner     = (document.getElementById('clOwnerName')?.value || '').trim();
-  const inspector = (document.getElementById('clInspector')?.value || '').trim();
-  const lastDate  = document.getElementById('comp_last_' + type)?.value || '';
-  const nextDate  = document.getElementById('comp_next_' + type)?.value || '';
-  const company   = document.getElementById('comp_company_' + type)?.value || '';
-
-  if (!prop)     { alert('Please enter the Property Address at the top of the checklist.'); return; }
-  if (!lastDate) { alert('Please enter the date of last ' + typeLabel + ' inspection.'); return; }
-  if (!company)  { alert('Please enter the Company / Inspector name.'); return; }
-
-  const fmtDate = iso => iso ? new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'}) : '—';
-  const freq = type === 'smoke' ? 'Every 12 months' : 'Every 2 years';
-  const today = new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});
-  const color = type === 'electrical' ? '#f59e0b' : type === 'gas' ? '#5BB8F5' : '#dc2626';
-
-  // Generate PDF-style HTML and print
-  const certHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8">
-    <title>${typeLabel} Compliance Certificate</title>
-    <style>
-      body { font-family: Arial, sans-serif; margin: 40px; color: #1a1a2e; }
-      .header { display:flex; align-items:center; justify-content:space-between; border-bottom:4px solid #0A2F5C; padding-bottom:16px; margin-bottom:24px; }
-      .logo-text { font-size:24px; font-weight:800; color:#0A2F5C; } 
-      .logo-text span { color:#5BB8F5; }
-      .badge { background:${color}; color:#fff; padding:6px 16px; border-radius:8px; font-weight:700; font-size:14px; }
-      h1 { font-size:20px; color:#0A2F5C; margin-bottom:4px; }
-      h2 { font-size:14px; font-weight:400; color:#555; margin-bottom:24px; }
-      .section { background:#f0f4f8; border-radius:10px; padding:16px 20px; margin-bottom:16px; }
-      .row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #e2e8f0; }
-      .row:last-child { border-bottom:none; }
-      .label { font-size:12px; color:#666; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; }
-      .value { font-size:13px; font-weight:700; color:#0A2F5C; }
-      .footer { margin-top:32px; border-top:2px solid #0A2F5C; padding-top:16px; font-size:11px; color:#888; }
-      .cert-num { font-size:11px; color:#888; }
-      .compliant-box { background:#dcfce7; border:2px solid #16a34a; border-radius:10px; padding:16px; text-align:center; margin:20px 0; }
-      .compliant-text { font-size:22px; font-weight:800; color:#16a34a; }
-    </style>
-  </head><body>
-    <div class="header">
-      <div>
-        <div class="logo-text">Vic<span>Rental</span> PRO</div>
-        <div style="font-size:11px;color:#888;letter-spacing:0.1em;">REPORT · TRACK · COMPLY</div>
-      </div>
-      <div class="badge">${typeLabel} Compliance Certificate</div>
-    </div>
-    <h1>${typeLabel} Compliance Certificate</h1>
-    <h2>Issued in accordance with Victorian rental property compliance requirements · ${freq}</h2>
-    <div class="compliant-box">
-      <div class="compliant-text">✅ COMPLIANT</div>
-      <div style="font-size:13px;color:#16a34a;margin-top:4px;">This property meets the required ${typeLabel.toLowerCase()} standards</div>
-    </div>
-    <div class="section">
-      <div class="row"><span class="label">Property Address</span><span class="value">${prop}</span></div>
-      <div class="row"><span class="label">Owner</span><span class="value">${owner || '—'}</span></div>
-    </div>
-    <div class="section">
-      <div class="row"><span class="label">Date of Inspection</span><span class="value">${fmtDate(lastDate)}</span></div>
-      <div class="row"><span class="label">Next Inspection Due</span><span class="value">${nextDate ? fmtDate(nextDate) : '—'}</span></div>
-      <div class="row"><span class="label">Inspection Frequency</span><span class="value">${freq}</span></div>
-      <div class="row"><span class="label">Inspecting Company / Inspector</span><span class="value">${company}</span></div>
-      <div class="row"><span class="label">Property Manager Inspector</span><span class="value">${inspector || '—'}</span></div>
-    </div>
-    <div class="footer">
-      <div>Certificate generated: ${today} via VicRental Pro</div>
-      <div class="cert-num">Cert ID: CERT-${type.toUpperCase()}-${Date.now()}</div>
-      <div style="margin-top:8px;">This certificate confirms the above property has undergone a ${typeLabel.toLowerCase()} inspection and was found to be compliant as at the date of inspection. This document should be retained by the property manager and shared with the owner and tenant.</div>
-    </div>
-  </body></html>`;
-
-  // Open print window
-  const win = window.open('', '_blank', 'width=800,height=900');
-  win.document.write(certHtml);
-  win.document.close();
-  win.focus();
-  setTimeout(() => win.print(), 500);
-
-  // Store for vault save
-  window._pendingCert = { type, typeLabel, prop, owner, lastDate, nextDate, company, today, color };
-
-  // Ask to save to vault
-  setTimeout(() => {
-    if (confirm(`Save this ${typeLabel} Compliance Certificate to the Document Vault under "${prop}"?`)) {
-      saveComplianceCertToVault();
-    }
-  }, 800);
-}
-
-function saveComplianceCertToVault() {
-  const v = window._pendingCert;
-  if (!v) return;
-  const vault = S.get(KEY_VAULT, []);
-  vault.unshift({
-    id:           'CERT-' + v.type.toUpperCase() + '-' + Date.now(),
-    name:         v.typeLabel + ' Compliance Certificate — ' + v.prop,
-    type:         'compliance_cert',
-    category:     'Compliance Certificate',
-    property:     v.prop,
-    owner:        v.owner || '',
-    date:         v.lastDate,
-    nextDue:      v.nextDate,
-    company:      v.company,
-    uploadedAt:   new Date().toISOString(),
-    ownerVisible: true,
-    fileType:     'pdf',
-    fileName:     v.typeLabel.replace(/\s/g,'_') + '_Cert_' + v.prop.replace(/[^a-z0-9]/gi,'_') + '.pdf'
-  });
-  S.set(KEY_VAULT, vault);
-  if (typeof showToast === 'function') showToast(v.typeLabel + ' certificate saved to vault ✅', 'ok');
-  if (typeof renderVault === 'function') renderVault();
 }
 
 function toggleCat(id) {
@@ -4969,6 +4847,8 @@ function renderVault() {
     const icon = VAULT_ICONS[doc.category] || '📁';
     const previewContent = doc.isImage
       ? `<img src="${doc.dataUrl}" alt="${doc.name}" loading="lazy">`
+      : doc.isHtml
+      ? `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px;"><span style="font-size:2.5rem;">📜</span><span style="font-size:0.65rem;font-weight:700;color:#0A2F5C;text-align:center;">COMPLIANCE<br>CERTIFICATE</span></div>`
       : `<span style="font-size:3rem;position:relative;z-index:1;">${icon}</span>`;
 
     return `<div class="vault-card">
@@ -5011,6 +4891,16 @@ function openDocPreview(docId) {
 
   if (doc.isImage) {
     body.innerHTML = `<img src="${doc.dataUrl}" alt="${doc.name}" style="max-width:100%;max-height:60vh;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.15);">`;
+  } else if (doc.isHtml) {
+    body.innerHTML = `<div style="text-align:center;padding:24px;">
+      <div style="font-size:3rem;margin-bottom:12px;">📜</div>
+      <div style="font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:6px;">${escHtmlVault(doc.name)}</div>
+      <div style="font-size:0.82rem;color:var(--muted);margin-bottom:20px;">Compliance Certificate · ${doc.date ? new Date(doc.date).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'}) : ''}</div>
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button onclick="openCertInWindow('${doc.id}')" class="btn btn-primary">👁 View Certificate</button>
+        <a class="btn btn-secondary" href="${doc.dataUrl}" download="${doc.fileName||'certificate.html'}">⬇ Download</a>
+      </div>
+    </div>`;
   } else if (doc.isPDF) {
     body.innerHTML = `<div style="text-align:center;padding:32px;">
       <div style="font-size:4rem;margin-bottom:16px;">📄</div>
@@ -5030,6 +4920,14 @@ function openDocPreview(docId) {
   dlLink.href = doc.dataUrl;
   dlLink.download = doc.fileName;
   document.getElementById('docLightbox').classList.add('open');
+}
+
+function openCertInWindow(docId) {
+  const doc = getVaultDocs().find(d => String(d.id) === String(docId));
+  if (!doc || !doc.dataUrl) return;
+  const html = decodeURIComponent(doc.dataUrl.replace('data:text/html;charset=utf-8,', ''));
+  const win = window.open('', '_blank', 'width=820,height=900');
+  if (win) { win.document.write(html); win.document.close(); }
 }
 
 function closeDocLightbox() {
@@ -5502,15 +5400,14 @@ async function loadOwners() {
   window._cachedOwners = merged;
 
   el.innerHTML = `
-    <div style="background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
     <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
       <thead>
-        <tr style="background:var(--warm);border-bottom:2px solid var(--border);">
-          <th style="text-align:left;padding:11px 16px;color:var(--muted);font-weight:700;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.07em;">Name</th>
-          <th style="text-align:left;padding:11px 16px;color:var(--muted);font-weight:700;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.07em;">Email / Phone</th>
-          <th style="text-align:left;padding:11px 16px;color:var(--muted);font-weight:700;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.07em;">Properties</th>
-          <th style="text-align:left;padding:11px 16px;color:var(--muted);font-weight:700;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.07em;">Added</th>
-          <th style="padding:11px 16px;"></th>
+        <tr style="border-bottom:2px solid var(--border);">
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Name</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Email / Phone</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Properties</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Added</th>
+          <th style="padding:8px 12px;"></th>
         </tr>
       </thead>
       <tbody>
@@ -5526,20 +5423,19 @@ async function loadOwners() {
           const contact = [o.email, o.phone].filter(Boolean).join(' · ') || '—';
           const sourceTag = o.source === 'property' ? `<span style="font-size:0.6rem;background:var(--blue-pale);color:var(--blue);padding:1px 6px;border-radius:4px;margin-left:6px;">from import</span>` : '';
           return `
-            <tr style="border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--warm)'" onmouseout="this.style.background=''">
-              <td style="padding:12px 16px;font-weight:600;color:var(--navy);">👤 ${name}${sourceTag}</td>
-              <td style="padding:12px 16px;color:var(--muted);font-size:0.78rem;">${contact}</td>
-              <td style="padding:12px 16px;">${propBadge}</td>
-              <td style="padding:12px 16px;color:var(--muted);font-size:0.78rem;">${o.createdAt ? new Date(o.createdAt).toLocaleDateString('en-AU') : '—'}</td>
-              <td style="padding:12px 16px;text-align:right;white-space:nowrap;">
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:10px 12px;font-weight:600;">👤 ${name}${sourceTag}</td>
+              <td style="padding:10px 12px;color:var(--muted);font-size:0.78rem;">${contact}</td>
+              <td style="padding:10px 12px;">${propBadge}</td>
+              <td style="padding:10px 12px;color:var(--muted);">${o.createdAt ? new Date(o.createdAt).toLocaleDateString('en-AU') : '—'}</td>
+              <td style="padding:10px 12px;text-align:right;">
                 <button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;" onclick="openEditOwnerByIdx(${oi})">✏️ Edit</button>
                 ${o.source !== 'property' ? `<button class="btn btn-ghost" style="font-size:0.7rem;padding:4px 10px;color:var(--red);" onclick="deleteOwner('${o.id || o.name}', '${name.replace(/'/g,"\\'")}')">🗑 Remove</button>` : ''}
               </td>
             </tr>`;
         }).join('')}
       </tbody>
-    </table>
-    </div>`;
+    </table>`;
 }
 
 async function deleteOwner(id, name) {
@@ -5850,20 +5746,16 @@ function renderManagedProps() {
     props.map(p => {
       const propId = (p.id || p.address).replace(/'/g,"&#39;");
       const gradeColor = p.lastInspectionColor || '#6b7280';
-      // Strip junk from Nominatim addresses
-      const _junkRe = /^(City|Shire|Municipality|Borough|Region) of |^Greater /i;
-      const _cleanPts = (p.address||'').split(',').map(x=>x.trim()).filter(Boolean)
-        .filter(x => x !== 'Australia' && x !== 'Melbourne' && !_junkRe.test(x));
-      const addrDisplay = _cleanPts.join(', ') || p.address || '—';
+      const parts = (p.address||'').split(',');
+      const line1 = parts[0] || '—';
+      const line2 = parts.slice(1).join(',').trim();
       const cardId = 'propcard_' + (p.id||p.address).replace(/[^a-zA-Z0-9]/g,'_');
-      const _gl = p.lastInspectionScore === 100 ? '100% Fully Compliant'
-               : p.lastInspectionScore != null ? p.lastInspectionScore + '% · ' + (p.lastInspectionGrade||'') : null;
       return `<div id="${cardId}" style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;flex-direction:column;gap:12px;">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;cursor:pointer;" onclick="openPropertySummary('${propId}')">
+        <div style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="openPropertySummary('${propId}')">
+          ${p.lastInspectionScore ? `<span style="background:${gradeColor};color:#fff;border-radius:6px;padding:4px 10px;font-size:0.72rem;font-weight:700;white-space:nowrap;flex-shrink:0;">${p.lastInspectionScore}% · ${p.lastInspectionGrade||''}</span>` : ''}
           <div style="flex:1;min-width:0;">
-            <div style="font-weight:800;font-size:0.97rem;color:var(--navy);line-height:1.4;text-decoration:underline;text-underline-offset:3px;">${addrDisplay}</div>
+            <div style="font-weight:800;font-size:0.95rem;color:var(--navy);line-height:1.3;text-decoration:underline;text-underline-offset:3px;">${line1}${line2 ? ', '+line2 : ''}</div>
           </div>
-          ${_gl ? `<span style="background:${gradeColor};color:#fff;border-radius:6px;padding:4px 11px;font-size:0.72rem;font-weight:700;white-space:nowrap;flex-shrink:0;">${_gl}</span>` : ''}
         </div>
         <div style="background:var(--warm);border-radius:9px;padding:10px 12px;">
           <div style="font-size:0.67rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px;">👤 Owner</div>
@@ -6101,7 +5993,7 @@ function seedDemo() {}
 
       <!-- Compliance card -->
       <div id="psmCompliance" style="border:1px solid var(--border);border-radius:12px;overflow:hidden;">
-        <div style="background:var(--warm);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="closePropSummary(); goToVaultForProp(document.getElementById('psmAddress').textContent)">
+        <div style="background:var(--warm);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="showPage('portal')">
           <div>
             <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);">📋 Compliance</div>
             <div id="psmComplianceStatus" style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-top:3px;">—</div>
@@ -6196,178 +6088,7 @@ function openPropertySummaryByAddr(address) {
 function closePropSummary() {
   document.getElementById('propSummaryModal').style.display = 'none';
 }
-
-function goToVaultForProp(prop) {
-  closePropSummary();
-  showPage('vault');
-  setTimeout(() => {
-    const search = document.getElementById('vaultSearch');
-    if (search) {
-      search.value = (prop||'').split(',')[0].trim();
-      if (typeof renderVault === 'function') renderVault();
-    }
-  }, 200);
-}
-
-function openEditTenantModal(idOrEmail) {
-  const tenants = getLocalTenants();
-  const t = tenants.find(x => (x.id||x.email) === idOrEmail || x.email === idOrEmail);
-  if (!t) { if (typeof showToast==='function') showToast('Tenant not found','err'); return; }
-  document.getElementById('editTenantId').value       = t.id || t.email;
-  document.getElementById('editTenantFirst').value    = t.firstName || '';
-  document.getElementById('editTenantLast').value     = t.lastName  || '';
-  document.getElementById('editTenantEmail').value    = t.email     || '';
-  document.getElementById('editTenantPhone').value    = t.phone     || '';
-  document.getElementById('editTenantProperty').value = t.property  || '';
-  document.getElementById('editTenantPassword').value = '';
-  const errEl = document.getElementById('editTenantError');
-  if (errEl) errEl.style.display = 'none';
-  document.getElementById('editTenantModal').style.display = 'flex';
-}
-
-function closeEditTenant() {
-  document.getElementById('editTenantModal').style.display = 'none';
-}
-
-function saveEditTenant() {
-  const idOrEmail = document.getElementById('editTenantId').value;
-  const firstName = (document.getElementById('editTenantFirst').value||'').trim();
-  const lastName  = (document.getElementById('editTenantLast').value||'').trim();
-  const email     = (document.getElementById('editTenantEmail').value||'').trim();
-  const phone     = (document.getElementById('editTenantPhone').value||'').trim();
-  const property  = (document.getElementById('editTenantProperty').value||'').trim();
-  const errEl     = document.getElementById('editTenantError');
-  if (!firstName || !email) {
-    if (errEl) { errEl.textContent = 'First name and email are required.'; errEl.style.display = ''; }
-    return;
-  }
-  const tenants = getLocalTenants();
-  const idx = tenants.findIndex(x => (x.id||x.email) === idOrEmail || x.email === idOrEmail);
-  if (idx !== -1) {
-    tenants[idx] = { ...tenants[idx], firstName, lastName, email, phone, property, updatedAt: new Date().toISOString() };
-    saveLocalTenants(tenants);
-    if (typeof cachedTenants !== 'undefined') {
-      const ci = cachedTenants.findIndex(x => (x.id||x.email) === idOrEmail || x.email === idOrEmail);
-      if (ci !== -1) cachedTenants[ci] = { ...cachedTenants[ci], firstName, lastName, email, phone, property };
-    }
-  }
-  closeEditTenant();
-  if (typeof renderTenantsList === 'function') renderTenantsList();
-  if (typeof showToast === 'function') showToast('Tenant updated ✅', 'ok');
-}
-
-// ─── Checklist Finalise ───────────────────────────────────────────────────────
-function updateFinaliseDate() {
-  const val = document.getElementById('clDate')?.value;
-  const str = val ? new Date(val).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'}) : '—';
-  ['clFinaliseDate','clFinaliseDate2'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=str; });
-}
-
-document.addEventListener('input', e => { if (e.target?.id === 'clDate') updateFinaliseDate(); });
-document.addEventListener('DOMContentLoaded', () => setTimeout(updateFinaliseDate, 600));
-
-function finaliseChecklist(type) {
-  const isNC = type === 'noncompliant';
-  const cbId = isNC ? 'clNonCompliantConfirm' : 'clFinaliseConfirm';
-  if (!document.getElementById(cbId)?.checked) { alert('Please tick the confirmation box before finalising.'); return; }
-  const prop      = (document.getElementById('clPropAddress')?.value||'').trim();
-  const owner     = (document.getElementById('clOwnerName')?.value||'').trim();
-  const inspector = (document.getElementById('clInspector')?.value||'').trim();
-  const dateVal   = document.getElementById('clDate')?.value || new Date().toISOString().split('T')[0];
-  const missing   = [];
-  if (!prop)      missing.push('Property Address');
-  if (!owner)     missing.push('Owner Name');
-  if (!inspector) missing.push('Inspector / Completed By');
-  if (missing.length) { alert('Please complete:\n• ' + missing.join('\n• ')); return; }
-  const score   = document.getElementById('clScoreVal')?.textContent || '—';
-  const grade   = document.getElementById('clScoreGrade')?.textContent || '';
-  const dateStr = new Date(dateVal).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});
-  const numScore = parseInt(score) || null;
-  const props = getManagedProps();
-  const pi = props.findIndex(p => p.address && p.address.toLowerCase()===prop.toLowerCase());
-  if (pi !== -1) {
-    props[pi].lastInspectionDate  = dateVal;
-    props[pi].lastInspectionScore = numScore;
-    props[pi].lastInspectionGrade = isNC ? '❌ Non-Compliant' : grade;
-    props[pi].lastInspectionColor = isNC ? '#dc2626' : (numScore>=80?'#16a34a':numScore>=50?'#d97706':'#dc2626');
-    saveManagedProps(props);
-  }
-  window._pendingVault = { prop, owner, inspector, dateVal, dateStr, score, grade, isNC };
-  document.getElementById('vaultPopupIcon').textContent      = isNC ? '⚠️' : '✅';
-  document.getElementById('vaultPopupTitle').textContent     = isNC ? 'Non-Compliant Report Finalised' : 'Compliant Report Finalised';
-  document.getElementById('vaultPopupProp').textContent      = prop;
-  document.getElementById('vaultPopupOwner').textContent     = owner;
-  document.getElementById('vaultPopupInspector').textContent = inspector;
-  document.getElementById('vaultPopupDate').textContent      = dateStr;
-  document.getElementById('vaultPopupScore').textContent     = score + (grade ? ' — ' + grade : '');
-  document.getElementById('vaultPopupScore').style.color     = isNC ? '#dc2626' : '#16a34a';
-  document.getElementById('vaultPopupMsg').innerHTML         = isNC
-    ? '⚠️ Saved to <strong>Document Vault</strong> and pushed to <strong>Properties</strong> & <strong>Owner Portal</strong> as <strong style="color:#dc2626;">Non-Compliant</strong>.'
-    : '📁 Saved to <strong>Document Vault</strong>. Appears on <strong>Properties</strong> & <strong>Owner Portal</strong> as <strong style="color:#16a34a;">Compliant</strong>.';
-  document.getElementById('vaultPopupModal').style.display = 'flex';
-  if (typeof logActivity==='function') logActivity((isNC?'⚠️ Non-compliant':'✅ Compliant')+' inspection: '+prop, isNC?'#dc2626':'#16a34a');
-}
-
-function dismissVaultPopup() {
-  document.getElementById('vaultPopupModal').style.display = 'none';
-  downloadInspectionReport();
-  setTimeout(resetChecklistSilent, 500);
-}
-
-function saveToVaultAndReset() {
-  document.getElementById('vaultPopupModal').style.display = 'none';
-  const v = window._pendingVault || {};
-  const vault = S.get(KEY_VAULT, []);
-  vault.unshift({
-    id:'INS-'+Date.now(), name:(v.isNC?'⚠️ Non-Compliant':'✅ Compliant')+' Inspection — '+(v.prop||''),
-    type:'inspection', result:v.isNC?'noncompliant':'compliant',
-    property:v.prop||'', owner:v.owner||'', inspector:v.inspector||'',
-    date:v.dateVal||new Date().toISOString().split('T')[0],
-    score:v.score||'—', grade:v.grade||'',
-    uploadedAt:new Date().toISOString(), ownerVisible:true, fileType:'pdf'
-  });
-  S.set(KEY_VAULT, vault);
-  if (typeof showToast==='function') showToast('Report saved to Document Vault','ok');
-  if (typeof renderVault==='function') renderVault();
-  if (typeof renderPortal==='function') renderPortal();
-  if (typeof renderProperties==='function') renderProperties();
-  downloadInspectionReport();
-  setTimeout(resetChecklistSilent, 500);
-}
-
-function resetChecklistSilent() {
-  if (typeof clStatuses!=='undefined') for(const k in clStatuses) delete clStatuses[k];
-  if (typeof clPhotos!=='undefined')   for(const k in clPhotos)   delete clPhotos[k];
-  if (typeof clInited!=='undefined')   window.clInited = false;
-  if (typeof S!=='undefined') S.del(KEY_CL);
-  ['clPropAddress','clInspector','clOwnerName'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  const dt=document.getElementById('clDate'); if(dt) dt.value=new Date().toISOString().split('T')[0];
-  ['clFinaliseConfirm','clNonCompliantConfirm'].forEach(id=>{const cb=document.getElementById(id);if(cb)cb.checked=false;});
-  updateFinaliseDate();
-  if (typeof initChecklist==='function') initChecklist();
-  if (typeof showToast==='function') showToast('Checklist reset','ok');
-}
 </script>
-
-<!-- Vault Popup Modal -->
-<div id="vaultPopupModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9500;align-items:center;justify-content:center;padding:20px;">
-  <div style="background:#fff;border-radius:18px;padding:32px;width:100%;max-width:500px;box-shadow:0 24px 64px rgba(0,0,0,0.3);text-align:center;">
-    <div id="vaultPopupIcon" style="font-size:3rem;margin-bottom:12px;">✅</div>
-    <div id="vaultPopupTitle" style="font-size:1.1rem;font-weight:800;color:var(--navy);margin-bottom:12px;">Report Finalised</div>
-    <div style="font-size:0.83rem;color:var(--muted);margin-bottom:18px;line-height:1.8;text-align:left;background:var(--warm);border-radius:10px;padding:14px 18px;">
-      <strong id="vaultPopupProp" style="color:var(--navy);display:block;font-size:0.9rem;margin-bottom:4px;"></strong>
-      Owner: <strong id="vaultPopupOwner"></strong><br>
-      Inspector: <strong id="vaultPopupInspector"></strong><br>
-      Date: <strong id="vaultPopupDate"></strong><br>
-      Result: <strong id="vaultPopupScore"></strong>
-    </div>
-    <div id="vaultPopupMsg" style="font-size:0.83rem;color:var(--text);line-height:1.6;margin-bottom:22px;text-align:left;"></div>
-    <div style="display:flex;gap:10px;justify-content:center;">
-      <button onclick="dismissVaultPopup()" style="padding:10px 22px;border:1px solid var(--border);border-radius:9px;background:#fff;cursor:pointer;font-family:'Montserrat', sans-serif;font-size:0.85rem;">Not now</button>
-      <button onclick="saveToVaultAndReset()" style="padding:10px 28px;background:var(--navy);color:#fff;border:none;border-radius:9px;cursor:pointer;font-family:'Montserrat', sans-serif;font-size:0.85rem;font-weight:700;">📁 Save to Vault &amp; Download</button>
-    </div>
-  </div>
-</div>
 
 </body>
 </html>
