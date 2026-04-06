@@ -4,39 +4,39 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Owner Portal — VicRental Pro</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <style>
 /* ══════════════════════════════════════════
    TOKENS — refined luxury property aesthetic
 ══════════════════════════════════════════ */
 :root {
-  --ink:       #0e1623;
-  --ink-mid:   #16243a;
-  --navy:      #1a3260;
-  --gold:      #b8892a;
-  --gold-lt:   #d4a843;
-  --gold-pale: #fdf6e8;
-  --gold-dim:  rgba(184,137,42,0.12);
-  --cream:     #faf7f2;
-  --warm:      #f3ede3;
+  --ink:       #0A2F5C;
+  --ink-mid:   #0d3870;
+  --navy:      #0A2F5C;
+  --gold:      #5BB8F5;
+  --gold-lt:   #7ECBF8;
+  --gold-pale: #eaf6fe;
+  --gold-dim:  rgba(91,184,245,0.12);
+  --cream:     #f0f4f8;
+  --warm:      #eaf6fe;
   --white:     #ffffff;
-  --red:       #b83232;
-  --red-pale:  #fceaea;
-  --red-dim:   rgba(184,50,50,0.10);
-  --green:     #1d7a50;
-  --green-pale:#e8f6ee;
-  --green-dim: rgba(29,122,80,0.10);
-  --amber:     #a05800;
-  --amber-pale:#fff4e0;
+  --red:       #dc2626;
+  --red-pale:  #fee2e2;
+  --red-dim:   rgba(220,38,38,0.10);
+  --green:     #16a34a;
+  --green-pale:#dcfce7;
+  --green-dim: rgba(22,163,74,0.10);
+  --amber:     #d97706;
+  --amber-pale:#fef3c7;
   --slate:     #5a6a8a;
-  --border:    #e8e0d2;
+  --border:    #e2e8f0;
   --text:      #1a1a2c;
-  --muted:     #7a8099;
+  --muted:     #64748b;
   --radius:    10px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cream); color: var(--text); }
+html, body { height: 100%; font-family: 'Montserrat', sans-serif; background: var(--cream); color: var(--text); }
 
 /* ══════════════════════════════════════════
    LOGIN SCREEN
@@ -83,20 +83,10 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
   z-index: 1;
 }
 
-.login-emblem {
-  width: 52px; height: 52px;
-  background: linear-gradient(135deg, var(--gold), var(--gold-lt));
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  margin-bottom: 20px;
-  box-shadow: 0 8px 24px rgba(184,137,42,0.3);
-}
+.login-emblem { display: none; }
 
 .login-brand-name {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 1.8rem;
   font-weight: 600;
   color: #fff;
@@ -106,7 +96,7 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
 
 .login-brand-sub {
   font-size: 0.72rem;
-  color: var(--gold-lt);
+  color: #5BB8F5;
   text-transform: uppercase;
   letter-spacing: 0.14em;
 }
@@ -117,7 +107,7 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
 }
 
 .login-tagline p {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 1.4rem;
   font-style: italic;
   color: rgba(255,255,255,0.55);
@@ -153,7 +143,7 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
 }
 
 .login-heading {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 2.2rem;
   font-weight: 600;
   color: var(--ink);
@@ -188,27 +178,27 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
   border-radius: var(--radius);
   padding: 12px 16px;
   font-size: 0.9rem;
-  font-family: 'Jost', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   color: var(--text);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .form-field input:focus {
   outline: none;
-  border-color: var(--gold);
+  border-color: #5BB8F5;
   box-shadow: 0 0 0 3px rgba(184,137,42,0.12);
 }
 
 .btn-login {
   width: 100%;
-  background: linear-gradient(135deg, var(--ink), var(--ink-mid));
+  background: linear-gradient(135deg, var(--navy), var(--ink-mid));
   color: #fff;
   border: none;
   border-radius: var(--radius);
   padding: 14px;
   font-size: 0.88rem;
   font-weight: 600;
-  font-family: 'Jost', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   cursor: pointer;
   letter-spacing: 0.06em;
   transition: all 0.2s;
@@ -220,7 +210,7 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
 }
 
 .btn-login:hover {
-  background: linear-gradient(135deg, var(--navy), var(--ink));
+  background: linear-gradient(135deg, #0A2F5C, #0d3870);
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(14,22,35,0.25);
 }
@@ -285,19 +275,10 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
   text-decoration: none;
 }
 
-.portal-logo-icon {
-  width: 36px; height: 36px;
-  background: linear-gradient(135deg, var(--gold), var(--gold-lt));
-  border-radius: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  flex-shrink: 0;
-}
+.portal-logo-icon { display: none; }
 
 .portal-logo-text {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 1.1rem;
   font-weight: 600;
   color: #fff;
@@ -306,7 +287,7 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
 
 .portal-logo-sub {
   font-size: 0.6rem;
-  color: var(--gold-lt);
+  color: #5BB8F5;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   display: block;
@@ -327,10 +308,10 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
 }
 
 .portal-header-owner strong {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--gold-lt);
+  color: #5BB8F5;
 }
 
 .btn-logout {
@@ -340,7 +321,7 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
   border-radius: 7px;
   padding: 7px 14px;
   font-size: 0.75rem;
-  font-family: 'Jost', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   cursor: pointer;
   transition: all 0.15s;
   flex-shrink: 0;
@@ -448,9 +429,9 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
 .kpi-slate::after { background: var(--slate); }
 
 .kpi-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); margin-bottom: 8px; }
-.kpi-val { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; line-height: 1; margin-bottom: 2px; }
+.kpi-val { font-family: 'Montserrat', sans-serif; font-size: 2.2rem; line-height: 1; margin-bottom: 2px; }
 .kpi-red .kpi-val { color: var(--red); }
-.kpi-amber .kpi-val { color: var(--gold); }
+.kpi-amber .kpi-val { color: #5BB8F5; }
 .kpi-green .kpi-val { color: var(--green); }
 .kpi-slate .kpi-val { color: var(--slate); }
 .kpi-sub { font-size: 0.68rem; color: var(--muted); }
@@ -503,7 +484,7 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
 }
 
 .prop-group-header h2 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 1.05rem;
   font-weight: 600;
   color: #fff;
@@ -627,7 +608,7 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
   font-size: 0.75rem;
   font-weight: 700;
   cursor: pointer;
-  font-family: 'Jost', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   transition: all 0.15s;
   letter-spacing: 0.03em;
 }
@@ -643,7 +624,7 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
   font-size: 0.75rem;
   font-weight: 700;
   cursor: pointer;
-  font-family: 'Jost', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   transition: all 0.15s;
   letter-spacing: 0.03em;
 }
@@ -659,7 +640,7 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
   font-size: 0.7rem;
   font-weight: 600;
   cursor: pointer;
-  font-family: 'Jost', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   transition: all 0.15s;
 }
 .btn-rescind:hover { background: var(--border); color: var(--text); }
@@ -695,13 +676,13 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
   border-radius: 6px;
   padding: 8px 12px;
   font-size: 0.82rem;
-  font-family: 'Jost', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   color: var(--text);
   resize: vertical;
   min-height: 70px;
   transition: border-color 0.15s;
 }
-.comment-section textarea:focus { outline: none; border-color: var(--gold); }
+.comment-section textarea:focus { outline: none; border-color: #5BB8F5; }
 
 .comment-btns { display: flex; gap: 8px; margin-top: 8px; justify-content: flex-end; }
 
@@ -711,7 +692,7 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
-  font-family: 'Jost', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   border: 1.5px solid;
   transition: all 0.15s;
 }
@@ -749,7 +730,7 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
   color: var(--muted);
 }
 .empty-icon { font-size: 3rem; margin-bottom: 14px; }
-.empty h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--text); margin-bottom: 8px; }
+.empty h3 { font-family: 'Montserrat', sans-serif; font-size: 1.4rem; color: var(--text); margin-bottom: 8px; }
 .empty p { font-size: 0.83rem; line-height: 1.6; max-width: 340px; margin: 0 auto; }
 
 /* ── Disclaimer ── */
@@ -819,7 +800,7 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
   padding: 18px 22px;
   border-bottom: 1px solid var(--border);
 }
-.modal-header h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 600; flex: 1; }
+.modal-header h3 { font-family: 'Montserrat', sans-serif; font-size: 1.2rem; font-weight: 600; flex: 1; }
 .modal-body { padding: 20px 22px; }
 .modal-body p { font-size: 0.84rem; line-height: 1.7; color: var(--muted); margin-bottom: 14px; }
 .modal-body .issue-ref {
@@ -853,7 +834,7 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
   overflow: hidden;
   transition: all 0.15s;
 }
-.owner-vault-card:hover { border-color: var(--gold); box-shadow: 0 3px 14px rgba(184,137,42,0.1); }
+.owner-vault-card:hover { border-color: #5BB8F5; box-shadow: 0 3px 14px rgba(184,137,42,0.1); }
 .ovc-preview {
   height: 110px;
   background: var(--warm);
@@ -867,12 +848,12 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
 }
 .ovc-preview img { width:100%;height:100%;object-fit:cover;position:absolute;inset:0; }
 .ovc-body { padding: 11px 14px; }
-.ovc-cat { font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold);margin-bottom:3px; }
+.ovc-cat { font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#5BB8F5;margin-bottom:3px; }
 .ovc-name { font-size:0.84rem;font-weight:600;line-height:1.3;margin-bottom:3px;color:var(--text); }
 .ovc-prop { font-size:0.68rem;color:var(--muted);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
 .ovc-meta { font-size:0.65rem;color:var(--muted); }
 .ovc-actions { display:flex;gap:6px;padding:9px 14px;border-top:1px solid var(--border);background:var(--warm); }
-.ovc-btn { flex:1;padding:6px 10px;border-radius:6px;font-size:0.72rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--white);color:var(--ink);font-family:'Jost',sans-serif;transition:all 0.12s;text-align:center; }
+.ovc-btn { flex:1;padding:6px 10px;border-radius:6px;font-size:0.72rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--white);color:var(--ink);font-family:'Montserrat', sans-serif;transition:all 0.12s;text-align:center; }
 .ovc-btn:hover { background:var(--ink);color:#fff;border-color:var(--ink); }
 
 /* ── Owner Quotes ── */
@@ -905,7 +886,7 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
   font-size: 1.4rem; flex-shrink: 0;
   background: var(--gold-pale); border: 1px solid #e8c86a;
 }
-.oq-cat { font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--gold); margin-bottom:3px; }
+.oq-cat { font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#5BB8F5; margin-bottom:3px; }
 .oq-desc { font-size:0.92rem; font-weight:600; margin-bottom:4px; line-height:1.4; }
 .oq-property { font-size:0.74rem; color:var(--muted); margin-bottom:6px; }
 .oq-meta { display:flex; flex-wrap:wrap; gap:10px; font-size:0.7rem; color:var(--muted); }
@@ -913,8 +894,8 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
 .oq-notes { margin-top:8px; padding:9px 12px; background:var(--warm); border-radius:7px; font-size:0.78rem; color:var(--muted); font-style:italic; border-left:2px solid var(--gold); }
 
 .oq-amount-wrap { display:flex; flex-direction:column; align-items:flex-end; gap:8px; min-width:140px; }
-.oq-amount { font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:600; color:var(--ink); line-height:1; }
-.oq-amount span { font-family:'Jost',sans-serif; font-size:0.68rem; color:var(--muted); display:block; margin-bottom:2px; }
+.oq-amount { font-family:'Montserrat', sans-serif; font-size:2rem; font-weight:600; color:var(--ink); line-height:1; }
+.oq-amount span { font-family:'Montserrat', sans-serif; font-size:0.68rem; color:var(--muted); display:block; margin-bottom:2px; }
 
 .oq-action-zone {
   padding: 14px 18px;
@@ -927,7 +908,7 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
   background: var(--green-pale); color: var(--green);
   border: 1.5px solid #a7d8be; border-radius: 8px;
   font-size: 0.82rem; font-weight: 700; cursor: pointer;
-  font-family: 'Jost', sans-serif; transition: all 0.15s;
+  font-family: 'Montserrat', sans-serif; transition: all 0.15s;
 }
 .oq-btn-approve:hover { background: var(--green); color: #fff; border-color: var(--green); }
 .oq-btn-reject {
@@ -935,7 +916,7 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
   background: var(--red-pale); color: var(--red);
   border: 1.5px solid #f5c6c2; border-radius: 8px;
   font-size: 0.82rem; font-weight: 700; cursor: pointer;
-  font-family: 'Jost', sans-serif; transition: all 0.15s;
+  font-family: 'Montserrat', sans-serif; transition: all 0.15s;
 }
 .oq-btn-reject:hover { background: var(--red); color: #fff; border-color: var(--red); }
 .oq-btn-rescind {
@@ -943,16 +924,16 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
   background: var(--white); color: var(--muted);
   border: 1px solid var(--border); border-radius: 7px;
   font-size: 0.72rem; font-weight: 600; cursor: pointer;
-  font-family: 'Jost', sans-serif; transition: all 0.15s;
+  font-family: 'Montserrat', sans-serif; transition: all 0.15s;
 }
 .oq-btn-rescind:hover { background: var(--warm); color: var(--text); }
 .oq-comment-box { margin-top: 10px; animation: slideDown 0.18s ease; }
 .oq-comment-box textarea {
   width: 100%; border: 1px solid var(--border); border-radius: 7px;
-  padding: 9px 12px; font-family: 'Jost', sans-serif; font-size: 0.82rem;
+  padding: 9px 12px; font-family: 'Montserrat', sans-serif; font-size: 0.82rem;
   background: var(--white); resize: vertical; min-height: 64px; margin-bottom: 8px;
 }
-.oq-comment-box textarea:focus { outline: none; border-color: var(--gold); }
+.oq-comment-box textarea:focus { outline: none; border-color: #5BB8F5; }
 .oq-comment-confirm { display:flex; gap:8px; justify-content:flex-end; }
 .oq-response-display {
   margin-top: 10px; padding: 10px 14px; border-radius: 8px;
@@ -969,7 +950,7 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--cr
 .doc-modal.open { display:flex; }
 .doc-modal-inner { background:var(--white);border-radius:14px;overflow:hidden;max-width:760px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,0.25); }
 .doc-modal-head { display:flex;align-items:center;gap:12px;padding:15px 20px;border-bottom:1px solid var(--border);background:var(--ink);flex-shrink:0; }
-.doc-modal-head h3 { font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;color:#fff;flex:1; }
+.doc-modal-head h3 { font-family:'Montserrat', sans-serif;font-size:1rem;font-weight:600;color:#fff;flex:1; }
 .doc-modal-body { flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;background:var(--warm);padding:20px;min-height:250px; }
 .doc-modal-body img { max-width:100%;max-height:55vh;border-radius:8px; }
 .doc-modal-foot { padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;background:var(--warm);flex-shrink:0; }
@@ -984,9 +965,16 @@ const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
 <div id="loginScreen">
   <div class="login-left">
     <div class="login-brand">
-      <div class="login-emblem">🏠</div>
-      <div class="login-brand-name">VicRental Pro<br>Owner Portal</div>
-      <div class="login-brand-sub">Victoria · Property Compliance</div>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 200" style="width:260px;height:auto;display:block;margin-bottom:16px;">
+        <polygon points="30,10 73,10 105,175 62,175" fill="#fff" opacity="0.9"/>
+        <polygon points="80,10 123,10 91,175 48,175" fill="#5BB8F5"/>
+        <rect x="48" y="169" width="63" height="8" fill="#fff" opacity="0.9"/>
+        <text x="148" y="88" font-family="Montserrat,Arial,sans-serif" font-size="46" font-weight="700" fill="#fff" letter-spacing="-1">Vic<tspan fill="#5BB8F5">Rental</tspan></text>
+        <text x="150" y="128" font-family="Montserrat,Arial,sans-serif" font-size="22" font-weight="400" fill="#fff" letter-spacing="10">PRO</text>
+        <rect x="150" y="138" width="188" height="3" fill="#5BB8F5"/>
+        <text x="150" y="163" font-family="Montserrat,Arial,sans-serif" font-size="11" letter-spacing="1"><tspan fill="#fff" font-weight="700">REPORT</tspan><tspan fill="#5BB8F5"> · </tspan><tspan fill="#fff" font-weight="700">TRACK</tspan><tspan fill="#5BB8F5"> · </tspan><tspan fill="#fff" font-weight="700">COMPLY</tspan></text>
+      </svg>
+      <div class="login-brand-sub" style="color:rgba(255,255,255,0.7);margin-top:4px;">Owner Portal · Victoria</div>
     </div>
     <div class="login-tagline">
       <div class="login-tagline-line"></div>
@@ -1032,12 +1020,15 @@ const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
   <!-- Header -->
   <div class="portal-header">
     <div class="portal-header-inner">
-      <div class="portal-logo">
-        <div class="portal-logo-icon">🏠</div>
-        <div>
-          <div class="portal-logo-text">Owner Portal</div>
-          <span class="portal-logo-sub">VicRental Pro · Victoria</span>
-        </div>
+      <div class="portal-logo" style="display:flex;align-items:center;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 200" style="width:160px;height:auto;display:block;">
+          <polygon points="30,10 73,10 105,175 62,175" fill="#fff" opacity="0.9"/>
+          <polygon points="80,10 123,10 91,175 48,175" fill="#5BB8F5"/>
+          <rect x="48" y="169" width="63" height="8" fill="#fff" opacity="0.9"/>
+          <text x="148" y="88" font-family="Montserrat,Arial,sans-serif" font-size="46" font-weight="700" fill="#fff" letter-spacing="-1">Vic<tspan fill="#5BB8F5">Rental</tspan></text>
+          <text x="150" y="128" font-family="Montserrat,Arial,sans-serif" font-size="22" font-weight="400" fill="#fff" letter-spacing="10">PRO</text>
+          <rect x="150" y="138" width="188" height="3" fill="#5BB8F5"/>
+        </svg>
       </div>
       <div class="portal-header-owner">
         <span>Signed in as</span>
@@ -1113,8 +1104,8 @@ const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
       </div>
       <!-- Vault filters -->
       <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
-        <input type="text" id="ownerVaultSearch" placeholder="🔍 Search documents…" oninput="renderOwnerVault()" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:0.82rem;font-family:'Jost',sans-serif;flex:1;min-width:180px;max-width:260px;">
-        <select id="ownerVaultCat" onchange="renderOwnerVault()" style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:0.82rem;font-family:'Jost',sans-serif;background:#fff;color:var(--text);">
+        <input type="text" id="ownerVaultSearch" placeholder="🔍 Search documents…" oninput="renderOwnerVault()" style="border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:0.82rem;font-family:'Montserrat', sans-serif;flex:1;min-width:180px;max-width:260px;">
+        <select id="ownerVaultCat" onchange="renderOwnerVault()" style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:0.82rem;font-family:'Montserrat', sans-serif;background:#fff;color:var(--text);">
           <option value="all">All categories</option>
           <option value="Compliance Certificate">Compliance Certificates</option>
           <option value="Invoice">Invoices</option>
@@ -1164,7 +1155,7 @@ const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
       <div class="issue-ref" id="modalIssueRef"></div>
       <p id="modalDesc"></p>
       <label style="display:block;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:6px;" id="modalCommentLabel">Comment (optional)</label>
-      <textarea id="modalComment" rows="3" placeholder="Add a note or reason…" style="width:100%;background:var(--warm);border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Jost',sans-serif;font-size:0.82rem;resize:vertical;"></textarea>
+      <textarea id="modalComment" rows="3" placeholder="Add a note or reason…" style="width:100%;background:var(--warm);border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;resize:vertical;"></textarea>
     </div>
     <div class="modal-footer">
       <button class="btn-sm btn-cancel-action" onclick="closeModal()">Cancel</button>
@@ -1183,7 +1174,7 @@ const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
     <div class="doc-modal-body" id="ownerDocBody"></div>
     <div class="doc-modal-foot">
       <button class="btn-login" onclick="closeOwnerDocModal()" style="width:auto;padding:8px 18px;margin:0;font-size:0.8rem;">Close</button>
-      <a id="ownerDocDownload" download style="background:linear-gradient(135deg,var(--ink),var(--ink-mid));color:#fff;border:none;border-radius:9px;padding:8px 18px;font-size:0.8rem;font-weight:600;font-family:'Jost',sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">⬇ Download</a>
+      <a id="ownerDocDownload" download style="background:linear-gradient(135deg,var(--ink),var(--ink-mid));color:#fff;border:none;border-radius:9px;padding:8px 18px;font-size:0.8rem;font-weight:600;font-family:'Montserrat', sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">⬇ Download</a>
     </div>
   </div>
 </div>
@@ -1764,7 +1755,7 @@ function renderOwnerQuotes() {
   if (allOwnerQuotes.length === 0) {
     container.innerHTML = `<div style="text-align:center;padding:56px 24px;color:var(--muted);">
       <div style="font-size:3rem;margin-bottom:14px;">💰</div>
-      <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--text);margin-bottom:8px;">No quotes yet</div>
+      <div style="font-family:'Montserrat', sans-serif;font-size:1.4rem;color:var(--text);margin-bottom:8px;">No quotes yet</div>
       <div style="font-size:0.82rem;line-height:1.6;max-width:340px;margin:0 auto;">Your property manager will upload repair quotes here for your review before any work is scheduled.</div>
     </div>`;
     return;
@@ -2000,7 +1991,7 @@ function renderOwnerVault() {
     const allVisible = S.get(KEY_VAULT, []).filter(d => d.ownerVisible === 'yes').length;
     grid.innerHTML = `<div style="text-align:center;padding:52px 24px;color:var(--muted);">
       <div style="font-size:3rem;margin-bottom:14px;">🗄️</div>
-      <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--text);margin-bottom:8px;">${allVisible === 0 ? 'No documents shared yet' : 'No documents match'}</div>
+      <div style="font-family:'Montserrat', sans-serif;font-size:1.3rem;color:var(--text);margin-bottom:8px;">${allVisible === 0 ? 'No documents shared yet' : 'No documents match'}</div>
       <div style="font-size:0.82rem;line-height:1.6;max-width:320px;margin:0 auto;">${allVisible === 0 ? 'Your property manager will share compliance certificates, invoices and reports here once available.' : 'Try adjusting your search or category filter.'}</div>
     </div>`;
     return;
