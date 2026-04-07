@@ -5470,10 +5470,11 @@ async function loadOwners() {
   window._cachedOwners = merged;
 
   el.innerHTML = `
+    <div style="background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
     <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
       <thead>
-        <tr style="border-bottom:2px solid var(--border);">
-          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Name</th>
+        <tr style="background:var(--warm);border-bottom:2px solid var(--border);">
+          <th style="text-align:left;padding:11px 16px;color:var(--muted);font-weight:700;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.07em;">Name</th>
           <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Email / Phone</th>
           <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Properties</th>
           <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Added</th>
@@ -5505,7 +5506,8 @@ async function loadOwners() {
             </tr>`;
         }).join('')}
       </tbody>
-    </table>`;
+    </table>
+    </div>`;
 }
 
 async function deleteOwner(id, name) {
