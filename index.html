@@ -73,7 +73,7 @@ body {
 }
 
 .sidebar-brand {
-  padding: 16px 18px 14px;
+  padding: 22px 18px 18px;
   border-bottom: 1px solid #e2e8f0;
 }
 
@@ -89,7 +89,7 @@ body {
 
 .brand-sub {
   font-size: 0.62rem;
-  color: #5BB8F5;
+  color: var(--gold);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -1658,7 +1658,7 @@ window.addEventListener('DOMContentLoaded', function() {
 <div class="app">
   <!-- ══════════════════════ SIDEBAR ══════════════════════ -->
   <aside class="sidebar">
-    <div class="sidebar-brand" style="padding:16px 18px 14px;">
+    <div class="sidebar-brand" style="padding:16px 18px 14px;border-bottom:1px solid #e2e8f0;">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 200" style="width:100%;max-width:200px;height:auto;display:block;">
         <polygon points="30,10 73,10 105,175 62,175" fill="#0A2F5C"/>
         <polygon points="80,10 123,10 91,175 48,175" fill="#5BB8F5"/>
@@ -1666,11 +1666,7 @@ window.addEventListener('DOMContentLoaded', function() {
         <text x="148" y="88" font-family="Montserrat,Arial,sans-serif" font-size="46" font-weight="700" fill="#0A2F5C" letter-spacing="-1">Vic<tspan fill="#5BB8F5">Rental</tspan></text>
         <text x="150" y="128" font-family="Montserrat,Arial,sans-serif" font-size="22" font-weight="400" fill="#0A2F5C" letter-spacing="10">PRO</text>
         <rect x="150" y="138" width="188" height="3" fill="#5BB8F5"/>
-        <text x="150" y="163" font-family="Montserrat,Arial,sans-serif" font-size="11" letter-spacing="1">
-          <tspan fill="#0A2F5C" font-weight="700">REPORT</tspan><tspan fill="#5BB8F5"> · </tspan>
-          <tspan fill="#0A2F5C" font-weight="700">TRACK</tspan><tspan fill="#5BB8F5"> · </tspan>
-          <tspan fill="#0A2F5C" font-weight="700">COMPLY</tspan>
-        </text>
+        <text x="150" y="163" font-family="Montserrat,Arial,sans-serif" font-size="11" letter-spacing="1"><tspan fill="#0A2F5C" font-weight="700">REPORT</tspan><tspan fill="#5BB8F5"> · </tspan><tspan fill="#0A2F5C" font-weight="700">TRACK</tspan><tspan fill="#5BB8F5"> · </tspan><tspan fill="#0A2F5C" font-weight="700">COMPLY</tspan></text>
       </svg>
     </div>
 
@@ -1766,24 +1762,12 @@ window.addEventListener('DOMContentLoaded', function() {
           <div class="kpi-card kpi-amber"><div class="kpi-label">In Progress</div><div class="kpi-value" id="dashIP">0</div><div class="kpi-sub">Repairs underway</div><div class="kpi-icon">🔨</div></div>
           <div class="kpi-card kpi-green"><div class="kpi-label">Resolved</div><div class="kpi-value" id="dashOK">0</div><div class="kpi-sub">Completed repairs</div><div class="kpi-icon">✅</div></div>
           <div class="kpi-card kpi-gold"><div class="kpi-label">Overdue</div><div class="kpi-value" id="dashOverdue">0</div><div class="kpi-sub">Past due date</div><div class="kpi-icon">⏰</div></div>
-          <div class="kpi-card" style="background:linear-gradient(135deg,#0A2F5C,#1a4d8a);cursor:pointer;" onclick="showPage('tenantreqs')"><div class="kpi-label" style="color:rgba(255,255,255,0.75);">New Requests</div><div class="kpi-value" style="color:#fff;" id="dashNewTR">0</div><div class="kpi-sub" style="color:rgba(255,255,255,0.6);">Awaiting review</div><div class="kpi-icon">🏡</div></div>
-          <div class="kpi-card" style="background:linear-gradient(135deg,#5B21B6,#7C3AED);cursor:pointer;" onclick="scrollToOwnerResponses()"><div class="kpi-label" style="color:rgba(255,255,255,0.75);">Owner Responses</div><div class="kpi-value" style="color:#fff;" id="dashOwnerResp">0</div><div class="kpi-sub" style="color:rgba(255,255,255,0.6);">Awaiting work order</div><div class="kpi-icon">✍️</div></div>
+          <div class="kpi-card" style="background:linear-gradient(135deg,#0A2F5C,#1a4d8a);cursor:pointer;" onclick="showPage('tenantreqs')"><div class="kpi-label" style="color:#334155;">New Requests</div><div class="kpi-value" style="color:#fff;" id="dashNewTR">0</div><div class="kpi-sub" style="color:rgba(255,255,255,0.6);">Awaiting review</div><div class="kpi-icon">🏡</div></div>
+          <div class="kpi-card" style="background:linear-gradient(135deg,#5B21B6,#7C3AED);cursor:pointer;" onclick="scrollToOwnerResponses()"><div class="kpi-label" style="color:rgba(255,255,255,0.75);">Owner Responses</div><div class="kpi-value" style="color:#fff;" id="dashOwnerResp">0</div><div class="kpi-sub" style="color:rgba(255,255,255,0.6);">Approvals received</div><div class="kpi-icon">✍️</div></div>
         </div>
 
         <!-- Owner Responses Panel -->
-        <div class="panel" style="margin-bottom:14px;" id="dashOwnerRespPanel">
-          <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;" id="ownerRespAnchor">
-            <h3>✍️ Owner Responses</h3>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <small id="dashOwnerRespLabel" style="color:var(--muted);"></small>
-              <button class="btn btn-ghost" style="font-size:0.72rem;padding:4px 10px;" onclick="renderDashboard()">↺ Refresh</button>
-            </div>
-          </div>
-          <div id="dashOwnerRespList"></div>
-        </div>
-
-        <!-- Owner Responses Panel -->
-        <div class="panel" style="margin-bottom:14px;" id="dashOwnerRespPanel">
+        <div class="panel" style="margin-bottom:14px;">
           <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;" id="ownerRespAnchor">
             <h3>✍️ Owner Responses</h3>
             <div style="display:flex;gap:8px;align-items:center;">
@@ -2093,11 +2077,14 @@ window.addEventListener('DOMContentLoaded', function() {
       <div class="page" id="page-owners">
 
         <!-- Owners List FIRST -->
-        <div style="margin-bottom:20px;">
-          <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:14px;gap:8px;">
-            <input type="text" id="ownerSearch" placeholder="🔍 Search owners…" oninput="filterOwners()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'Montserrat', sans-serif;font-size:0.8rem;width:220px;background:#fff;">
-            <button class="btn btn-ghost" onclick="loadOwners()" style="font-size:0.75rem;padding:5px 12px;">↺ Refresh</button>
-            <button class="btn btn-primary" onclick="toggleOwnerForm()" style="font-size:0.75rem;padding:5px 14px;">+ Add Owner</button>
+        <div class="panel" style="margin-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Owners — A to Z</div>
+            <div style="display:flex;gap:8px;">
+              <input type="text" id="ownerSearch" placeholder="🔍 Search owners…" oninput="filterOwners()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'Montserrat', sans-serif;font-size:0.8rem;width:220px;">
+              <button class="btn btn-ghost" onclick="loadOwners()" style="font-size:0.75rem;padding:5px 12px;">↺ Refresh</button>
+              <button class="btn btn-primary" onclick="toggleOwnerForm()" style="font-size:0.75rem;padding:5px 14px;">+ Add Owner</button>
+            </div>
           </div>
           <div id="ownersList"><div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">Loading owners…</div></div>
         </div>
@@ -2131,11 +2118,14 @@ window.addEventListener('DOMContentLoaded', function() {
       <div class="page" id="page-tenants">
 
         <!-- Tenant List FIRST -->
-        <div style="margin-bottom:20px;">
-          <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:14px;gap:8px;">
-            <input type="text" id="tenantSearch" placeholder="🔍 Search name, email or property…" oninput="renderTenantsList()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'Montserrat', sans-serif;font-size:0.8rem;width:260px;background:#fff;">
-            <button class="btn btn-ghost" onclick="loadTenants()" style="font-size:0.75rem;padding:5px 12px;">↺ Refresh</button>
-            <button class="btn btn-primary" onclick="toggleTenantForm()" style="font-size:0.75rem;padding:5px 14px;">+ Add Tenant</button>
+        <div class="panel" style="margin-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Registered Tenants — A to Z</div>
+            <div style="display:flex;gap:8px;">
+              <input type="text" id="tenantSearch" placeholder="🔍 Search name, email or property…" oninput="renderTenantsList()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'Montserrat', sans-serif;font-size:0.8rem;width:260px;">
+              <button class="btn btn-ghost" onclick="loadTenants()" style="font-size:0.75rem;padding:5px 12px;">↺ Refresh</button>
+              <button class="btn btn-primary" onclick="toggleTenantForm()" style="font-size:0.75rem;padding:5px 14px;">+ Add Tenant</button>
+            </div>
           </div>
           <div id="tenantsList"><div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">Loading tenants…</div></div>
         </div>
@@ -2193,10 +2183,13 @@ window.addEventListener('DOMContentLoaded', function() {
       <div class="page" id="page-manageprops">
 
         <!-- Property List FIRST -->
-        <div style="margin-bottom:20px;">
-          <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:14px;gap:8px;">
-            <input type="text" id="propSearch" placeholder="🔍 Search address or owner…" oninput="renderManagedProps()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'Montserrat', sans-serif;font-size:0.8rem;width:220px;background:#fff;">
-            <button class="btn btn-primary" onclick="togglePropForm()" style="font-size:0.75rem;padding:5px 14px;">+ Add Property</button>
+        <div class="panel" style="margin-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div></div>
+            <div style="display:flex;gap:8px;">
+              <input type="text" id="propSearch" placeholder="🔍 Search address or owner…" oninput="renderManagedProps()" style="border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:'Montserrat', sans-serif;font-size:0.8rem;width:220px;">
+              <button class="btn btn-primary" onclick="togglePropForm()" style="font-size:0.75rem;padding:5px 14px;">+ Add Property</button>
+            </div>
           </div>
           <div id="managedPropsList"></div>
         </div>
@@ -3250,25 +3243,24 @@ function renderDashboard() {
     }).join('');
   }
 
-  // ── Owner Responses ──────────────────────────────────────────────────
-  const KEY_REV2   = 'vicrental_owner_reviews';
-  const ownerRevs  = S.get(KEY_REV2, {});
-  const portalAll  = S.get(KEY_PORT, []);
-  const approvedList = Object.entries(ownerRevs)
+  // ── Owner Responses ─────────────────────────────────────────────────────
+  const ownerRevMap  = S.get('vicrental_owner_reviews', {});
+  const portalForOwner = S.get(KEY_PORT, []);
+  const ownerApprovedItems = Object.entries(ownerRevMap)
     .filter(([id, r]) => r.type === 'approve')
-    .map(([id, r]) => ({ id, review: r, item: portalAll.find(p => p.id === id), wo: wos.find(w => w.id === id) }))
+    .map(([id, r]) => ({ id, review: r, item: portalForOwner.find(p => p.id === id), wo: wos.find(w => w.id === id) }))
     .filter(({ item }) => !!item);
-  const ownerRespEl    = document.getElementById('dashOwnerResp');
-  const ownerRespLabel = document.getElementById('dashOwnerRespLabel');
-  const ownerRespList  = document.getElementById('dashOwnerRespList');
-  if (ownerRespEl)    ownerRespEl.textContent = approvedList.length;
-  if (ownerRespLabel) ownerRespLabel.textContent = approvedList.length + ' approval' + (approvedList.length!==1?'s':'') + ' received';
-  if (ownerRespList) {
-    if (!approvedList.length) {
-      ownerRespList.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.82rem;">No owner responses yet — approvals will appear here when owners respond.</div>';
+  const _ownerRespEl    = document.getElementById('dashOwnerResp');
+  const _ownerRespLabel = document.getElementById('dashOwnerRespLabel');
+  const _ownerRespList  = document.getElementById('dashOwnerRespList');
+  if (_ownerRespEl)    _ownerRespEl.textContent = ownerApprovedItems.length;
+  if (_ownerRespLabel) _ownerRespLabel.textContent = ownerApprovedItems.length + ' approval' + (ownerApprovedItems.length!==1?'s':'') + ' received';
+  if (_ownerRespList) {
+    if (!ownerApprovedItems.length) {
+      _ownerRespList.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.82rem;">No owner responses yet — approvals will appear here when owners respond.</div>';
     } else {
-      const fmtT = iso => new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'})+' '+new Date(iso).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
-      ownerRespList.innerHTML = approvedList.map(({ id, review, item, wo }) => {
+      const _fmtT = iso => new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'})+' '+new Date(iso).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
+      _ownerRespList.innerHTML = ownerApprovedItems.map(({ id, review, item, wo }) => {
         const jobCreated = wo?._jobCreated;
         return `<div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;">
           <div style="width:36px;height:36px;border-radius:50%;background:#ede9fe;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">✍️</div>
@@ -3279,7 +3271,7 @@ function renderDashboard() {
               ${jobCreated?'<span style="background:var(--green-pale);color:var(--green);font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:5px;">📋 Job Created</span>':''}
             </div>
             <div style="font-size:0.8rem;color:var(--text);margin-bottom:3px;"><strong>${item.issue||'—'}</strong></div>
-            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:6px;">Approved by <strong>${review.owner}</strong> · ${fmtT(review.time)}</div>
+            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:6px;">Approved by <strong>${review.owner}</strong> · ${_fmtT(review.time)}</div>
             ${review.comment?`<div style="font-size:0.78rem;background:var(--warm);border-left:3px solid #5B21B6;padding:6px 10px;border-radius:0 6px 6px 0;color:var(--text);margin-bottom:8px;">"${review.comment}"</div>`:''}
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
               <button onclick="viewOwnerApproval('${id}')" style="padding:5px 12px;background:var(--warm);color:var(--navy);border:1px solid var(--border);border-radius:7px;font-size:0.75rem;font-weight:600;cursor:pointer;font-family:'Montserrat',sans-serif;">👁 View Details</button>
@@ -3951,14 +3943,33 @@ function saveChecklistState() {
   });
 }
 
-
+function renderCategories() {
+  const container = document.getElementById('clCategories');
+  container.innerHTML = CATEGORIES.map((cat, ci) =>
+    `<div class="cat-accordion ${ci===0?'open':''}" id="cacc-${cat.id}">
+      <div class="cat-head" onclick="toggleCat('${cat.id}')">
+        <span class="cat-icon">${cat.icon}</span>
+        <div class="cat-info">
+          <div class="cat-title">${cat.title}</div>
+          <div class="cat-sub">${cat.subtitle}</div>
+        </div>
+        <div class="cat-progress" id="catprog-${cat.id}"></div>
+        <span class="cat-chevron">▼</span>
+      </div>
+      <div class="cat-body" id="catbody-${cat.id}">
+        ${cat.items.map(item => renderCheckItem(item, cat)).join('')}
+      </div>
+    </div>`
+  ).join('');
+  updateCatProgress();
+}
 
 function renderCategories() {
   const container = document.getElementById('clCategories');
   if (!container) return;
   container.innerHTML = CATEGORIES.map((cat, ci) => {
-    const compSection     = cat.complianceType ? buildComplianceSection(cat) : '';
-    const cleaningSection = cat.hasCleaningSection ? buildCleaningSection() : '';
+    const comp     = cat.complianceType ? buildComplianceSection(cat) : '';
+    const cleaning = cat.hasCleaningSection ? buildCleaningSection() : '';
     return `<div class="cat-accordion ${ci===0?'open':''}" id="cacc-${cat.id}">
       <div class="cat-head" onclick="toggleCat('${cat.id}')">
         <span class="cat-icon">${cat.icon}</span>
@@ -3968,7 +3979,7 @@ function renderCategories() {
       </div>
       <div class="cat-body" id="catbody-${cat.id}">
         ${cat.items.map(item => renderCheckItem(item, cat)).join('')}
-        ${compSection}${cleaningSection}
+        ${comp}${cleaning}
       </div>
     </div>`;
   }).join('');
@@ -3982,65 +3993,46 @@ function buildComplianceSection(cat) {
   const freq = t==='smoke'?'Every 12 months':'Every 2 years';
   const label = t==='electrical'?'Electrical Safety':t==='gas'?'Gas Safety':'Smoke Alarm';
   const col = t==='electrical'?'#f59e0b':t==='gas'?'#5BB8F5':'#dc2626';
-  const inp = `width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Montserrat',sans-serif;font-size:0.82rem;background:#fff;box-sizing:border-box;`;
   return `<div style="margin:12px 16px 16px;background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:16px;">
-    <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:12px;">
-      📋 ${label} Compliance Record <span style="background:${col};color:#fff;border-radius:5px;padding:2px 8px;font-size:0.65rem;margin-left:6px;">${freq}</span></div>
+    <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:12px;">📋 ${label} Compliance Record <span style="background:${col};color:#fff;border-radius:5px;padding:2px 8px;font-size:0.65rem;margin-left:6px;">${freq}</span></div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;">
-      <div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Date of Last Inspection</label>
-        <input type="date" id="comp_last_${t}" onchange="autoCalcNextDate('${t}')" style="${inp}"></div>
-      <div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Next Inspection Due</label>
-        <input type="date" id="comp_next_${t}" style="${inp}"></div>
-      <div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Company / Inspector</label>
-        <input type="text" id="comp_company_${t}" placeholder="e.g. Safe Gas Pty Ltd" oninput="saveComplianceDates('${t}')" style="${inp}"></div>
+      <div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Date of Last Inspection</label><input type="date" id="comp_last_${t}" onchange="autoCalcNextDate('${t}')" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Montserrat',sans-serif;font-size:0.82rem;background:#fff;box-sizing:border-box;"></div>
+      <div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Next Inspection Due</label><input type="date" id="comp_next_${t}" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Montserrat',sans-serif;font-size:0.82rem;background:#fff;box-sizing:border-box;"></div>
+      <div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Company / Inspector</label><input type="text" id="comp_company_${t}" placeholder="e.g. Safe Gas Pty Ltd" oninput="saveComplianceDates('${t}')" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Montserrat',sans-serif;font-size:0.82rem;background:#fff;box-sizing:border-box;"></div>
     </div>
-    <button onclick="generateComplianceCert('${t}','${label}')"
-      style="padding:8px 20px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">
-      📜 Generate ${label} Compliance Certificate</button>
+    <button onclick="generateComplianceCert('${t}','${label}')" style="padding:8px 20px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📜 Generate ${label} Compliance Certificate</button>
   </div>`;
 }
 
 function buildCleaningSection() {
-  const inp = `width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Montserrat',sans-serif;font-size:0.82rem;background:#fff;box-sizing:border-box;`;
+  const i = `width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Montserrat',sans-serif;font-size:0.82rem;background:#fff;box-sizing:border-box;`;
   return `<div style="margin:12px 16px 16px;background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:16px;">
     <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:14px;">🧹 Cleaning Records</div>
     <div style="background:#fff;border:1px solid var(--border);border-radius:9px;padding:14px;margin-bottom:12px;">
       <div style="font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:10px;">🏠 Professional Property Clean</div>
       <div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:12px;align-items:center;">
         <label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;font-weight:600;cursor:pointer;"><input type="checkbox" id="clean_prof_done" onchange="saveCleaningRecords()" style="width:16px;height:16px;accent-color:#0A2F5C;"> Completed</label>
-        <div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Date of Clean</label><input type="date" id="clean_prof_date" onchange="saveCleaningRecords()" style="${inp}"></div>
-        <div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Company / Person</label><input type="text" id="clean_prof_company" placeholder="e.g. CleanPro Services" oninput="saveCleaningRecords()" style="${inp}"></div>
-        <div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Receipt</label>
-          <label style="display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px dashed var(--border);border-radius:7px;cursor:pointer;background:#fafafa;font-size:0.78rem;color:var(--muted);">📎 Upload<input type="file" accept="image/*,.pdf" style="display:none;" onchange="handleCleaningReceipt(event,'prof')"></label>
-          <div id="clean_prof_receipt_name" style="font-size:0.7rem;color:#16a34a;margin-top:3px;"></div></div>
+        <div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Date of Clean</label><input type="date" id="clean_prof_date" onchange="saveCleaningRecords()" style="${i}"></div>
+        <div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Company / Person</label><input type="text" id="clean_prof_company" placeholder="e.g. CleanPro Services" oninput="saveCleaningRecords()" style="${i}"></div>
+        <div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Receipt</label><label style="display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px dashed var(--border);border-radius:7px;cursor:pointer;background:#fafafa;font-size:0.78rem;color:var(--muted);">📎 Upload<input type="file" accept="image/*,.pdf" style="display:none;" onchange="handleCleaningReceipt(event,'prof')"></label><div id="clean_prof_receipt_name" style="font-size:0.7rem;color:#16a34a;margin-top:3px;"></div></div>
       </div><div id="clean_prof_receipt_preview" style="margin-top:6px;"></div>
     </div>
     <div style="background:#fff;border:1px solid var(--border);border-radius:9px;padding:14px;">
       <div style="font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:10px;">🪣 Carpet Steam Clean</div>
       <div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:12px;align-items:center;">
         <label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;font-weight:600;cursor:pointer;"><input type="checkbox" id="clean_carpet_done" onchange="saveCleaningRecords()" style="width:16px;height:16px;accent-color:#0A2F5C;"> Completed</label>
-        <div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Date of Clean</label><input type="date" id="clean_carpet_date" onchange="saveCleaningRecords()" style="${inp}"></div>
-        <div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Company / Person</label><input type="text" id="clean_carpet_company" placeholder="e.g. Steam King" oninput="saveCleaningRecords()" style="${inp}"></div>
-        <div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Receipt</label>
-          <label style="display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px dashed var(--border);border-radius:7px;cursor:pointer;background:#fafafa;font-size:0.78rem;color:var(--muted);">📎 Upload<input type="file" accept="image/*,.pdf" style="display:none;" onchange="handleCleaningReceipt(event,'carpet')"></label>
-          <div id="clean_carpet_receipt_name" style="font-size:0.7rem;color:#16a34a;margin-top:3px;"></div></div>
+        <div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Date of Clean</label><input type="date" id="clean_carpet_date" onchange="saveCleaningRecords()" style="${i}"></div>
+        <div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Company / Person</label><input type="text" id="clean_carpet_company" placeholder="e.g. Steam King" oninput="saveCleaningRecords()" style="${i}"></div>
+        <div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Receipt</label><label style="display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px dashed var(--border);border-radius:7px;cursor:pointer;background:#fafafa;font-size:0.78rem;color:var(--muted);">📎 Upload<input type="file" accept="image/*,.pdf" style="display:none;" onchange="handleCleaningReceipt(event,'carpet')"></label><div id="clean_carpet_receipt_name" style="font-size:0.7rem;color:#16a34a;margin-top:3px;"></div></div>
       </div><div id="clean_carpet_receipt_preview" style="margin-top:6px;"></div>
     </div>
   </div>`;
 }
 
-function autoCalcNextDate(t) {
-  const last=document.getElementById('comp_last_'+t)?.value; const nextEl=document.getElementById('comp_next_'+t);
-  if (!last||!nextEl) return;
-  const d=new Date(last); d.setMonth(d.getMonth()+(t==='smoke'?12:24)); nextEl.value=d.toISOString().split('T')[0]; saveComplianceDates(t);
-}
-function saveComplianceDates(t) {
-  localStorage.setItem('vicrental_comp_'+t, JSON.stringify({ last:document.getElementById('comp_last_'+t)?.value||'', next:document.getElementById('comp_next_'+t)?.value||'', company:document.getElementById('comp_company_'+t)?.value||'' }));
-}
-function restoreComplianceDates(t) {
-  try { const d=JSON.parse(localStorage.getItem('vicrental_comp_'+t)||'null'); if(!d)return; ['last','next','company'].forEach(f=>{const el=document.getElementById('comp_'+f+'_'+t);if(el&&d[f])el.value=d[f];}); } catch(e){}
-}
-function generateComplianceCert(type, typeLabel) {
+function autoCalcNextDate(t){const last=document.getElementById('comp_last_'+t)?.value;const nextEl=document.getElementById('comp_next_'+t);if(!last||!nextEl)return;const d=new Date(last);d.setMonth(d.getMonth()+(t==='smoke'?12:24));nextEl.value=d.toISOString().split('T')[0];saveComplianceDates(t);}
+function saveComplianceDates(t){localStorage.setItem('vicrental_comp_'+t,JSON.stringify({last:document.getElementById('comp_last_'+t)?.value||'',next:document.getElementById('comp_next_'+t)?.value||'',company:document.getElementById('comp_company_'+t)?.value||''}));}
+function restoreComplianceDates(t){try{const d=JSON.parse(localStorage.getItem('vicrental_comp_'+t)||'null');if(!d)return;['last','next','company'].forEach(f=>{const el=document.getElementById('comp_'+f+'_'+t);if(el&&d[f])el.value=d[f];});}catch(e){}}
+function generateComplianceCert(type,typeLabel){
   const prop=(document.getElementById('clPropAddress')?.value||'').trim();
   const owner=(document.getElementById('clOwnerName')?.value||'').trim();
   const inspector=(document.getElementById('clInspector')?.value||'').trim();
@@ -4055,53 +4047,23 @@ function generateComplianceCert(type, typeLabel) {
   const today=new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});
   const col=type==='electrical'?'#f59e0b':type==='gas'?'#0A2F5C':'#dc2626';
   const certId='CERT-'+type.toUpperCase()+'-'+Date.now();
-  const certHtml=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${typeLabel} Compliance Certificate</title><style>body{font-family:Arial,sans-serif;margin:40px;color:#1a1a2e;}.hdr{display:flex;align-items:center;justify-content:space-between;border-bottom:4px solid #0A2F5C;padding-bottom:16px;margin-bottom:24px;}.logo{font-size:22px;font-weight:800;color:#0A2F5C;}.logo span{color:#5BB8F5;}.badge{background:${col};color:#fff;padding:6px 16px;border-radius:8px;font-weight:700;font-size:13px;}.ok{background:#dcfce7;border:2px solid #16a34a;border-radius:10px;padding:16px;text-align:center;margin:20px 0;}.ok-text{font-size:22px;font-weight:800;color:#16a34a;}.sec{background:#f0f4f8;border-radius:10px;padding:16px 20px;margin-bottom:16px;}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0;}.row:last-child{border-bottom:none;}.lbl{font-size:11px;color:#666;font-weight:600;text-transform:uppercase;}.val{font-size:13px;font-weight:700;color:#0A2F5C;}.footer{margin-top:32px;border-top:2px solid #0A2F5C;padding-top:16px;font-size:11px;color:#888;}</style></head><body>
-<div class="hdr"><div><div class="logo">Vic<span>Rental</span> PRO</div><div style="font-size:11px;color:#888;letter-spacing:0.1em;">REPORT · TRACK · COMPLY</div></div><div class="badge">${typeLabel} Compliance Certificate</div></div>
+  const certHtml=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${typeLabel} Compliance Certificate</title><style>body{font-family:Arial,sans-serif;margin:40px;color:#1a1a2e;}.hdr{display:flex;align-items:center;justify-content:space-between;border-bottom:4px solid #0A2F5C;padding-bottom:16px;margin-bottom:24px;}.logo{font-size:22px;font-weight:800;color:#0A2F5C;}.logo span{color:#5BB8F5;}.badge{background:${col};color:#fff;padding:6px 16px;border-radius:8px;font-weight:700;}.ok{background:#dcfce7;border:2px solid #16a34a;border-radius:10px;padding:16px;text-align:center;margin:20px 0;}.ok-text{font-size:22px;font-weight:800;color:#16a34a;}.sec{background:#f0f4f8;border-radius:10px;padding:16px 20px;margin-bottom:16px;}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0;}.row:last-child{border-bottom:none;}.lbl{font-size:11px;color:#666;font-weight:600;text-transform:uppercase;}.val{font-size:13px;font-weight:700;color:#0A2F5C;}.footer{margin-top:32px;border-top:2px solid #0A2F5C;padding-top:16px;font-size:11px;color:#888;}</style></head><body>
+<div class="hdr"><div><div class="logo">Vic<span>Rental</span> PRO</div><div style="font-size:11px;color:#888;">REPORT · TRACK · COMPLY</div></div><div class="badge">${typeLabel} Compliance Certificate</div></div>
 <div class="ok"><div class="ok-text">✅ COMPLIANT</div><div style="font-size:13px;color:#16a34a;margin-top:4px;">This property meets the required ${typeLabel.toLowerCase()} standards</div></div>
 <div class="sec"><div class="row"><span class="lbl">Property Address</span><span class="val">${prop}</span></div><div class="row"><span class="lbl">Owner</span><span class="val">${owner||'—'}</span></div></div>
-<div class="sec"><div class="row"><span class="lbl">Date of Inspection</span><span class="val">${fmt(lastDate)}</span></div><div class="row"><span class="lbl">Next Inspection Due</span><span class="val">${fmt(nextDate)}</span></div><div class="row"><span class="lbl">Frequency Required</span><span class="val">${freq}</span></div><div class="row"><span class="lbl">Inspecting Company / Inspector</span><span class="val">${company}</span></div><div class="row"><span class="lbl">Property Manager</span><span class="val">${inspector||'—'}</span></div></div>
-<div class="footer">Certificate generated: ${today} via VicRental Pro · ${certId}</div>
-</body></html>`;
+<div class="sec"><div class="row"><span class="lbl">Date of Inspection</span><span class="val">${fmt(lastDate)}</span></div><div class="row"><span class="lbl">Next Inspection Due</span><span class="val">${fmt(nextDate)}</span></div><div class="row"><span class="lbl">Frequency Required</span><span class="val">${freq}</span></div><div class="row"><span class="lbl">Company / Inspector</span><span class="val">${company}</span></div><div class="row"><span class="lbl">Property Manager</span><span class="val">${inspector||'—'}</span></div></div>
+<div class="footer">Generated: ${today} via VicRental Pro · ${certId}</div></body></html>`;
   const dataUrl='data:text/html;charset=utf-8,'+encodeURIComponent(certHtml);
-  const fname=typeLabel.replace(/\s/g,'_')+'_Certificate.html';
   const blob=new Blob([certHtml],{type:'text/html;charset=utf-8'});
-  const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=fname; a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000);
-  window._pendingCert={type,typeLabel,prop,owner,lastDate,nextDate,company,certId,dataUrl,fname};
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=typeLabel.replace(/\s/g,'_')+'_Certificate.html';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);
+  window._pendingCert={type,typeLabel,prop,owner,lastDate,nextDate,company,certId,dataUrl};
   setTimeout(()=>{if(confirm('Save this '+typeLabel+' Compliance Certificate to the Document Vault under "'+prop+'"?'))saveCertToVault();},900);
 }
-function saveCertToVault(){
-  const v=window._pendingCert; if(!v)return;
-  const vault=S.get(KEY_VAULT,[]); vault.unshift({id:v.certId,name:v.typeLabel+' Compliance Certificate — '+v.prop,type:'compliance_cert',category:'Compliance Certificate',fileName:v.fname,property:v.prop,owner:v.owner||'',date:v.lastDate,nextDue:v.nextDate,company:v.company,uploadedAt:new Date().toISOString(),ownerVisible:true,fileType:'html',isHtml:true,dataUrl:v.dataUrl});
-  S.set(KEY_VAULT,vault); if(typeof showToast==='function')showToast(v.typeLabel+' certificate saved to vault ✅','ok'); if(typeof renderVault==='function')renderVault();
-}
-function openCertInWindow(docId){
-  const doc=getVaultDocs().find(d=>String(d.id)===String(docId)); if(!doc?.dataUrl)return;
-  const html=decodeURIComponent(doc.dataUrl.replace('data:text/html;charset=utf-8,','')); const win=window.open('','_blank','width=820,height=900'); if(win){win.document.write(html);win.document.close();}
-}
-function handleCleaningReceipt(event,type){
-  const file=event.target.files[0]; if(!file)return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const dataUrl=e.target.result;
-    const nameEl=document.getElementById('clean_'+type+'_receipt_name'); const previewEl=document.getElementById('clean_'+type+'_receipt_preview');
-    if(nameEl)nameEl.textContent='✅ '+file.name;
-    if(previewEl)previewEl.innerHTML=file.type.startsWith('image/')?`<img src="${dataUrl}" style="max-width:200px;max-height:120px;border-radius:6px;border:1px solid var(--border);">`:`<div style="font-size:0.78rem;color:var(--muted);padding:6px 10px;background:#f8fafc;border-radius:6px;">📄 ${file.name}</div>`;
-    const cleaning=JSON.parse(localStorage.getItem('vicrental_cleaning')||'{}'); cleaning[type+'_receipt']={name:file.name,dataUrl,type:file.type}; localStorage.setItem('vicrental_cleaning',JSON.stringify(cleaning));
-  }; reader.readAsDataURL(file);
-}
-function saveCleaningRecords(){
-  const data={prof_done:document.getElementById('clean_prof_done')?.checked||false,prof_date:document.getElementById('clean_prof_date')?.value||'',prof_company:document.getElementById('clean_prof_company')?.value||'',carpet_done:document.getElementById('clean_carpet_done')?.checked||false,carpet_date:document.getElementById('clean_carpet_date')?.value||'',carpet_company:document.getElementById('clean_carpet_company')?.value||''};
-  const ex=JSON.parse(localStorage.getItem('vicrental_cleaning')||'{}'); localStorage.setItem('vicrental_cleaning',JSON.stringify({...ex,...data}));
-}
-function restoreCleaningRecords(){
-  try{
-    const d=JSON.parse(localStorage.getItem('vicrental_cleaning')||'{}');
-    const set=(id,val)=>{const el=document.getElementById(id);if(el){if(typeof val==='boolean')el.checked=val;else el.value=val;}};
-    set('clean_prof_done',d.prof_done||false);set('clean_prof_date',d.prof_date||'');set('clean_prof_company',d.prof_company||'');
-    set('clean_carpet_done',d.carpet_done||false);set('clean_carpet_date',d.carpet_date||'');set('clean_carpet_company',d.carpet_company||'');
-    ['prof','carpet'].forEach(type=>{const r=d[type+'_receipt'];if(!r)return;const nameEl=document.getElementById('clean_'+type+'_receipt_name');const previewEl=document.getElementById('clean_'+type+'_receipt_preview');if(nameEl)nameEl.textContent='✅ '+r.name;if(previewEl)previewEl.innerHTML=r.type?.startsWith('image/')?`<img src="${r.dataUrl}" style="max-width:200px;max-height:120px;border-radius:6px;border:1px solid var(--border);">`:`<div style="font-size:0.78rem;color:var(--muted);padding:6px 10px;background:#f8fafc;border-radius:6px;">📄 ${r.name}</div>`;});
-  }catch(e){}
-}
+function saveCertToVault(){const v=window._pendingCert;if(!v)return;const vault=S.get(KEY_VAULT,[]);vault.unshift({id:v.certId,name:v.typeLabel+' Compliance Certificate — '+v.prop,type:'compliance_cert',category:'Compliance Certificate',fileName:v.typeLabel.replace(/\s/g,'_')+'_Certificate.html',property:v.prop,owner:v.owner||'',date:v.lastDate,nextDue:v.nextDate,company:v.company,uploadedAt:new Date().toISOString(),ownerVisible:true,fileType:'html',isHtml:true,dataUrl:v.dataUrl});S.set(KEY_VAULT,vault);if(typeof showToast==='function')showToast(v.typeLabel+' certificate saved to vault ✅','ok');if(typeof renderVault==='function')renderVault();}
+function openCertInWindow(docId){const doc=getVaultDocs().find(d=>String(d.id)===String(docId));if(!doc?.dataUrl)return;const html=decodeURIComponent(doc.dataUrl.replace('data:text/html;charset=utf-8,',''));const win=window.open('','_blank','width=820,height=900');if(win){win.document.write(html);win.document.close();}}
+function handleCleaningReceipt(event,type){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const dataUrl=e.target.result;const n=document.getElementById('clean_'+type+'_receipt_name');const p=document.getElementById('clean_'+type+'_receipt_preview');if(n)n.textContent='✅ '+file.name;if(p)p.innerHTML=file.type.startsWith('image/')?`<img src="${dataUrl}" style="max-width:200px;max-height:120px;border-radius:6px;border:1px solid var(--border);">`:`<div style="font-size:0.78rem;color:var(--muted);padding:6px 10px;background:#f8fafc;border-radius:6px;">📄 ${file.name}</div>`;const c=JSON.parse(localStorage.getItem('vicrental_cleaning')||'{}');c[type+'_receipt']={name:file.name,dataUrl,type:file.type};localStorage.setItem('vicrental_cleaning',JSON.stringify(c));};reader.readAsDataURL(file);}
+function saveCleaningRecords(){const d={prof_done:document.getElementById('clean_prof_done')?.checked||false,prof_date:document.getElementById('clean_prof_date')?.value||'',prof_company:document.getElementById('clean_prof_company')?.value||'',carpet_done:document.getElementById('clean_carpet_done')?.checked||false,carpet_date:document.getElementById('clean_carpet_date')?.value||'',carpet_company:document.getElementById('clean_carpet_company')?.value||''};const e=JSON.parse(localStorage.getItem('vicrental_cleaning')||'{}');localStorage.setItem('vicrental_cleaning',JSON.stringify({...e,...d}));}
+function restoreCleaningRecords(){try{const d=JSON.parse(localStorage.getItem('vicrental_cleaning')||'{}');const set=(id,val)=>{const el=document.getElementById(id);if(el){if(typeof val==='boolean')el.checked=val;else el.value=val;}};set('clean_prof_done',d.prof_done||false);set('clean_prof_date',d.prof_date||'');set('clean_prof_company',d.prof_company||'');set('clean_carpet_done',d.carpet_done||false);set('clean_carpet_date',d.carpet_date||'');set('clean_carpet_company',d.carpet_company||'');['prof','carpet'].forEach(type=>{const r=d[type+'_receipt'];if(!r)return;const n=document.getElementById('clean_'+type+'_receipt_name');const p=document.getElementById('clean_'+type+'_receipt_preview');if(n)n.textContent='✅ '+r.name;if(p)p.innerHTML=r.type?.startsWith('image/')?`<img src="${r.dataUrl}" style="max-width:200px;max-height:120px;border-radius:6px;border:1px solid var(--border);">`:`<div style="font-size:0.78rem;color:var(--muted);padding:6px 10px;background:#f8fafc;border-radius:6px;">📄 ${r.name}</div>`;});}catch(e){}}
 
 function renderCheckItem(item, cat) {
   const s = clStatuses[item.id] || '';
@@ -5470,11 +5432,10 @@ async function loadOwners() {
   window._cachedOwners = merged;
 
   el.innerHTML = `
-    <div style="background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
     <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
       <thead>
-        <tr style="background:var(--warm);border-bottom:2px solid var(--border);">
-          <th style="text-align:left;padding:11px 16px;color:var(--muted);font-weight:700;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.07em;">Name</th>
+        <tr style="border-bottom:2px solid var(--border);">
+          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Name</th>
           <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Email / Phone</th>
           <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Properties</th>
           <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;">Added</th>
@@ -5506,8 +5467,7 @@ async function loadOwners() {
             </tr>`;
         }).join('')}
       </tbody>
-    </table>
-    </div>`;
+    </table>`;
 }
 
 async function deleteOwner(id, name) {
@@ -6161,192 +6121,113 @@ function closePropSummary() {
   document.getElementById('propSummaryModal').style.display = 'none';
 }
 
-// ── Owner Response Functions ──────────────────────────────────────────────────
 function scrollToOwnerResponses() {
   showPage('dashboard');
-  setTimeout(() => {
-    const el = document.getElementById('ownerRespAnchor');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 200);
+  setTimeout(() => { const el=document.getElementById('ownerRespAnchor'); if(el)el.scrollIntoView({behavior:'smooth',block:'start'}); }, 200);
 }
 
 function viewOwnerApproval(itemId) {
-  const KEY_REV = 'vicrental_owner_reviews';
-  const KEY_PORT = 'vicrental_portal';
-  const review = S.get(KEY_REV, {})[itemId];
-  const item   = S.get(KEY_PORT, []).find(p => p.id === itemId);
-  if (!review || !item) { showToast('Approval data not found', 'err'); return; }
-  const fmt = iso => new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'}) + ' at ' + new Date(iso).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
-
-  // Show modal with approval details
+  const review = S.get('vicrental_owner_reviews',{})[itemId];
+  const item   = S.get(KEY_PORT,[]).find(p=>p.id===itemId);
+  if (!review||!item) { if(typeof showToast==='function')showToast('Approval data not found','err'); return; }
+  const fmt = iso => new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'})+' at '+new Date(iso).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
   const modal = document.createElement('div');
   modal.id = 'ownerApprovalModal';
   modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9800;display:flex;align-items:center;justify-content:center;padding:20px;';
-  modal.innerHTML = `
-    <div style="background:#fff;border-radius:18px;padding:28px;width:100%;max-width:560px;box-shadow:0 24px 64px rgba(0,0,0,0.25);">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-        <div style="font-size:1rem;font-weight:800;color:#0A2F5C;">✍️ Owner Approval</div>
-        <button onclick="document.getElementById('ownerApprovalModal').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#64748b;">✕</button>
-      </div>
-      <div style="background:#f0f4f8;border-radius:10px;padding:14px 16px;margin-bottom:14px;">
-        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;color:#64748b;letter-spacing:0.06em;margin-bottom:4px;">Property</div>
-        <div style="font-size:0.9rem;font-weight:700;color:#0A2F5C;">${item.property || '—'}</div>
-      </div>
-      <div style="background:#f0f4f8;border-radius:10px;padding:14px 16px;margin-bottom:14px;">
-        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;color:#64748b;letter-spacing:0.06em;margin-bottom:4px;">Issue</div>
-        <div style="font-size:0.85rem;color:#0A2F5C;">${item.issue || '—'}</div>
-        ${item.legalRef ? `<div style="font-size:0.72rem;color:#64748b;margin-top:3px;">${item.legalRef}</div>` : ''}
-      </div>
-      <div style="background:#ede9fe;border:1px solid #c4b5fd;border-radius:10px;padding:14px 16px;margin-bottom:14px;">
-        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;color:#5B21B6;letter-spacing:0.06em;margin-bottom:6px;">✅ Owner Response</div>
-        <div style="font-size:0.85rem;font-weight:700;color:#5B21B6;margin-bottom:4px;">APPROVED by ${review.owner}</div>
-        <div style="font-size:0.75rem;color:#64748b;margin-bottom:8px;">${fmt(review.time)}</div>
-        ${review.comment ? `<div style="font-size:0.83rem;color:#1a1a2e;background:#fff;padding:8px 12px;border-radius:7px;border-left:3px solid #5B21B6;">"${review.comment}"</div>` : '<div style="font-size:0.78rem;color:#94a3b8;font-style:italic;">No additional comment provided</div>'}
-      </div>
-      <div style="display:flex;gap:10px;justify-content:flex-end;">
-        <button onclick="document.getElementById('ownerApprovalModal').remove()" style="padding:9px 20px;background:#f0f4f8;color:#0A2F5C;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;">Close</button>
-        <button onclick="document.getElementById('ownerApprovalModal').remove();createWorkOrderFromApproval('${itemId}')" style="padding:9px 20px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;font-weight:700;">📋 Create Work Order →</button>
-      </div>
-    </div>`;
+  modal.innerHTML = `<div style="background:#fff;border-radius:18px;padding:28px;width:100%;max-width:560px;box-shadow:0 24px 64px rgba(0,0,0,0.25);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+      <div style="font-size:1rem;font-weight:800;color:#0A2F5C;">✍️ Owner Approval</div>
+      <button onclick="document.getElementById('ownerApprovalModal').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#64748b;">✕</button>
+    </div>
+    <div style="background:#f0f4f8;border-radius:10px;padding:14px 16px;margin-bottom:14px;">
+      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;color:#64748b;letter-spacing:0.06em;margin-bottom:4px;">Property</div>
+      <div style="font-size:0.9rem;font-weight:700;color:#0A2F5C;">${item.property||'—'}</div>
+    </div>
+    <div style="background:#f0f4f8;border-radius:10px;padding:14px 16px;margin-bottom:14px;">
+      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;color:#64748b;letter-spacing:0.06em;margin-bottom:4px;">Issue</div>
+      <div style="font-size:0.85rem;color:#0A2F5C;">${item.issue||'—'}</div>
+      ${item.legalRef?`<div style="font-size:0.72rem;color:#64748b;margin-top:3px;">${item.legalRef}</div>`:''}
+    </div>
+    <div style="background:#ede9fe;border:1px solid #c4b5fd;border-radius:10px;padding:14px 16px;margin-bottom:14px;">
+      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;color:#5B21B6;letter-spacing:0.06em;margin-bottom:6px;">✅ Owner Response</div>
+      <div style="font-size:0.85rem;font-weight:700;color:#5B21B6;margin-bottom:4px;">APPROVED by ${review.owner}</div>
+      <div style="font-size:0.75rem;color:#64748b;margin-bottom:8px;">${fmt(review.time)}</div>
+      ${review.comment?`<div style="font-size:0.83rem;color:#1a1a2e;background:#fff;padding:8px 12px;border-radius:7px;border-left:3px solid #5B21B6;">"${review.comment}"</div>`:'<div style="font-size:0.78rem;color:#94a3b8;font-style:italic;">No additional comment provided</div>'}
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="document.getElementById('ownerApprovalModal').remove()" style="padding:9px 20px;background:#f0f4f8;color:#0A2F5C;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;">Close</button>
+      <button onclick="document.getElementById('ownerApprovalModal').remove();createWorkOrderFromApproval('${itemId}')" style="padding:9px 20px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;font-weight:700;">📋 Create Work Order →</button>
+    </div>
+  </div>`;
   document.body.appendChild(modal);
 }
 
 function createWorkOrderFromApproval(itemId) {
-  const KEY_REV  = 'vicrental_owner_reviews';
-  const KEY_PORT = 'vicrental_portal';
-  const review = S.get(KEY_REV, {})[itemId];
-  const item   = S.get(KEY_PORT, []).find(p => p.id === itemId);
-  if (!review || !item) { showToast('Approval data not found', 'err'); return; }
-
-  // Show CRM push modal
+  const review = S.get('vicrental_owner_reviews',{})[itemId];
+  const item   = S.get(KEY_PORT,[]).find(p=>p.id===itemId);
+  if (!review||!item) { if(typeof showToast==='function')showToast('Approval data not found','err'); return; }
   const modal = document.createElement('div');
   modal.id = 'crmModal';
   modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9900;display:flex;align-items:center;justify-content:center;padding:20px;';
-  modal.innerHTML = `
-    <div style="background:#fff;border-radius:18px;padding:28px;width:100%;max-width:580px;box-shadow:0 24px 64px rgba(0,0,0,0.25);">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-        <div style="font-size:1rem;font-weight:800;color:#0A2F5C;">📋 Create Work Order</div>
-        <button onclick="document.getElementById('crmModal').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#64748b;">✕</button>
-      </div>
-
-      <div style="background:#f0f4f8;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:0.82rem;">
-        <div style="font-weight:700;color:#0A2F5C;margin-bottom:2px;">${item.property || '—'}</div>
-        <div style="color:#475569;">${item.issue || '—'}</div>
-        <div style="color:#5B21B6;font-size:0.75rem;margin-top:4px;">✅ Approved by ${review.owner}${review.comment ? ' — "' + review.comment + '"' : ''}</div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
-        <div>
-          <label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Job Title</label>
-          <input type="text" id="crm_title" value="${item.issue || ''}" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;">
-        </div>
-        <div>
-          <label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Property Address</label>
-          <input type="text" id="crm_property" value="${item.property || ''}" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;">
-        </div>
-        <div>
-          <label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Trade Required</label>
-          <input type="text" id="crm_trade" value="${item.trade || ''}" placeholder="e.g. Electrician" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;">
-        </div>
-        <div>
-          <label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Priority</label>
-          <select id="crm_priority" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;">
-            <option value="high"${item.priority==='high'?' selected':''}>High</option>
-            <option value="critical"${item.priority==='critical'?' selected':''}>Critical</option>
-            <option value="routine">Routine</option>
-          </select>
-        </div>
-        <div>
-          <label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Due Date</label>
-          <input type="date" id="crm_due" value="${item.dueDate || ''}" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;">
-        </div>
-        <div>
-          <label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Owner</label>
-          <input type="text" id="crm_owner" value="${item.ownerName || review.owner || ''}" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;">
-        </div>
-      </div>
-      <div style="margin-bottom:14px;">
-        <label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Notes / Owner Comment</label>
-        <textarea id="crm_notes" rows="2" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;resize:vertical;">${review.comment || ''}</textarea>
-      </div>
-      <div style="margin-bottom:16px;">
-        <label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">CRM Webhook URL</label>
-        <input type="url" id="crm_webhook" placeholder="https://your-crm.com/api/jobs/create" value="${localStorage.getItem('vicrental_crm_webhook')||''}" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;">
-        <div style="font-size:0.7rem;color:#64748b;margin-top:3px;">Enter your CRM's webhook or API endpoint. Saved automatically for next time.</div>
-      </div>
-      <div id="crmStatus" style="display:none;padding:10px 14px;border-radius:8px;font-size:0.82rem;margin-bottom:12px;"></div>
-      <div style="display:flex;gap:10px;justify-content:flex-end;">
-        <button onclick="document.getElementById('crmModal').remove()" style="padding:9px 20px;background:#f0f4f8;color:#0A2F5C;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;">Cancel</button>
-        <button onclick="pushJobToCRM('${itemId}')" style="padding:9px 22px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;font-weight:700;">🚀 Push to CRM</button>
-      </div>
-    </div>`;
+  modal.innerHTML = `<div style="background:#fff;border-radius:18px;padding:28px;width:100%;max-width:580px;box-shadow:0 24px 64px rgba(0,0,0,0.25);max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+      <div style="font-size:1rem;font-weight:800;color:#0A2F5C;">📋 Create Work Order</div>
+      <button onclick="document.getElementById('crmModal').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#64748b;">✕</button>
+    </div>
+    <div style="background:#f0f4f8;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:0.82rem;">
+      <div style="font-weight:700;color:#0A2F5C;margin-bottom:2px;">${item.property||'—'}</div>
+      <div style="color:#475569;">${item.issue||'—'}</div>
+      <div style="color:#5B21B6;font-size:0.75rem;margin-top:4px;">✅ Approved by ${review.owner}${review.comment?' — "'+review.comment+'"':''}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+      <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Job Title</label><input type="text" id="crm_title" value="${item.issue||''}" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"></div>
+      <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Property Address</label><input type="text" id="crm_property" value="${item.property||''}" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"></div>
+      <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Trade Required</label><input type="text" id="crm_trade" value="${item.trade||''}" placeholder="e.g. Electrician" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"></div>
+      <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Priority</label><select id="crm_priority" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"><option value="critical"${item.priority==='critical'?' selected':''}>Critical</option><option value="high"${item.priority==='high'?' selected':''}>High</option><option value="routine">Routine</option></select></div>
+      <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Due Date</label><input type="date" id="crm_due" value="${item.dueDate||''}" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"></div>
+      <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Owner</label><input type="text" id="crm_owner" value="${item.ownerName||review.owner||''}" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"></div>
+    </div>
+    <div style="margin-bottom:14px;"><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Notes / Owner Comment</label><textarea id="crm_notes" rows="2" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;resize:vertical;">${review.comment||''}</textarea></div>
+    <div style="margin-bottom:16px;"><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">CRM Webhook URL</label><input type="url" id="crm_webhook" placeholder="https://your-crm.com/api/jobs/create" value="${localStorage.getItem('vicrental_crm_webhook')||''}" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"><div style="font-size:0.7rem;color:#64748b;margin-top:3px;">Your CRM's API endpoint. Saved automatically.</div></div>
+    <div id="crmStatus" style="display:none;padding:10px 14px;border-radius:8px;font-size:0.82rem;margin-bottom:12px;"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="document.getElementById('crmModal').remove()" style="padding:9px 20px;background:#f0f4f8;color:#0A2F5C;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;">Cancel</button>
+      <button onclick="pushJobToCRM('${itemId}')" style="padding:9px 22px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;font-weight:700;">🚀 Push to CRM</button>
+    </div>
+  </div>`;
   document.body.appendChild(modal);
 }
 
 async function pushJobToCRM(itemId) {
-  const webhookUrl = (document.getElementById('crm_webhook')?.value || '').trim();
-  const title      = document.getElementById('crm_title')?.value || '';
-  const property   = document.getElementById('crm_property')?.value || '';
-  const trade      = document.getElementById('crm_trade')?.value || '';
-  const priority   = document.getElementById('crm_priority')?.value || 'high';
-  const dueDate    = document.getElementById('crm_due')?.value || '';
-  const owner      = document.getElementById('crm_owner')?.value || '';
-  const notes      = document.getElementById('crm_notes')?.value || '';
-  const statusEl   = document.getElementById('crmStatus');
-
-  if (!webhookUrl) {
-    statusEl.style.cssText = 'display:block;background:#fee2e2;color:#dc2626;padding:10px 14px;border-radius:8px;font-size:0.82rem;margin-bottom:12px;';
-    statusEl.textContent = '⚠ Please enter your CRM webhook URL above.';
-    return;
-  }
-
-  // Save webhook for next time
-  localStorage.setItem('vicrental_crm_webhook', webhookUrl);
-
-  const payload = {
-    source:    'VicRental Pro',
-    job_id:    itemId,
-    title,
-    property,
-    trade,
-    priority,
-    due_date:  dueDate,
-    owner,
-    notes,
-    owner_approved: true,
-    created_at: new Date().toISOString()
-  };
-
-  statusEl.style.cssText = 'display:block;background:#eaf6fe;color:#0A2F5C;padding:10px 14px;border-radius:8px;font-size:0.82rem;margin-bottom:12px;';
-  statusEl.textContent = '⏳ Pushing to CRM...';
-
-  try {
-    const res = await fetch(webhookUrl, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(payload)
-    });
-    if (res.ok) {
-      statusEl.style.background = '#dcfce7'; statusEl.style.color = '#16a34a';
-      statusEl.textContent = '✅ Job pushed to CRM successfully!';
-      // Mark as job created in work orders
-      const KEY_WO2 = 'vicrental_workorders';
-      const wos = S.get(KEY_WO2, []);
-      const idx = wos.findIndex(w => w.id === itemId);
-      if (idx >= 0) { wos[idx]._jobCreated = true; S.set(KEY_WO2, wos); }
-      if (typeof showToast === 'function') showToast('Job pushed to CRM ✅', 'ok');
-      if (typeof logActivity === 'function') logActivity('📋 Work order pushed to CRM: ' + title, '#16a34a');
-      setTimeout(() => { document.getElementById('crmModal')?.remove(); renderDashboard(); }, 1800);
-    } else {
-      statusEl.style.background = '#fee2e2'; statusEl.style.color = '#dc2626';
-      statusEl.textContent = `❌ CRM returned status ${res.status}. Check your webhook URL and try again.`;
-    }
-  } catch (err) {
-    statusEl.style.background = '#fee2e2'; statusEl.style.color = '#dc2626';
-    statusEl.textContent = '❌ Could not reach CRM. Check the URL and your network connection.';
-  }
+  const webhookUrl=(document.getElementById('crm_webhook')?.value||'').trim();
+  const title=document.getElementById('crm_title')?.value||'';
+  const property=document.getElementById('crm_property')?.value||'';
+  const trade=document.getElementById('crm_trade')?.value||'';
+  const priority=document.getElementById('crm_priority')?.value||'high';
+  const dueDate=document.getElementById('crm_due')?.value||'';
+  const owner=document.getElementById('crm_owner')?.value||'';
+  const notes=document.getElementById('crm_notes')?.value||'';
+  const statusEl=document.getElementById('crmStatus');
+  if(!webhookUrl){statusEl.style.cssText='display:block;background:#fee2e2;color:#dc2626;padding:10px 14px;border-radius:8px;font-size:0.82rem;margin-bottom:12px;';statusEl.textContent='⚠ Please enter your CRM webhook URL.';return;}
+  localStorage.setItem('vicrental_crm_webhook',webhookUrl);
+  const payload={source:'VicRental Pro',job_id:itemId,title,property,trade,priority,due_date:dueDate,owner,notes,owner_approved:true,created_at:new Date().toISOString()};
+  statusEl.style.cssText='display:block;background:#eaf6fe;color:#0A2F5C;padding:10px 14px;border-radius:8px;font-size:0.82rem;margin-bottom:12px;';
+  statusEl.textContent='⏳ Pushing to CRM...';
+  try{
+    const res=await fetch(webhookUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(res.ok){
+      statusEl.style.background='#dcfce7';statusEl.style.color='#16a34a';statusEl.textContent='✅ Job pushed to CRM successfully!';
+      const wos=S.get('vicrental_workorders',[]);const idx=wos.findIndex(w=>w.id===itemId);if(idx>=0){wos[idx]._jobCreated=true;S.set('vicrental_workorders',wos);}
+      if(typeof showToast==='function')showToast('Job pushed to CRM ✅','ok');
+      if(typeof logActivity==='function')logActivity('📋 Work order pushed to CRM: '+title,'#16a34a');
+      setTimeout(()=>{document.getElementById('crmModal')?.remove();renderDashboard();},1800);
+    }else{statusEl.style.background='#fee2e2';statusEl.style.color='#dc2626';statusEl.textContent='❌ CRM returned status '+res.status+'. Check your webhook URL.';}
+  }catch(err){statusEl.style.background='#fee2e2';statusEl.style.color='#dc2626';statusEl.textContent='❌ Could not reach CRM. Check the URL and network.';}
 }
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
