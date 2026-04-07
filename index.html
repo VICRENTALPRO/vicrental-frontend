@@ -1927,6 +1927,33 @@ window.addEventListener('DOMContentLoaded', function() {
         <!-- Category Accordions -->
         <div id="clCategories" style="margin-top:16px;"></div>
 
+        <!-- ── Finalise: Compliant / Non-Compliant ── -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px;">
+
+          <!-- Green: Compliant -->
+          <div style="background:#fff;border:2px solid #16a34a;border-radius:14px;padding:22px 24px;">
+            <div style="font-size:0.9rem;font-weight:700;color:#16a34a;margin-bottom:6px;">✅ Save Compliant Report</div>
+            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:14px;">Property address, owner, inspector and date must be completed before finalising.</div>
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:14px;">
+              <input type="checkbox" id="clFinaliseConfirm" style="margin-top:3px;width:15px;height:15px;flex-shrink:0;accent-color:#16a34a;">
+              <span style="font-size:0.8rem;color:var(--text);line-height:1.6;">I confirm this report is <strong>true and correct</strong> as at <span id="clFinaliseDate" style="font-weight:700;color:var(--navy);">—</span>, completed in accordance with the <em>Residential Tenancies Act 1997</em> (Victoria).</span>
+            </label>
+            <button onclick="finaliseChecklist('compliant')" style="width:100%;padding:10px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">✅ Finalise &amp; Save Compliant Report</button>
+          </div>
+
+          <!-- Red: Non-Compliant -->
+          <div style="background:#fff;border:2px solid #dc2626;border-radius:14px;padding:22px 24px;">
+            <div style="font-size:0.9rem;font-weight:700;color:#dc2626;margin-bottom:6px;">⚠️ Save Non-Compliant Report</div>
+            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:14px;">Use when one or more items have failed. Pushes Non-Compliant status to Owner Portal documents.</div>
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:14px;">
+              <input type="checkbox" id="clNonCompliantConfirm" style="margin-top:3px;width:15px;height:15px;flex-shrink:0;accent-color:#dc2626;">
+              <span style="font-size:0.8rem;color:var(--text);line-height:1.6;">I confirm this report is <strong>true and correct</strong> as at <span id="clFinaliseDate2" style="font-weight:700;color:var(--navy);">—</span>, completed in accordance with the <em>Residential Tenancies Act 1997</em> (Victoria).</span>
+            </label>
+            <button onclick="finaliseChecklist('noncompliant')" style="width:100%;padding:10px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">⚠️ Finalise &amp; Save Non-Compliant Report</button>
+          </div>
+
+        </div>
+
         <div class="disclaimer">
           This checklist is a general guide based on Victoria's rental minimum standards under the <em>Residential Tenancies Act 1997</em> (effective 29 March 2021). Not legal advice. Visit Consumer Affairs Victoria for official guidance.
         </div>
@@ -6117,6 +6144,118 @@ function openPropertySummaryByAddr(address) {
   document.getElementById('propSummaryModal').style.display = 'flex';
 }
 
+// ── Checklist Finalise ────────────────────────────────────────────────────────
+function updateFinaliseDate() {
+  const val = document.getElementById('clDate')?.value;
+  const str = val ? new Date(val).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'}) : '—';
+  ['clFinaliseDate','clFinaliseDate2'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=str; });
+}
+document.addEventListener('input', e => { if(e.target?.id==='clDate') updateFinaliseDate(); });
+document.addEventListener('DOMContentLoaded', () => setTimeout(updateFinaliseDate, 800));
+
+function finaliseChecklist(type) {
+  const isNC = type === 'noncompliant';
+  const cbId = isNC ? 'clNonCompliantConfirm' : 'clFinaliseConfirm';
+  if (!document.getElementById(cbId)?.checked) { alert('Please tick the confirmation box before finalising.'); return; }
+  const prop      = (document.getElementById('clPropAddress')?.value||'').trim();
+  const owner     = (document.getElementById('clOwnerName')?.value||'').trim();
+  const inspector = (document.getElementById('clInspector')?.value||'').trim();
+  const dateVal   = document.getElementById('clDate')?.value || new Date().toISOString().split('T')[0];
+  const missing = [];
+  if (!prop) missing.push('Property Address');
+  if (!owner) missing.push('Owner Name');
+  if (!inspector) missing.push('Inspector / Completed By');
+  if (missing.length) { alert('Please complete:\n• ' + missing.join('\n• ')); return; }
+
+  const score   = document.getElementById('clScoreVal')?.textContent || '—';
+  const grade   = document.getElementById('clScoreGrade')?.textContent || '';
+  const dateStr = new Date(dateVal).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});
+  const today   = new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});
+
+  // Build report HTML
+  const reportHtml = buildInspectionReportHtml({ prop, owner, inspector, dateVal, dateStr, today, score, grade, isNC });
+  const dataUrl    = 'data:text/html;charset=utf-8,' + encodeURIComponent(reportHtml);
+  const certId     = (isNC ? 'NC' : 'COMP') + '-INSP-' + Date.now();
+  const fileName   = (isNC ? 'NonCompliant' : 'Compliant') + '_Inspection_' + prop.replace(/[^a-z0-9]/gi,'_').substring(0,25) + '.html';
+
+  // Save to managed properties
+  const props = getManagedProps();
+  const pi = props.findIndex(p => p.address?.toLowerCase() === prop.toLowerCase());
+  if (pi !== -1) {
+    props[pi].lastInspectionDate  = dateVal;
+    props[pi].lastInspectionGrade = isNC ? '❌ Non-Compliant' : grade;
+    saveManagedProps(props);
+  }
+
+  // Save to Document Vault (owner portal visible)
+  const vault = S.get(KEY_VAULT, []);
+  vault.unshift({
+    id: certId,
+    name: (isNC ? '⚠️ Non-Compliant' : '✅ Compliant') + ' Inspection Report — ' + prop,
+    type: 'inspection_report',
+    category: 'Inspection Report',
+    fileName,
+    property: prop,
+    owner: owner,
+    inspector: inspector,
+    date: dateVal,
+    score: score,
+    grade: isNC ? 'Non-Compliant' : grade,
+    uploadedAt: new Date().toISOString(),
+    ownerVisible: true,
+    fileType: 'html',
+    isHtml: true,
+    dataUrl
+  });
+  S.set(KEY_VAULT, vault);
+
+  // Download the report
+  const blob = new Blob([reportHtml], {type:'text/html;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a'); a.href=url; a.download=fileName; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+
+  // Show vault popup
+  document.getElementById('vaultPopupIcon').textContent    = isNC ? '⚠️' : '✅';
+  document.getElementById('vaultPopupTitle').textContent   = isNC ? 'Non-Compliant Report Saved' : 'Compliant Report Saved';
+  document.getElementById('vaultPopupProp').textContent    = prop;
+  document.getElementById('vaultPopupOwner').textContent   = owner;
+  document.getElementById('vaultPopupInspector').textContent = inspector;
+  document.getElementById('vaultPopupDate').textContent    = dateStr;
+  document.getElementById('vaultPopupScore').textContent   = score + (grade ? ' — ' + grade : '');
+  document.getElementById('vaultPopupScore').style.color   = isNC ? '#dc2626' : '#16a34a';
+  document.getElementById('vaultPopupMsg').innerHTML       = `📁 Report downloaded and saved to <strong>Document Vault</strong> under <strong>${prop}</strong>. It is visible to the owner in their portal under <strong>Documents</strong>.`;
+  document.getElementById('vaultPopupModal').style.display = 'flex';
+
+  if (typeof logActivity==='function') logActivity((isNC?'⚠️ Non-compliant':'✅ Compliant')+' inspection finalised: '+prop, isNC?'#dc2626':'#16a34a');
+  if (typeof renderVault==='function') renderVault();
+}
+
+function buildInspectionReportHtml({ prop, owner, inspector, dateVal, dateStr, today, score, grade, isNC }) {
+  const statusColour = isNC ? '#dc2626' : '#16a34a';
+  const statusLabel  = isNC ? '⚠️ NON-COMPLIANT' : '✅ COMPLIANT';
+  const statusBg     = isNC ? '#fee2e2' : '#dcfce7';
+  const statusBorder = isNC ? '#dc2626' : '#16a34a';
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Inspection Report — ${prop}</title>
+<style>body{font-family:Arial,sans-serif;margin:40px;color:#1a1a2e;font-size:13px;}.hdr{display:flex;align-items:center;justify-content:space-between;border-bottom:4px solid #0A2F5C;padding-bottom:16px;margin-bottom:24px;}.logo{font-size:20px;font-weight:800;color:#0A2F5C;}.logo span{color:#5BB8F5;}.status{background:${statusBg};border:2px solid ${statusBorder};border-radius:10px;padding:16px;text-align:center;margin:20px 0;font-size:22px;font-weight:800;color:${statusColour};}.sec{background:#f0f4f8;border-radius:10px;padding:16px 20px;margin-bottom:16px;}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0;}.row:last-child{border-bottom:none;}.lbl{font-size:11px;color:#666;font-weight:600;text-transform:uppercase;}.val{font-size:13px;font-weight:700;color:#0A2F5C;}.footer{margin-top:28px;border-top:2px solid #0A2F5C;padding-top:14px;font-size:10px;color:#888;}</style>
+</head><body>
+<div class="hdr"><div><div class="logo">Vic<span>Rental</span> PRO</div><div style="font-size:10px;color:#888;letter-spacing:0.1em;">REPORT · TRACK · COMPLY</div></div><div style="text-align:right;"><div style="font-size:15px;font-weight:700;color:#0A2F5C;">Rental Property Inspection Report</div><div style="font-size:10px;color:#888;">Residential Tenancies Act 1997 (Victoria)</div></div></div>
+<div class="status">${statusLabel}</div>
+<div class="sec">
+  <div class="row"><span class="lbl">Property Address</span><span class="val">${prop}</span></div>
+  <div class="row"><span class="lbl">Owner</span><span class="val">${owner||'—'}</span></div>
+  <div class="row"><span class="lbl">Inspector / Property Manager</span><span class="val">${inspector||'—'}</span></div>
+  <div class="row"><span class="lbl">Date of Inspection</span><span class="val">${dateStr}</span></div>
+  <div class="row"><span class="lbl">Overall Score</span><span class="val" style="color:${statusColour};">${score}${grade?' — '+grade:''}</span></div>
+</div>
+<div class="footer">Generated: ${today} via VicRental Pro · This report has been automatically saved to the Document Vault and shared with the property owner.</div>
+</body></html>`;
+}
+
+function dismissVaultPopup() {
+  document.getElementById('vaultPopupModal').style.display = 'none';
+}
+
 function closePropSummary() {
   document.getElementById('propSummaryModal').style.display = 'none';
 }
@@ -6228,6 +6367,23 @@ async function pushJobToCRM(itemId) {
 
 </body>
 </html>
+
+<!-- Vault Popup Modal -->
+<div id="vaultPopupModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9500;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:18px;padding:32px;width:100%;max-width:500px;box-shadow:0 24px 64px rgba(0,0,0,0.3);text-align:center;">
+    <div id="vaultPopupIcon" style="font-size:3rem;margin-bottom:12px;">✅</div>
+    <div id="vaultPopupTitle" style="font-size:1.1rem;font-weight:800;color:var(--navy);margin-bottom:12px;">Report Saved</div>
+    <div style="font-size:0.83rem;color:var(--muted);margin-bottom:18px;line-height:1.8;text-align:left;background:var(--warm);border-radius:10px;padding:14px 18px;">
+      <strong id="vaultPopupProp" style="color:var(--navy);display:block;font-size:0.9rem;margin-bottom:4px;"></strong>
+      Owner: <strong id="vaultPopupOwner"></strong><br>
+      Inspector: <strong id="vaultPopupInspector"></strong><br>
+      Date: <strong id="vaultPopupDate"></strong><br>
+      Result: <strong id="vaultPopupScore"></strong>
+    </div>
+    <div id="vaultPopupMsg" style="font-size:0.83rem;color:var(--text);line-height:1.6;margin-bottom:22px;text-align:left;"></div>
+    <button onclick="dismissVaultPopup()" style="padding:10px 28px;background:var(--navy);color:#fff;border:none;border-radius:9px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;font-weight:700;">OK — Close</button>
+  </div>
+</div>
 
 </body>
 </html>
