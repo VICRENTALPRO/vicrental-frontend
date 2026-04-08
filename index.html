@@ -5786,14 +5786,20 @@ function openEditPropModal(propId) {
   const props = getManagedProps();
   const p = props.find(x => (x.id||x.address).replace(/'/g,"&#39;") === propId || (x.id||x.address) === propId);
   if (!p) return;
-  document.getElementById('editPropId').value         = p.id || p.address;
-  document.getElementById('editPropAddress').value    = p.address || '';
-  document.getElementById('editPropOwner').value      = p.owner || '';
-  document.getElementById('editPropOwnerEmail').value = p.ownerEmail || '';
-  document.getElementById('editPropOwnerPhone').value = p.ownerPhone || '';
-  document.getElementById('editPropTenant').value     = p.tenant || '';
-  document.getElementById('editPropTenantEmail').value= p.tenantEmail || '';
-  document.getElementById('editPropTenantPhone').value= p.tenantPhone || '';
+  document.getElementById('editPropId').value              = p.id || p.address;
+  document.getElementById('editPropAddress').value         = p.address || '';
+  document.getElementById('editPropOwner').value           = p.owner || '';
+  document.getElementById('editPropOwnerEmail').value      = p.ownerEmail || '';
+  document.getElementById('editPropOwnerPhone').value      = p.ownerPhone || '';
+  document.getElementById('editPropTenant').value          = p.tenant || '';
+  document.getElementById('editPropTenantEmail').value     = p.tenantEmail || '';
+  document.getElementById('editPropTenantPhone').value     = p.tenantPhone || '';
+  document.getElementById('editPropLeaseType').value       = p.leaseType || '';
+  document.getElementById('editPropTenantMoveIn').value    = p.tenantMoveIn || '';
+  document.getElementById('editPropLeaseStart').value      = p.leaseStart || '';
+  document.getElementById('editPropLeaseEnd').value        = p.leaseEnd || '';
+  document.getElementById('editPropRentPcm').value         = p.rentPcm || '';
+  document.getElementById('editPropLastRentReview').value  = p.lastRentReview || '';
   document.getElementById('editPropModal').style.display = 'flex';
 }
 
@@ -5810,12 +5816,18 @@ function saveEditProp() {
   const idx = props.findIndex(x => (x.id||x.address) === propId);
   if (idx === -1) return;
   props[idx] = { ...props[idx], address, owner,
-    ownerEmail:  (document.getElementById('editPropOwnerEmail').value||'').trim(),
-    ownerPhone:  (document.getElementById('editPropOwnerPhone').value||'').trim(),
-    tenant:      (document.getElementById('editPropTenant').value||'').trim(),
-    tenantEmail: (document.getElementById('editPropTenantEmail').value||'').trim(),
-    tenantPhone: (document.getElementById('editPropTenantPhone').value||'').trim(),
-    updatedAt:   new Date().toISOString()
+    ownerEmail:       (document.getElementById('editPropOwnerEmail').value||'').trim(),
+    ownerPhone:       (document.getElementById('editPropOwnerPhone').value||'').trim(),
+    tenant:           (document.getElementById('editPropTenant').value||'').trim(),
+    tenantEmail:      (document.getElementById('editPropTenantEmail').value||'').trim(),
+    tenantPhone:      (document.getElementById('editPropTenantPhone').value||'').trim(),
+    leaseType:        (document.getElementById('editPropLeaseType').value||'').trim(),
+    tenantMoveIn:     document.getElementById('editPropTenantMoveIn').value || '',
+    leaseStart:       document.getElementById('editPropLeaseStart').value || '',
+    leaseEnd:         document.getElementById('editPropLeaseEnd').value || '',
+    rentPcm:          (document.getElementById('editPropRentPcm').value||'').trim(),
+    lastRentReview:   document.getElementById('editPropLastRentReview').value || '',
+    updatedAt:        new Date().toISOString()
   };
   saveManagedProps(props);
   closeEditPropModal();
@@ -5927,7 +5939,7 @@ function seedDemo() {}
 
 <!-- Edit Property Modal -->
 <div id="editPropModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9000;align-items:center;justify-content:center;padding:20px;">
-  <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+  <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
       <div style="font-size:1rem;font-weight:700;color:var(--navy);">✏️ Edit Property</div>
       <button onclick="closeEditPropModal()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted);">✕</button>
@@ -5962,7 +5974,44 @@ function seedDemo() {}
         <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Tenant Phone</label>
         <input type="text" id="editPropTenantPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;box-sizing:border-box;">
       </div>
+      <div>
+        <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Lease Type</label>
+        <select id="editPropLeaseType" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;box-sizing:border-box;background:#fff;">
+          <option value="">— Select —</option>
+          <option value="Fixed Term">Fixed Term</option>
+          <option value="Periodic">Periodic</option>
+          <option value="Month to Month">Month to Month</option>
+        </select>
+      </div>
     </div>
+
+    <!-- Tenancy Details section -->
+    <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border);">
+      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:12px;">📋 Tenancy Details</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;">
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Tenant Move-in Date</label>
+          <input type="date" id="editPropTenantMoveIn" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Lease Commenced</label>
+          <input type="date" id="editPropLeaseStart" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Lease Expiry</label>
+          <input type="date" id="editPropLeaseEnd" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Rent (per month $)</label>
+          <input type="number" id="editPropRentPcm" placeholder="e.g. 2200" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Last Rent Review</label>
+          <input type="date" id="editPropLastRentReview" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;box-sizing:border-box;">
+        </div>
+      </div>
+    </div>
+
     <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
       <button onclick="closeEditPropModal()" style="padding:9px 20px;border:1px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;font-family:'Montserrat', sans-serif;font-size:0.85rem;">Cancel</button>
       <button onclick="saveEditProp()" style="padding:9px 24px;background:var(--navy);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:'Montserrat', sans-serif;font-size:0.85rem;font-weight:600;">Save Changes</button>
