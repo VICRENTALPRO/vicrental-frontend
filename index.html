@@ -5668,7 +5668,17 @@ function nominatimSearch(val) {
 }
 
 function selectPropAddress(address) {
-  document.getElementById('newPropAddress').value = address;
+  // Strip verbose Nominatim parts: Australia, Melbourne, City/Shire/Municipality of X, Greater X
+  const parts = address.split(',').map(p => p.trim()).filter(Boolean);
+  const cleaned = parts.filter(p =>
+    p !== 'Australia' &&
+    p !== 'Melbourne' &&
+    !/^(City|Shire|Municipality|Borough|Greater|Region) of /i.test(p) &&
+    !/^(Victoria|VIC)$/.test(p.trim())
+  );
+  // Keep street, suburb, postcode — max 3 meaningful parts
+  const result = cleaned.slice(0, 3).join(', ');
+  document.getElementById('newPropAddress').value = result || address;
   document.getElementById('propAddressSuggestions').style.display = 'none';
 }
 
@@ -5801,6 +5811,18 @@ function renderManagedProps() {
     el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted);font-size:0.85rem;">${search ? 'No properties match your search.' : 'No properties yet. Click + Add Property to get started.'}</div>`;
     return;
   }
+  // Clean verbose Nominatim address for display
+  const cleanAddr = (addr) => {
+    if (!addr) return '';
+    const parts = addr.split(',').map(p => p.trim()).filter(Boolean);
+    const cleaned = parts.filter(p =>
+      p !== 'Australia' && p !== 'Melbourne' &&
+      !/^(City|Shire|Municipality|Borough|Greater|Region) of /i.test(p) &&
+      !/^(Victoria|VIC)$/.test(p.trim())
+    );
+    return cleaned.slice(0, 3).join(', ') || addr;
+  };
+
   // Compliance badge logic
   const getComplianceBadge = (p) => {
     if (p.lastInspectionGrade && p.lastInspectionGrade.includes('Non-Compliant')) {
@@ -5818,7 +5840,7 @@ function renderManagedProps() {
       const propId  = (p.id || p.address).replace(/'/g,"&#39;");
       const safeId  = (p.id || p.address).replace(/[^a-zA-Z0-9]/g,'_');
       const cardId  = 'propcard_' + safeId;
-      const parts   = (p.address||'').split(',');
+      const parts   = cleanAddr(p.address||'').split(',');
       const line1   = parts[0]?.trim() || '—';
       const line2   = parts.slice(1).join(',').trim();
       return `<div id="${cardId}" style="background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
@@ -5904,6 +5926,10 @@ function unarchiveManagedProp(id) {
   saveManagedProps(props);
   renderManagedProps();
   if (typeof showToast === 'function') showToast('Property restored ✅', 'ok');
+}
+
+function goToPropertiesFiltered(filter) {
+  showPage('properties');
 }
 
 function openOwnerPortalForProp(propId) {
