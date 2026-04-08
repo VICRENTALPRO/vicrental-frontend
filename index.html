@@ -2214,10 +2214,14 @@ window.addEventListener('DOMContentLoaded', function() {
               <input type="email" id="newPropOwnerEmail" placeholder="owner@email.com" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
             </div>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr auto;gap:12px;align-items:end;">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr auto;gap:12px;align-items:end;">
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Owner Phone</label>
               <input type="text" id="newPropOwnerPhone" placeholder="Optional" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
+            </div>
+            <div>
+              <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Owner Password</label>
+              <input type="text" id="newPropOwnerPassword" placeholder="Set portal password" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
             </div>
             <div>
               <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Tenant Name</label>
@@ -5682,13 +5686,15 @@ function togglePropForm() {
 }
 
 function addProperty() {
-  const address     = (document.getElementById('newPropAddress')?.value || '').trim();
-  const owner       = (document.getElementById('newPropOwner')?.value || '').trim();
-  const ownerEmail  = (document.getElementById('newPropOwnerEmail')?.value || '').trim();
-  const ownerPhone  = (document.getElementById('newPropOwnerPhone')?.value || '').trim();
-  const tenant      = (document.getElementById('newPropTenant')?.value || '').trim();
-  const tenantEmail = (document.getElementById('newPropTenantEmail')?.value || '').trim();
-  const tenantPhone = (document.getElementById('newPropTenantPhone')?.value || '').trim();
+  const address       = (document.getElementById('newPropAddress')?.value || '').trim();
+  const owner         = (document.getElementById('newPropOwner')?.value || '').trim();
+  const ownerEmail    = (document.getElementById('newPropOwnerEmail')?.value || '').trim();
+  const ownerPhone    = (document.getElementById('newPropOwnerPhone')?.value || '').trim();
+  const ownerPassword = (document.getElementById('newPropOwnerPassword')?.value || '').trim();
+  const tenant        = (document.getElementById('newPropTenant')?.value || '').trim();
+  const tenantEmail   = (document.getElementById('newPropTenantEmail')?.value || '').trim();
+  const tenantPhone   = (document.getElementById('newPropTenantPhone')?.value || '').trim();
+  const tenantPassword = (document.getElementById('newPropTenantPassword')?.value || '').trim();
   const errEl = document.getElementById('propAddError');
   const okEl  = document.getElementById('propAddSuccess');
   if (errEl) errEl.style.display = 'none';
@@ -5706,11 +5712,52 @@ function addProperty() {
   saveManagedProps(props);
   if (tenantEmail && tenant) addLocalTenant((tenant.split(' ')[0]||''), (tenant.split(' ').slice(1).join(' ')||''), tenantEmail, tenantPhone, address);
   if (owner) addLocalOwner(owner, ownerEmail||'', ownerPhone||'');
-  if (okEl) { okEl.textContent = '✅ Property added!'; okEl.style.display = ''; }
-  ['newPropAddress','newPropOwner','newPropOwnerEmail','newPropOwnerPhone','newPropTenant','newPropTenantEmail','newPropTenantPhone','newPropTenantPassword'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+
+  // Send portal invitation emails
+  if (ownerEmail) sendPortalInviteEmail('owner', { name: owner, email: ownerEmail, password: ownerPassword, address });
+  if (tenantEmail) sendPortalInviteEmail('tenant', { name: tenant, email: tenantEmail, password: tenantPassword, address });
+
+  if (okEl) { okEl.textContent = '✅ Property added!' + (ownerEmail||tenantEmail ? ' Invitation email(s) opened.' : ''); okEl.style.display = ''; }
+  ['newPropAddress','newPropOwner','newPropOwnerEmail','newPropOwnerPhone','newPropOwnerPassword','newPropTenant','newPropTenantEmail','newPropTenantPhone','newPropTenantPassword'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
   renderManagedProps();
   if (typeof updateSidebarBadges === 'function') updateSidebarBadges();
   if (typeof logActivity === 'function') logActivity('Property added: ' + address, '#1d7a50');
+}
+
+function sendPortalInviteEmail(role, { name, email, password, address }) {
+  const isOwner = role === 'owner';
+  const portalUrl = isOwner
+    ? 'https://scintillating-salmiakki-33c677.netlify.app'
+    : 'https://fancy-banoffee-641f32.netlify.app';
+  const portalName = isOwner ? 'Owner Portal' : 'Tenant Portal';
+  const greeting = name ? `Dear ${name.split(' ')[0]},` : `Dear ${isOwner ? 'Owner' : 'Tenant'},`;
+
+  const bodyLines = [
+    greeting,
+    '',
+    `You have been set up with access to the VicRental Pro ${portalName} for the property at:`,
+    `${address}`,
+    '',
+    `Your login details are:`,
+    `  Portal: ${portalUrl}`,
+    `  Username / Email: ${email}`,
+    password ? `  Password: ${password}` : `  Password: (as provided separately)`,
+    '',
+    `You can log in and update your password once you have access.`,
+    '',
+    isOwner
+      ? `Through the Owner Portal you can view your property's compliance status, work orders, documents and more.`
+      : `Through the Tenant Portal you can submit maintenance requests and view updates on your property.`,
+    '',
+    `If you have any questions please contact your property manager.`,
+    '',
+    `Kind regards,`,
+    `VicRental Pro`
+  ];
+
+  const subject = encodeURIComponent(`Your VicRental Pro ${portalName} Access — ${address}`);
+  const body    = encodeURIComponent(bodyLines.join('\n'));
+  window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
 }
 
 function renderManagedProps() {
