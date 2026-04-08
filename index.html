@@ -225,7 +225,7 @@ body {
 
 .btn-primary {
   background: linear-gradient(135deg, var(--navy), var(--navy-mid));
-  color: #ffffff;
+  color: var(--navy);
 }
 .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(10,47,92,0.4); }
 
@@ -1583,7 +1583,7 @@ const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
       <div style="background:linear-gradient(135deg,#0a3356,#0f4c81);padding:28px 32px;">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 200" style="width:220px;height:auto;display:block;margin:0 auto 8px;"><polygon points="30,10 73,10 105,175 62,175" fill="#fff" opacity="0.9"/><polygon points="80,10 123,10 91,175 48,175" fill="#5BB8F5"/><rect x="48" y="169" width="63" height="8" fill="#fff" opacity="0.9"/><text x="148" y="88" font-family="Montserrat,Arial,sans-serif" font-size="46" font-weight="700" fill="#fff" letter-spacing="-1">Vic<tspan fill="#5BB8F5">Rental</tspan></text><text x="150" y="128" font-family="Montserrat,Arial,sans-serif" font-size="22" font-weight="400" fill="#fff" letter-spacing="10">PRO</text><rect x="150" y="138" width="188" height="3" fill="#5BB8F5"/><text x="150" y="163" font-family="Montserrat,Arial,sans-serif" font-size="11" letter-spacing="1"><tspan fill="#fff" font-weight="700">REPORT</tspan><tspan fill="#5BB8F5"> · </tspan><tspan fill="#fff" font-weight="700">TRACK</tspan><tspan fill="#5BB8F5"> · </tspan><tspan fill="#fff" font-weight="700">COMPLY</tspan></text></svg>
         <div style="font-size:0.72rem;color:#64748b;text-transform:uppercase;letter-spacing:0.1em;">Property Management Platform</div>
-        <div style="font-family:'Montserrat',sans-serif;font-size:1.8rem;color:#fff;font-weight:500;margin-top:16px;">Property Manager <em style="font-style:italic;font-weight:300;">Login</em></div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:#fff;font-weight:500;margin-top:16px;">Property Manager <em style="font-style:italic;font-weight:300;">Login</em></div>
       </div>
       <div style="padding:28px 32px;">
         <div style="margin-bottom:14px;">
@@ -1754,10 +1754,7 @@ window.addEventListener('DOMContentLoaded', function() {
         <div class="panel" style="margin-bottom:14px;">
           <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;" id="ownerRespAnchor">
             <h3>✍️ Owner Responses</h3>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <small id="dashOwnerRespLabel" style="color:var(--muted);"></small>
-              <button class="btn btn-ghost" style="font-size:0.72rem;padding:4px 10px;" onclick="renderDashboard()">↺ Refresh</button>
-            </div>
+            <div style="display:flex;gap:8px;align-items:center;"><small id="dashOwnerRespLabel" style="color:var(--muted);"></small><button class="btn btn-ghost" style="font-size:0.72rem;padding:4px 10px;" onclick="renderDashboard()">↺ Refresh</button></div>
           </div>
           <div id="dashOwnerRespList"></div>
         </div>
@@ -1916,23 +1913,16 @@ window.addEventListener('DOMContentLoaded', function() {
           <div style="background:#fff;border:2px solid #16a34a;border-radius:14px;padding:22px 24px;">
             <div style="font-size:0.9rem;font-weight:700;color:#16a34a;margin-bottom:6px;">✅ Save Compliant Report</div>
             <div style="font-size:0.75rem;color:var(--muted);margin-bottom:14px;">Property address, owner, inspector and date must be completed before finalising.</div>
-            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:14px;">
-              <input type="checkbox" id="clFinaliseConfirm" style="margin-top:3px;width:15px;height:15px;flex-shrink:0;accent-color:#16a34a;">
-              <span style="font-size:0.8rem;color:var(--text);line-height:1.6;">I confirm this report is <strong>true and correct</strong> as at <span id="clFinaliseDate" style="font-weight:700;color:var(--navy);">—</span>, in accordance with the <em>Residential Tenancies Act 1997</em> (Victoria).</span>
-            </label>
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:14px;"><input type="checkbox" id="clFinaliseConfirm" style="margin-top:3px;width:15px;height:15px;flex-shrink:0;accent-color:#16a34a;"><span style="font-size:0.8rem;color:var(--text);line-height:1.6;">I confirm this report is <strong>true and correct</strong> as at <span id="clFinaliseDate" style="font-weight:700;color:var(--navy);">—</span>, in accordance with the <em>Residential Tenancies Act 1997</em> (Victoria).</span></label>
             <button onclick="finaliseChecklist('compliant')" style="width:100%;padding:10px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">✅ Finalise &amp; Save Compliant Report</button>
           </div>
           <div style="background:#fff;border:2px solid #dc2626;border-radius:14px;padding:22px 24px;">
             <div style="font-size:0.9rem;font-weight:700;color:#dc2626;margin-bottom:6px;">⚠️ Save Non-Compliant Report</div>
             <div style="font-size:0.75rem;color:var(--muted);margin-bottom:14px;">Use when one or more items have failed. Pushes Non-Compliant status to Owner Portal.</div>
-            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:14px;">
-              <input type="checkbox" id="clNonCompliantConfirm" style="margin-top:3px;width:15px;height:15px;flex-shrink:0;accent-color:#dc2626;">
-              <span style="font-size:0.8rem;color:var(--text);line-height:1.6;">I confirm this report is <strong>true and correct</strong> as at <span id="clFinaliseDate2" style="font-weight:700;color:var(--navy);">—</span>, in accordance with the <em>Residential Tenancies Act 1997</em> (Victoria).</span>
-            </label>
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:14px;"><input type="checkbox" id="clNonCompliantConfirm" style="margin-top:3px;width:15px;height:15px;flex-shrink:0;accent-color:#dc2626;"><span style="font-size:0.8rem;color:var(--text);line-height:1.6;">I confirm this report is <strong>true and correct</strong> as at <span id="clFinaliseDate2" style="font-weight:700;color:var(--navy);">—</span>, in accordance with the <em>Residential Tenancies Act 1997</em> (Victoria).</span></label>
             <button onclick="finaliseChecklist('noncompliant')" style="width:100%;padding:10px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">⚠️ Finalise &amp; Save Non-Compliant Report</button>
           </div>
         </div>
-
         <div class="disclaimer">
           This checklist is a general guide based on Victoria's rental minimum standards under the <em>Residential Tenancies Act 1997</em> (effective 29 March 2021). Not legal advice. Visit Consumer Affairs Victoria for official guidance.
         </div>
@@ -3244,18 +3234,15 @@ function renderDashboard() {
     }).join('');
   }
 
-  // ── Owner Responses ─────────────────────────────────────────────────────
-  const _oRevs = S.get('vicrental_owner_reviews', {});
-  const _pAll  = S.get(KEY_PORT, []);
-  const _approved = Object.entries(_oRevs).filter(([id,r])=>r.type==='approve').map(([id,r])=>({id,review:r,item:_pAll.find(p=>p.id===id),wo:wos.find(w=>w.id===id)})).filter(({item})=>!!item);
-  const _orEl=document.getElementById('dashOwnerResp'); const _orLbl=document.getElementById('dashOwnerRespLabel'); const _orList=document.getElementById('dashOwnerRespList');
-  if(_orEl) _orEl.textContent=_approved.length;
-  if(_orLbl) _orLbl.textContent=_approved.length+' approval'+(_approved.length!==1?'s':'')+' received';
-  if(_orList){
-    if(!_approved.length){_orList.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.82rem;">No owner responses yet.</div>';}
-    else{const _ft=iso=>new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'})+' '+new Date(iso).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
-    _orList.innerHTML=_approved.map(({id,review,item,wo})=>{const jc=wo?._jobCreated;return `<div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;"><div style="width:36px;height:36px;border-radius:50%;background:#ede9fe;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">✍️</div><div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;"><span style="font-size:0.85rem;font-weight:700;color:var(--navy);">${item.property||'—'}</span><span style="background:#ede9fe;color:#5B21B6;font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:5px;">✅ Approved</span>${jc?'<span style="background:var(--green-pale);color:var(--green);font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:5px;">📋 Job Created</span>':''}</div><div style="font-size:0.8rem;color:var(--text);margin-bottom:3px;"><strong>${item.issue||'—'}</strong></div><div style="font-size:0.75rem;color:var(--muted);margin-bottom:6px;">Approved by <strong>${review.owner}</strong> · ${_ft(review.time)}</div>${review.comment?`<div style="font-size:0.78rem;background:var(--warm);border-left:3px solid #5B21B6;padding:6px 10px;border-radius:0 6px 6px 0;color:var(--text);margin-bottom:8px;">"${review.comment}"</div>`:''}<div style="display:flex;gap:8px;flex-wrap:wrap;"><button onclick="viewOwnerApproval('${id}')" style="padding:5px 12px;background:var(--warm);color:var(--navy);border:1px solid var(--border);border-radius:7px;font-size:0.75rem;font-weight:600;cursor:pointer;font-family:'Montserrat',sans-serif;">👁 View Details</button>${!jc?`<button onclick="createWorkOrderFromApproval('${id}')" style="padding:5px 14px;background:#0A2F5C;color:#fff;border:none;border-radius:7px;font-size:0.75rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📋 Create Work Order</button>`:''}</div></div></div>`;}).join('');}
-  }
+  // Owner Responses
+  const _oRevs=S.get('vicrental_owner_reviews',{});const _pAll=S.get(KEY_PORT,[]);
+  const _approved=Object.entries(_oRevs).filter(([id,r])=>r.type==='approve').map(([id,r])=>({id,review:r,item:_pAll.find(p=>p.id===id),wo:wos.find(w=>w.id===id)})).filter(({item})=>!!item);
+  const _orEl=document.getElementById('dashOwnerResp');const _orLbl=document.getElementById('dashOwnerRespLabel');const _orList=document.getElementById('dashOwnerRespList');
+  if(_orEl)_orEl.textContent=_approved.length;
+  if(_orLbl)_orLbl.textContent=_approved.length+' approval'+(_approved.length!==1?'s':'')+' received';
+  if(_orList){if(!_approved.length){_orList.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.82rem;">No owner responses yet.</div>';}
+  else{const _ft=iso=>new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'})+' '+new Date(iso).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
+  _orList.innerHTML=_approved.map(({id,review,item,wo})=>{const jc=wo?._jobCreated;return `<div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;"><div style="width:36px;height:36px;border-radius:50%;background:#ede9fe;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">✍️</div><div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;"><span style="font-size:0.85rem;font-weight:700;color:var(--navy);">${item.property||'—'}</span><span style="background:#ede9fe;color:#5B21B6;font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:5px;">✅ Approved</span>${jc?'<span style="background:var(--green-pale);color:var(--green);font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:5px;">📋 Job Created</span>':''}</div><div style="font-size:0.8rem;color:var(--text);margin-bottom:3px;"><strong>${item.issue||'—'}</strong></div><div style="font-size:0.75rem;color:var(--muted);margin-bottom:6px;">Approved by <strong>${review.owner}</strong> · ${_ft(review.time)}</div>${review.comment?`<div style="font-size:0.78rem;background:var(--warm);border-left:3px solid #5B21B6;padding:6px 10px;border-radius:0 6px 6px 0;color:var(--text);margin-bottom:8px;">"${review.comment}"</div>`:''}<div style="display:flex;gap:8px;flex-wrap:wrap;"><button onclick="viewOwnerApproval('${id}')" style="padding:5px 12px;background:var(--warm);color:var(--navy);border:1px solid var(--border);border-radius:7px;font-size:0.75rem;font-weight:600;cursor:pointer;font-family:'Montserrat',sans-serif;">👁 View Details</button>${!jc?`<button onclick="createWorkOrderFromApproval('${id}')" style="padding:5px 14px;background:#0A2F5C;color:#fff;border:none;border-radius:7px;font-size:0.75rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📋 Create Work Order</button>`:''}</div></div></div>`}).join('');}}
 
   // Tenant Requests on Dashboard
   const allTR   = S.get(KEY_TREQS, []);
@@ -3938,91 +3925,6 @@ function renderCategories() {
   updateCatProgress();
 }
 
-function renderCategories() {
-  const container = document.getElementById('clCategories');
-  if (!container) return;
-  container.innerHTML = CATEGORIES.map((cat, ci) => {
-    const comp     = cat.complianceType ? buildComplianceSection(cat) : '';
-    const cleaning = cat.hasCleaningSection ? buildCleaningSection() : '';
-    return `<div class="cat-accordion ${ci===0?'open':''}" id="cacc-${cat.id}">
-      <div class="cat-head" onclick="toggleCat('${cat.id}')">
-        <span class="cat-icon">${cat.icon}</span>
-        <div class="cat-info"><div class="cat-title">${cat.title}</div><div class="cat-sub">${cat.subtitle}</div></div>
-        <div class="cat-progress" id="catprog-${cat.id}"></div>
-        <span class="cat-chevron">▼</span>
-      </div>
-      <div class="cat-body" id="catbody-${cat.id}">
-        ${cat.items.map(item => renderCheckItem(item, cat)).join('')}
-        ${comp}${cleaning}
-      </div>
-    </div>`;
-  }).join('');
-  updateCatProgress();
-  ['electrical','gas','smoke'].forEach(restoreComplianceDates);
-  restoreCleaningRecords();
-}
-
-function buildComplianceSection(cat) {
-  const t=cat.complianceType,freq=t==='smoke'?'Every 12 months':'Every 2 years',label=t==='electrical'?'Electrical Safety':t==='gas'?'Gas Safety':'Smoke Alarm',col=t==='electrical'?'#f59e0b':t==='gas'?'#5BB8F5':'#dc2626',inp=`width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Montserrat',sans-serif;font-size:0.82rem;background:#fff;box-sizing:border-box;`;
-  return `<div style="margin:12px 16px 16px;background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:16px;">
-    <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:12px;">📋 ${label} Compliance Record <span style="background:${col};color:#fff;border-radius:5px;padding:2px 8px;font-size:0.65rem;margin-left:6px;">${freq}</span></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;">
-      <div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Date of Last Inspection</label><input type="date" id="comp_last_${t}" onchange="autoCalcNextDate('${t}')" style="${inp}"></div>
-      <div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Next Inspection Due</label><input type="date" id="comp_next_${t}" style="${inp}"></div>
-      <div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Company / Inspector</label><input type="text" id="comp_company_${t}" placeholder="e.g. Safe Gas Pty Ltd" oninput="saveComplianceDates('${t}')" style="${inp}"></div>
-    </div>
-    <button onclick="generateComplianceCert('${t}','${label}')" style="padding:8px 20px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📜 Generate ${label} Compliance Certificate</button>
-  </div>`;
-}
-
-function buildCleaningSection() {
-  const i=`width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Montserrat',sans-serif;font-size:0.82rem;background:#fff;box-sizing:border-box;`;
-  return `<div style="margin:12px 16px 16px;background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:16px;">
-    <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:14px;">🧹 Cleaning Records</div>
-    <div style="background:#fff;border:1px solid var(--border);border-radius:9px;padding:14px;margin-bottom:12px;">
-      <div style="font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:10px;">🏠 Professional Property Clean</div>
-      <div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:12px;align-items:center;">
-        <label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;font-weight:600;cursor:pointer;"><input type="checkbox" id="clean_prof_done" onchange="saveCleaningRecords()" style="width:16px;height:16px;accent-color:#0A2F5C;"> Completed</label>
-        <div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Date of Clean</label><input type="date" id="clean_prof_date" onchange="saveCleaningRecords()" style="${i}"></div>
-        <div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Company / Person</label><input type="text" id="clean_prof_company" placeholder="e.g. CleanPro" oninput="saveCleaningRecords()" style="${i}"></div>
-        <div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Receipt</label><label style="display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px dashed var(--border);border-radius:7px;cursor:pointer;background:#fafafa;font-size:0.78rem;color:var(--muted);">📎 Upload<input type="file" accept="image/*,.pdf" style="display:none;" onchange="handleCleaningReceipt(event,'prof')"></label><div id="clean_prof_receipt_name" style="font-size:0.7rem;color:#16a34a;margin-top:3px;"></div></div>
-      </div><div id="clean_prof_receipt_preview" style="margin-top:6px;"></div>
-    </div>
-    <div style="background:#fff;border:1px solid var(--border);border-radius:9px;padding:14px;">
-      <div style="font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:10px;">🪣 Carpet Steam Clean</div>
-      <div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:12px;align-items:center;">
-        <label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;font-weight:600;cursor:pointer;"><input type="checkbox" id="clean_carpet_done" onchange="saveCleaningRecords()" style="width:16px;height:16px;accent-color:#0A2F5C;"> Completed</label>
-        <div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Date of Clean</label><input type="date" id="clean_carpet_date" onchange="saveCleaningRecords()" style="${i}"></div>
-        <div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Company / Person</label><input type="text" id="clean_carpet_company" placeholder="e.g. Steam King" oninput="saveCleaningRecords()" style="${i}"></div>
-        <div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Receipt</label><label style="display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px dashed var(--border);border-radius:7px;cursor:pointer;background:#fafafa;font-size:0.78rem;color:var(--muted);">📎 Upload<input type="file" accept="image/*,.pdf" style="display:none;" onchange="handleCleaningReceipt(event,'carpet')"></label><div id="clean_carpet_receipt_name" style="font-size:0.7rem;color:#16a34a;margin-top:3px;"></div></div>
-      </div><div id="clean_carpet_receipt_preview" style="margin-top:6px;"></div>
-    </div>
-  </div>`;
-}
-
-function autoCalcNextDate(t){const last=document.getElementById('comp_last_'+t)?.value;const nextEl=document.getElementById('comp_next_'+t);if(!last||!nextEl)return;const d=new Date(last);d.setMonth(d.getMonth()+(t==='smoke'?12:24));nextEl.value=d.toISOString().split('T')[0];saveComplianceDates(t);}
-function saveComplianceDates(t){localStorage.setItem('vicrental_comp_'+t,JSON.stringify({last:document.getElementById('comp_last_'+t)?.value||'',next:document.getElementById('comp_next_'+t)?.value||'',company:document.getElementById('comp_company_'+t)?.value||''}));}
-function restoreComplianceDates(t){try{const d=JSON.parse(localStorage.getItem('vicrental_comp_'+t)||'null');if(!d)return;['last','next','company'].forEach(f=>{const el=document.getElementById('comp_'+f+'_'+t);if(el&&d[f])el.value=d[f];});}catch(e){}}
-function generateComplianceCert(type,typeLabel){
-  const prop=(document.getElementById('clPropAddress')?.value||'').trim();const owner=(document.getElementById('clOwnerName')?.value||'').trim();const inspector=(document.getElementById('clInspector')?.value||'').trim();
-  const lastDate=document.getElementById('comp_last_'+type)?.value||'';const nextDate=document.getElementById('comp_next_'+type)?.value||'';const company=document.getElementById('comp_company_'+type)?.value||'';
-  if(!prop){alert('Please enter the Property Address.');return;}if(!lastDate){alert('Please enter the Date of Last Inspection for '+typeLabel+'.');return;}if(!company){alert('Please enter the Company / Inspector name.');return;}
-  const fmt=iso=>iso?new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'}):'—';const freq=type==='smoke'?'Every 12 months':'Every 2 years';const today=new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});const col=type==='electrical'?'#f59e0b':type==='gas'?'#0A2F5C':'#dc2626';const certId='CERT-'+type.toUpperCase()+'-'+Date.now();
-  const certHtml=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${typeLabel} Compliance Certificate</title><style>body{font-family:Arial,sans-serif;margin:40px;color:#1a1a2e;}.hdr{display:flex;align-items:center;justify-content:space-between;border-bottom:4px solid #0A2F5C;padding-bottom:16px;margin-bottom:24px;}.logo{font-size:22px;font-weight:800;color:#0A2F5C;}.logo span{color:#5BB8F5;}.badge{background:${col};color:#fff;padding:6px 16px;border-radius:8px;font-weight:700;}.ok{background:#dcfce7;border:2px solid #16a34a;border-radius:10px;padding:16px;text-align:center;margin:20px 0;}.ok-text{font-size:22px;font-weight:800;color:#16a34a;}.sec{background:#f0f4f8;border-radius:10px;padding:16px 20px;margin-bottom:16px;}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0;}.row:last-child{border-bottom:none;}.lbl{font-size:11px;color:#666;font-weight:600;text-transform:uppercase;}.val{font-size:13px;font-weight:700;color:#0A2F5C;}.footer{margin-top:32px;border-top:2px solid #0A2F5C;padding-top:16px;font-size:11px;color:#888;}</style></head><body>
-<div class="hdr"><div><div class="logo">Vic<span>Rental</span> PRO</div><div style="font-size:11px;color:#888;">REPORT · TRACK · COMPLY</div></div><div class="badge">${typeLabel} Compliance Certificate</div></div>
-<div class="ok"><div class="ok-text">✅ COMPLIANT</div><div style="font-size:13px;color:#16a34a;margin-top:4px;">This property meets the required ${typeLabel.toLowerCase()} standards</div></div>
-<div class="sec"><div class="row"><span class="lbl">Property Address</span><span class="val">${prop}</span></div><div class="row"><span class="lbl">Owner</span><span class="val">${owner||'—'}</span></div></div>
-<div class="sec"><div class="row"><span class="lbl">Date of Inspection</span><span class="val">${fmt(lastDate)}</span></div><div class="row"><span class="lbl">Next Inspection Due</span><span class="val">${fmt(nextDate)}</span></div><div class="row"><span class="lbl">Frequency Required</span><span class="val">${freq}</span></div><div class="row"><span class="lbl">Company / Inspector</span><span class="val">${company}</span></div></div>
-<div class="footer">Generated: ${today} via VicRental Pro · ${certId}</div></body></html>`;
-  const dataUrl='data:text/html;charset=utf-8,'+encodeURIComponent(certHtml);const blob=new Blob([certHtml],{type:'text/html;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=typeLabel.replace(/\s/g,'_')+'_Certificate.html';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);
-  const vault=S.get(KEY_VAULT,[]);vault.unshift({id:certId,name:typeLabel+' Compliance Certificate — '+prop,type:'compliance_cert',category:'Compliance Certificate',fileName:typeLabel.replace(/\s/g,'_')+'_Certificate.html',property:prop,owner:owner||'',date:lastDate,nextDue:nextDate,company,uploadedAt:new Date().toISOString(),ownerVisible:true,fileType:'html',isHtml:true,dataUrl});S.set(KEY_VAULT,vault);
-  if(typeof showToast==='function')showToast(typeLabel+' certificate saved to vault ✅','ok');if(typeof renderVault==='function')renderVault();
-  setTimeout(()=>{if(confirm('Save this '+typeLabel+' Compliance Certificate to the Document Vault under "'+prop+'"?\n\n(Already saved automatically — click OK to confirm or Cancel to dismiss)')){}},100);
-}
-function handleCleaningReceipt(event,type){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const dataUrl=e.target.result;const n=document.getElementById('clean_'+type+'_receipt_name');const p=document.getElementById('clean_'+type+'_receipt_preview');if(n)n.textContent='✅ '+file.name;if(p)p.innerHTML=file.type.startsWith('image/')?`<img src="${dataUrl}" style="max-width:200px;max-height:120px;border-radius:6px;border:1px solid var(--border);">`:`<div style="font-size:0.78rem;color:var(--muted);padding:6px 10px;background:#f8fafc;border-radius:6px;">📄 ${file.name}</div>`;const c=JSON.parse(localStorage.getItem('vicrental_cleaning')||'{}');c[type+'_receipt']={name:file.name,dataUrl,type:file.type};localStorage.setItem('vicrental_cleaning',JSON.stringify(c));};reader.readAsDataURL(file);}
-function saveCleaningRecords(){const d={prof_done:document.getElementById('clean_prof_done')?.checked||false,prof_date:document.getElementById('clean_prof_date')?.value||'',prof_company:document.getElementById('clean_prof_company')?.value||'',carpet_done:document.getElementById('clean_carpet_done')?.checked||false,carpet_date:document.getElementById('clean_carpet_date')?.value||'',carpet_company:document.getElementById('clean_carpet_company')?.value||''};const e=JSON.parse(localStorage.getItem('vicrental_cleaning')||'{}');localStorage.setItem('vicrental_cleaning',JSON.stringify({...e,...d}));}
-function restoreCleaningRecords(){try{const d=JSON.parse(localStorage.getItem('vicrental_cleaning')||'{}');const set=(id,val)=>{const el=document.getElementById(id);if(el){if(typeof val==='boolean')el.checked=val;else el.value=val;}};set('clean_prof_done',d.prof_done||false);set('clean_prof_date',d.prof_date||'');set('clean_prof_company',d.prof_company||'');set('clean_carpet_done',d.carpet_done||false);set('clean_carpet_date',d.carpet_date||'');set('clean_carpet_company',d.carpet_company||'');['prof','carpet'].forEach(type=>{const r=d[type+'_receipt'];if(!r)return;const n=document.getElementById('clean_'+type+'_receipt_name');const p=document.getElementById('clean_'+type+'_receipt_preview');if(n)n.textContent='✅ '+r.name;if(p)p.innerHTML=r.type?.startsWith('image/')?`<img src="${r.dataUrl}" style="max-width:200px;max-height:120px;border-radius:6px;border:1px solid var(--border);">`:`<div style="font-size:0.78rem;color:var(--muted);padding:6px 10px;background:#f8fafc;border-radius:6px;">📄 ${r.name}</div>`;});}catch(e){}}
-
 function renderCheckItem(item, cat) {
   const s = clStatuses[item.id] || '';
   const photos = clPhotos[item.id] || [];
@@ -4399,7 +4301,7 @@ function downloadInspectionReport() {
   const generated = new Date().toLocaleString('en-AU',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
 
   const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Inspection Report — ${address}</title>
-
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:'DM Sans',Georgia,sans-serif;background:#faf8f3;color:#1a1a2e;}@media print{body{background:#fff;}}</style>
 <scr` + `ipt>
 const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
@@ -5599,7 +5501,9 @@ function nominatimSearch(val) {
 }
 
 function selectPropAddress(address) {
-  document.getElementById('newPropAddress').value = address;
+  const parts = address.split(',').map(p => p.trim()).filter(Boolean);
+  const cleaned = parts.filter(p => p !== 'Australia' && p !== 'Melbourne' && !/^(City|Shire|Municipality|Borough|Greater|Region) of /i.test(p) && !/^(Victoria|VIC)$/.test(p.trim()));
+  document.getElementById('newPropAddress').value = cleaned.slice(0,3).join(', ') || address;
   document.getElementById('propAddressSuggestions').style.display = 'none';
 }
 
@@ -5686,14 +5590,14 @@ function togglePropForm() {
 }
 
 function addProperty() {
-  const address       = (document.getElementById('newPropAddress')?.value || '').trim();
-  const owner         = (document.getElementById('newPropOwner')?.value || '').trim();
-  const ownerEmail    = (document.getElementById('newPropOwnerEmail')?.value || '').trim();
-  const ownerPhone    = (document.getElementById('newPropOwnerPhone')?.value || '').trim();
-  const ownerPassword = (document.getElementById('newPropOwnerPassword')?.value || '').trim();
-  const tenant        = (document.getElementById('newPropTenant')?.value || '').trim();
-  const tenantEmail   = (document.getElementById('newPropTenantEmail')?.value || '').trim();
-  const tenantPhone   = (document.getElementById('newPropTenantPhone')?.value || '').trim();
+  const address        = (document.getElementById('newPropAddress')?.value || '').trim();
+  const owner          = (document.getElementById('newPropOwner')?.value || '').trim();
+  const ownerEmail     = (document.getElementById('newPropOwnerEmail')?.value || '').trim();
+  const ownerPhone     = (document.getElementById('newPropOwnerPhone')?.value || '').trim();
+  const ownerPassword  = (document.getElementById('newPropOwnerPassword')?.value || '').trim();
+  const tenant         = (document.getElementById('newPropTenant')?.value || '').trim();
+  const tenantEmail    = (document.getElementById('newPropTenantEmail')?.value || '').trim();
+  const tenantPhone    = (document.getElementById('newPropTenantPhone')?.value || '').trim();
   const tenantPassword = (document.getElementById('newPropTenantPassword')?.value || '').trim();
   const errEl = document.getElementById('propAddError');
   const okEl  = document.getElementById('propAddSuccess');
@@ -5712,52 +5616,114 @@ function addProperty() {
   saveManagedProps(props);
   if (tenantEmail && tenant) addLocalTenant((tenant.split(' ')[0]||''), (tenant.split(' ').slice(1).join(' ')||''), tenantEmail, tenantPhone, address);
   if (owner) addLocalOwner(owner, ownerEmail||'', ownerPhone||'');
-
-  // Send portal invitation emails
-  if (ownerEmail) sendPortalInviteEmail('owner', { name: owner, email: ownerEmail, password: ownerPassword, address });
-  if (tenantEmail) sendPortalInviteEmail('tenant', { name: tenant, email: tenantEmail, password: tenantPassword, address });
-
-  if (okEl) { okEl.textContent = '✅ Property added!' + (ownerEmail||tenantEmail ? ' Invitation email(s) opened.' : ''); okEl.style.display = ''; }
   ['newPropAddress','newPropOwner','newPropOwnerEmail','newPropOwnerPhone','newPropOwnerPassword','newPropTenant','newPropTenantEmail','newPropTenantPhone','newPropTenantPassword'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
   renderManagedProps();
   if (typeof updateSidebarBadges === 'function') updateSidebarBadges();
   if (typeof logActivity === 'function') logActivity('Property added: ' + address, '#1d7a50');
+  // Show invitation popup — does NOT auto-send any email
+  showPortalInviteModal({ address, owner, ownerEmail, ownerPassword, tenant, tenantEmail, tenantPassword });
 }
 
-function sendPortalInviteEmail(role, { name, email, password, address }) {
-  const isOwner = role === 'owner';
-  const portalUrl = isOwner
-    ? 'https://scintillating-salmiakki-33c677.netlify.app'
-    : 'https://fancy-banoffee-641f32.netlify.app';
-  const portalName = isOwner ? 'Owner Portal' : 'Tenant Portal';
-  const greeting = name ? `Dear ${name.split(' ')[0]},` : `Dear ${isOwner ? 'Owner' : 'Tenant'},`;
+function showPortalInviteModal({ address, owner, ownerEmail, ownerPassword, tenant, tenantEmail, tenantPassword }) {
+  const hasOwner  = !!ownerEmail;
+  const hasTenant = !!tenantEmail;
+  const ownerUrl  = 'https://scintillating-salmiakki-33c677.netlify.app';
+  const tenantUrl = 'https://fancy-banoffee-641f32.netlify.app';
+  const lbl = 'font-size:0.68rem;font-weight:600;color:#64748b;margin-bottom:2px;';
+  const val = 'font-size:0.85rem;font-weight:700;color:#0A2F5C;word-break:break-all;';
 
-  const bodyLines = [
-    greeting,
-    '',
-    `You have been set up with access to the VicRental Pro ${portalName} for the property at:`,
-    `${address}`,
-    '',
-    `Your login details are:`,
-    `  Portal: ${portalUrl}`,
-    `  Username / Email: ${email}`,
-    password ? `  Password: ${password}` : `  Password: (as provided separately)`,
-    '',
-    `You can log in and update your password once you have access.`,
-    '',
-    isOwner
-      ? `Through the Owner Portal you can view your property's compliance status, work orders, documents and more.`
-      : `Through the Tenant Portal you can submit maintenance requests and view updates on your property.`,
-    '',
-    `If you have any questions please contact your property manager.`,
-    '',
-    `Kind regards,`,
-    `VicRental Pro`
-  ];
+  const buildBody = (role) => {
+    const isO = role === 'owner';
+    const nm  = isO ? owner    : tenant;
+    const em  = isO ? ownerEmail  : tenantEmail;
+    const pw  = isO ? ownerPassword : tenantPassword;
+    const url = isO ? ownerUrl : tenantUrl;
+    const pn  = isO ? 'Owner Portal' : 'Tenant Portal';
+    const fn  = (nm||'').split(' ')[0] || (isO ? 'Owner' : 'Tenant');
+    return [
+      'Dear ' + fn + ',',
+      '',
+      'You have been set up with access to the VicRental Pro ' + pn + ' for the property at:',
+      address,
+      '',
+      'Your login details are:',
+      '  Portal: ' + url,
+      '  Username / Email: ' + em,
+      pw ? '  Password: ' + pw : '  Password: (as provided separately)',
+      '',
+      'You can log in and update your password at any time.',
+      '',
+      isO ? "Through the Owner Portal you can view your property's compliance status, work orders, documents and more."
+          : 'Through the Tenant Portal you can submit maintenance requests and view updates on your property.',
+      '',
+      'If you have any questions please contact your property manager.',
+      '',
+      'Kind regards,',
+      'VicRental Pro'
+    ].join('\n');
+  };
 
-  const subject = encodeURIComponent(`Your VicRental Pro ${portalName} Access — ${address}`);
-  const body    = encodeURIComponent(bodyLines.join('\n'));
-  window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
+  window._inviteEmails = {
+    owner:  hasOwner  ? { to: ownerEmail,  subject: 'Your VicRental Pro Owner Portal Access — '  + address, body: buildBody('owner')  } : null,
+    tenant: hasTenant ? { to: tenantEmail, subject: 'Your VicRental Pro Tenant Portal Access — ' + address, body: buildBody('tenant') } : null,
+  };
+
+  const ownerBlock = hasOwner ? `
+    <div style="background:#eaf6fe;border:2px solid #0A2F5C;border-radius:10px;padding:16px;margin-bottom:14px;">
+      <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;color:#0A2F5C;margin-bottom:12px;">👤 Owner Portal Access</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div><div style="${lbl}">Owner Name</div><div style="${val}">${owner||'—'}</div></div>
+        <div><div style="${lbl}">Email (Username)</div><div style="${val}">${ownerEmail}</div></div>
+        <div><div style="${lbl}">Password</div><div style="${val}">${ownerPassword||'(not set)'}</div></div>
+        <div><div style="${lbl}">Portal URL</div><div style="font-size:0.75rem;color:#0A2F5C;word-break:break-all;">${ownerUrl}</div></div>
+      </div>
+      <button id="ownerInviteBtn" onclick="sendInviteEmail('owner')" style="width:100%;padding:10px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📧 Generate &amp; Send Owner Invitation</button>
+    </div>` : '';
+
+  const tenantBlock = hasTenant ? `
+    <div style="background:#f0fdf4;border:2px solid #16a34a;border-radius:10px;padding:16px;margin-bottom:14px;">
+      <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;color:#16a34a;margin-bottom:12px;">🏡 Tenant Portal Access</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div><div style="${lbl}">Tenant Name</div><div style="${val}">${tenant||'—'}</div></div>
+        <div><div style="${lbl}">Email (Username)</div><div style="${val}">${tenantEmail}</div></div>
+        <div><div style="${lbl}">Password</div><div style="${val}">${tenantPassword||'(not set)'}</div></div>
+        <div><div style="${lbl}">Portal URL</div><div style="font-size:0.75rem;color:#0A2F5C;word-break:break-all;">${tenantUrl}</div></div>
+      </div>
+      <button id="tenantInviteBtn" onclick="sendInviteEmail('tenant')" style="width:100%;padding:10px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📧 Generate &amp; Send Tenant Invitation</button>
+    </div>` : '';
+
+  const noEmailBlock = !hasOwner && !hasTenant ? `
+    <div style="text-align:center;padding:16px;color:#64748b;font-size:0.85rem;background:#f8fafc;border-radius:8px;margin-bottom:14px;">
+      No email addresses provided — invitations cannot be sent.<br>Edit the property to add emails.
+    </div>` : '';
+
+  const existing = document.getElementById('inviteModal');
+  if (existing) existing.remove();
+  const modal = document.createElement('div');
+  modal.id = 'inviteModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9800;display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.innerHTML = `
+    <div style="background:#fff;border-radius:18px;padding:28px;width:100%;max-width:540px;box-shadow:0 24px 64px rgba(0,0,0,0.25);max-height:90vh;overflow-y:auto;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-size:1rem;font-weight:800;color:#0A2F5C;">✅ Property Added</div>
+        <button onclick="document.getElementById('inviteModal').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#64748b;line-height:1;">✕</button>
+      </div>
+      <div style="font-size:0.82rem;color:#64748b;margin-bottom:16px;"><strong style="color:#0A2F5C;">${address}</strong> has been saved.</div>
+      <div style="font-size:0.8rem;color:#0A2F5C;background:#eaf6fe;border-radius:8px;padding:10px 14px;margin-bottom:16px;">📧 Click a button below to open your email client with a pre-written invitation. You can review and edit before sending.</div>
+      ${ownerBlock}${tenantBlock}${noEmailBlock}
+      <div style="text-align:center;margin-top:4px;">
+        <button onclick="document.getElementById('inviteModal').remove()" style="padding:9px 28px;background:#f0f4f8;color:#0A2F5C;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;">Done — Close</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+}
+
+function sendInviteEmail(role) {
+  const inv = window._inviteEmails?.[role];
+  if (!inv) return;
+  window.open('mailto:' + inv.to + '?subject=' + encodeURIComponent(inv.subject) + '&body=' + encodeURIComponent(inv.body), '_blank');
+  const btn = document.getElementById(role + 'InviteBtn');
+  if (btn) { btn.textContent = '✅ Email client opened — review and send'; btn.style.background = '#64748b'; btn.disabled = true; }
 }
 
 function renderManagedProps() {
@@ -5775,120 +5741,45 @@ function renderManagedProps() {
     el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted);font-size:0.85rem;">${search ? 'No properties match your search.' : 'No properties yet. Click + Add Property to get started.'}</div>`;
     return;
   }
-
-  // Clean verbose Nominatim address
-  const cleanAddr = addr => {
-    if (!addr) return '';
-    const parts = addr.split(',').map(p => p.trim()).filter(Boolean);
-    return parts.filter(p => p !== 'Australia' && p !== 'Melbourne' &&
-      !/^(City|Shire|Municipality|Borough|Greater|Region) of /i.test(p) &&
-      !/^(Victoria|VIC)$/.test(p.trim())).slice(0,3).join(', ') || addr;
-  };
-
-  // Compliance badge
-  const badge = p => {
-    if (p.lastInspectionGrade?.includes('Non-Compliant'))
-      return `<span style="background:#dc2626;color:#fff;border-radius:6px;padding:3px 9px;font-size:0.68rem;font-weight:700;white-space:nowrap;">⚠️ Non-Compliant</span>`;
-    if (p.lastInspectionScore) {
-      const s = parseInt(p.lastInspectionScore), bg = s>=80?'#16a34a':s>=50?'#d97706':'#dc2626';
-      return `<span style="background:${bg};color:#fff;border-radius:6px;padding:3px 9px;font-size:0.68rem;font-weight:700;white-space:nowrap;">${s}% · ${p.lastInspectionGrade||'Compliant'}</span>`;
-    }
-    return `<span style="background:#e2e8f0;color:#64748b;border-radius:6px;padding:3px 9px;font-size:0.68rem;font-weight:600;white-space:nowrap;">No inspection</span>`;
-  };
-
-  const active   = props.filter(p => !p.archived);
-  const archived = props.filter(p =>  p.archived);
-
-  const renderTile = p => {
-    const propId = (p.id||p.address).replace(/'/g,"&#39;");
-    const addr   = cleanAddr(p.address||'');
-    const parts  = addr.split(',');
-    const line1  = parts[0]?.trim() || '—';
-    const line2  = parts.slice(1).join(',').trim();
+  const cleanAddr = addr => { if(!addr)return''; const p=addr.split(',').map(x=>x.trim()).filter(Boolean); return p.filter(x=>x!=='Australia'&&x!=='Melbourne'&&!/^(City|Shire|Municipality|Borough|Greater|Region) of /i.test(x)&&!/^(Victoria|VIC)$/.test(x.trim())).slice(0,3).join(', ')||addr; };
+  const badge = p => { if(p.lastInspectionGrade?.includes('Non-Compliant'))return`<span style="background:#dc2626;color:#fff;border-radius:6px;padding:3px 9px;font-size:0.68rem;font-weight:700;white-space:nowrap;">⚠️ Non-Compliant</span>`;if(p.lastInspectionScore){const s=parseInt(p.lastInspectionScore),bg=s>=80?'#16a34a':s>=50?'#d97706':'#dc2626';return`<span style="background:${bg};color:#fff;border-radius:6px;padding:3px 9px;font-size:0.68rem;font-weight:700;white-space:nowrap;">${s}% · ${p.lastInspectionGrade||'Compliant'}</span>`;}return`<span style="background:#e2e8f0;color:#64748b;border-radius:6px;padding:3px 9px;font-size:0.68rem;font-weight:600;white-space:nowrap;">No inspection</span>`; };
+  const active=props.filter(p=>!p.archived); const archived=props.filter(p=>p.archived);
+  const renderTile = p => { const propId=(p.id||p.address).replace(/'/g,"&#39;"); const addr=cleanAddr(p.address||''); const parts=addr.split(','); const line1=parts[0]?.trim()||'—'; const line2=parts.slice(1).join(',').trim();
     return `<div style="background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-
-      <!-- Header: address + compliance badge -->
       <div style="background:linear-gradient(135deg,#0A2F5C,#0d3870);padding:14px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
-        <div style="flex:1;min-width:0;cursor:pointer;" onclick="showPage('properties')">
-          <div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.55);margin-bottom:3px;">Property Address</div>
-          <div style="font-weight:800;font-size:0.92rem;color:#fff;line-height:1.35;text-decoration:underline;text-underline-offset:3px;">${line1}${line2?`<span style="font-weight:500;font-size:0.8rem;opacity:0.8;">, ${line2}</span>`:''}</div>
-        </div>
+        <div style="flex:1;min-width:0;cursor:pointer;" onclick="showPage('properties')"><div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.55);margin-bottom:3px;">Property Address</div><div style="font-weight:800;font-size:0.92rem;color:#fff;line-height:1.35;text-decoration:underline;text-underline-offset:3px;">${line1}${line2?'<span style="font-weight:500;font-size:0.8rem;opacity:0.8;">, '+line2+'</span>':''}</div></div>
         <div style="flex-shrink:0;margin-top:2px;">${badge(p)}</div>
       </div>
-
-      <!-- Body: owner + tenant side by side -->
       <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);">
-        <div style="padding:12px 14px;border-right:1px solid var(--border);">
-          <div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:5px;">👤 Owner</div>
-          <div style="font-weight:700;font-size:0.82rem;color:var(--navy);margin-bottom:3px;cursor:pointer;text-decoration:underline;text-underline-offset:2px;" onclick="window.open('https://scintillating-salmiakki-33c677.netlify.app','_blank')">${p.owner||'—'}</div>
-          ${p.ownerEmail?`<div style="font-size:0.7rem;color:var(--muted);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="mailto:${p.ownerEmail}" style="color:var(--navy);text-decoration:none;">✉ ${p.ownerEmail}</a></div>`:''}
-          ${p.ownerPhone?`<div style="font-size:0.7rem;color:var(--muted);margin-top:1px;"><a href="tel:${p.ownerPhone}" style="color:var(--navy);text-decoration:none;">📞 ${p.ownerPhone}</a></div>`:''}
-        </div>
-        <div style="padding:12px 14px;">
-          <div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:5px;">🏡 Tenant</div>
-          <div style="font-weight:700;font-size:0.82rem;color:var(--navy);margin-bottom:3px;">${p.tenant||'No tenant'}</div>
-          ${p.tenantEmail?`<div style="font-size:0.7rem;color:var(--muted);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="mailto:${p.tenantEmail}" style="color:var(--navy);text-decoration:none;">✉ ${p.tenantEmail}</a></div>`:''}
-          ${p.tenantPhone?`<div style="font-size:0.7rem;color:var(--muted);margin-top:1px;"><a href="tel:${p.tenantPhone}" style="color:var(--navy);text-decoration:none;">📞 ${p.tenantPhone}</a></div>`:''}
-        </div>
+        <div style="padding:12px 14px;border-right:1px solid var(--border);"><div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:5px;">👤 Owner</div><div style="font-weight:700;font-size:0.82rem;color:var(--navy);margin-bottom:3px;cursor:pointer;text-decoration:underline;text-underline-offset:2px;" onclick="window.open('https://scintillating-salmiakki-33c677.netlify.app','_blank')">${p.owner||'—'}</div>${p.ownerEmail?'<div style="font-size:0.7rem;color:var(--muted);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="mailto:'+p.ownerEmail+'" style="color:var(--navy);text-decoration:none;">✉ '+p.ownerEmail+'</a></div>':''}${p.ownerPhone?'<div style="font-size:0.7rem;color:var(--muted);margin-top:1px;"><a href="tel:'+p.ownerPhone+'" style="color:var(--navy);text-decoration:none;">📞 '+p.ownerPhone+'</a></div>':''}</div>
+        <div style="padding:12px 14px;"><div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:5px;">🏡 Tenant</div><div style="font-weight:700;font-size:0.82rem;color:var(--navy);margin-bottom:3px;">${p.tenant||'No tenant'}</div>${p.tenantEmail?'<div style="font-size:0.7rem;color:var(--muted);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="mailto:'+p.tenantEmail+'" style="color:var(--navy);text-decoration:none;">✉ '+p.tenantEmail+'</a></div>':''}${p.tenantPhone?'<div style="font-size:0.7rem;color:var(--muted);margin-top:1px;"><a href="tel:'+p.tenantPhone+'" style="color:var(--navy);text-decoration:none;">📞 '+p.tenantPhone+'</a></div>':''}</div>
       </div>
-
-      <!-- Footer: actions -->
       <div style="padding:10px 14px;display:flex;gap:8px;background:#f8fafc;">
         <button onclick="openEditPropModal('${propId}')" style="flex:1;padding:7px 10px;background:#0A2F5C;color:#fff;border:none;border-radius:7px;font-size:0.75rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">✏️ Edit</button>
-        <button onclick="archiveManagedProp('${propId}')" style="padding:7px 12px;background:#fff;color:#64748b;border:1px solid var(--border);border-radius:7px;font-size:0.75rem;cursor:pointer;font-family:'Montserrat',sans-serif;" title="Archive — hide from list but keep data">📦 Archive</button>
+        <button onclick="archiveManagedProp('${propId}')" style="padding:7px 12px;background:#fff;color:#64748b;border:1px solid var(--border);border-radius:7px;font-size:0.75rem;cursor:pointer;font-family:'Montserrat',sans-serif;" title="Archive">📦 Archive</button>
         <button onclick="deleteManagedProp('${propId}')" style="padding:7px 10px;background:#fff;color:var(--red);border:1px solid #fca5a5;border-radius:7px;font-size:0.75rem;cursor:pointer;font-family:'Montserrat',sans-serif;">🗑</button>
       </div>
-    </div>`;
-  };
-
+    </div>`; };
   el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px;margin-top:8px;">${active.map(renderTile).join('')}</div>`;
-
-  if (archived.length) {
-    el.innerHTML += `<div style="margin-top:28px;">
-      <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:12px;">📦 Archived Properties (${archived.length})</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;">
-        ${archived.map(p => {
-          const pid = (p.id||p.address).replace(/'/g,"&#39;");
-          return `<div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
-            <div><div style="font-weight:600;font-size:0.82rem;color:var(--muted);">${cleanAddr(p.address||'')}</div><div style="font-size:0.72rem;color:var(--muted);">Owner: ${p.owner||'—'}</div></div>
-            <button onclick="unarchiveManagedProp('${pid}')" style="padding:5px 12px;background:#fff;color:var(--navy);border:1px solid var(--border);border-radius:6px;font-size:0.72rem;cursor:pointer;font-family:'Montserrat',sans-serif;white-space:nowrap;">↩ Restore</button>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>`;
-  }
+  if(archived.length){el.innerHTML+=`<div style="margin-top:28px;"><div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:12px;">📦 Archived (${archived.length})</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;">${archived.map(p=>{const pid=(p.id||p.address).replace(/'/g,"&#39;");return`<div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;"><div><div style="font-weight:600;font-size:0.82rem;color:var(--muted);">${cleanAddr(p.address||'')}</div><div style="font-size:0.72rem;color:var(--muted);">Owner: ${p.owner||'—'}</div></div><button onclick="unarchiveManagedProp('${pid}')" style="padding:5px 12px;background:#fff;color:var(--navy);border:1px solid var(--border);border-radius:6px;font-size:0.72rem;cursor:pointer;font-family:'Montserrat',sans-serif;white-space:nowrap;">↩ Restore</button></div>`;}).join('')}</div></div>`;}
 }
 
 function deleteManagedProp(id) {
-  if (!confirm('Permanently remove this property? This cannot be undone.\n\nTip: Use Archive to hide it while keeping the data.')) return;
+  if (!confirm('Permanently remove this property? Use Archive to hide it while keeping data.')) return;
   let props = getManagedProps();
   props = props.filter(p => (p.id||p.address) !== id && (p.id||p.address).replace(/'/g,"&#39;") !== id);
-  saveManagedProps(props);
-  renderManagedProps();
-  if (typeof updateSidebarBadges === 'function') updateSidebarBadges();
+  saveManagedProps(props); renderManagedProps(); if (typeof updateSidebarBadges === 'function') updateSidebarBadges();
 }
-
 function archiveManagedProp(id) {
-  if (!confirm('Archive this property? It will be hidden from the main list but kept in records. You can restore it anytime.')) return;
-  const props = getManagedProps();
-  const idx = props.findIndex(p => (p.id||p.address).replace(/'/g,"&#39;") === id || (p.id||p.address) === id);
-  if (idx === -1) return;
-  props[idx].archived = true;
-  props[idx].archivedAt = new Date().toISOString();
-  saveManagedProps(props);
-  renderManagedProps();
-  if (typeof showToast === 'function') showToast('Property archived — restore anytime from the Archived section', 'ok');
+  if (!confirm('Archive this property? It will be hidden but kept in records.')) return;
+  const props=getManagedProps(); const idx=props.findIndex(p=>(p.id||p.address).replace(/'/g,"&#39;")===id||(p.id||p.address)===id);
+  if(idx===-1)return; props[idx].archived=true; props[idx].archivedAt=new Date().toISOString(); saveManagedProps(props); renderManagedProps();
+  if(typeof showToast==='function')showToast('Property archived — restore anytime','ok');
 }
-
 function unarchiveManagedProp(id) {
-  const props = getManagedProps();
-  const idx = props.findIndex(p => (p.id||p.address).replace(/'/g,"&#39;") === id || (p.id||p.address) === id);
-  if (idx === -1) return;
-  delete props[idx].archived;
-  delete props[idx].archivedAt;
-  saveManagedProps(props);
-  renderManagedProps();
-  if (typeof showToast === 'function') showToast('Property restored ✅', 'ok');
+  const props=getManagedProps(); const idx=props.findIndex(p=>(p.id||p.address).replace(/'/g,"&#39;")===id||(p.id||p.address)===id);
+  if(idx===-1)return; delete props[idx].archived; delete props[idx].archivedAt; saveManagedProps(props); renderManagedProps();
+  if(typeof showToast==='function')showToast('Property restored ✅','ok');
 }
 
 function openEditPropModal(propId) {
@@ -6172,8 +6063,7 @@ function openPropertySummaryByAddr(address) {
       <span style="flex:1;">${w.issue||w.category||'—'}</span>
     </div>`).join('') || '<div style="color:var(--muted);font-style:italic;">No work orders for this property.</div>';
   document.getElementById('psmWOHeader').onclick = () => { closePropSummary(); filterWOsByProp(dec); };
-  const psmCH = document.getElementById('psmComplianceHeader');
-  if (psmCH) psmCH.onclick = () => { closePropSummary(); goToVaultForProp(dec); };
+  const _psmCH=document.getElementById('psmComplianceHeader'); if(_psmCH)_psmCH.onclick=()=>{closePropSummary();goToVaultForProp(dec);};
 
   // Tenant Requests
   const reqs = S.get(KEY_TREQS, []).filter(r => r.property && r.property.toLowerCase() === dec.toLowerCase());
@@ -6188,185 +6078,109 @@ function openPropertySummaryByAddr(address) {
   document.getElementById('propSummaryModal').style.display = 'flex';
 }
 
+
 function goToVaultForProp(address) {
   document.getElementById('propSummaryModal').style.display = 'none';
   showPage('vault');
   setTimeout(() => {
-    const search = document.getElementById('vaultSearch');
-    if (search) {
-      search.value = (address || '').split(',')[0].trim();
-      search.dispatchEvent(new Event('input'));
-      if (typeof renderVault === 'function') renderVault();
-    }
+    const s = document.getElementById('vaultSearch');
+    if (s) { s.value = (address||'').split(',')[0].trim(); s.dispatchEvent(new Event('input')); if(typeof renderVault==='function')renderVault(); }
   }, 200);
 }
-
-function goToPropertiesFiltered(filter) {
-  showPage('properties');
-}
-
-function scrollToOwnerResponses() {
-  showPage('dashboard');
-  setTimeout(() => {
-    const el = document.getElementById('ownerRespAnchor');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 200);
-}
-
+function goToPropertiesFiltered(f) { showPage('properties'); }
+function scrollToOwnerResponses() { showPage('dashboard'); setTimeout(()=>{const el=document.getElementById('ownerRespAnchor');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});},200); }
 function viewOwnerApproval(itemId) {
-  const review = S.get('vicrental_owner_reviews', {})[itemId];
-  const item   = S.get(KEY_PORT, []).find(p => p.id === itemId);
-  if (!review || !item) { if(typeof showToast==='function') showToast('Approval data not found','err'); return; }
-  const fmt = iso => new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'})+' at '+new Date(iso).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
-  const modal = document.createElement('div');
-  modal.id = 'ownerApprovalModal';
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9800;display:flex;align-items:center;justify-content:center;padding:20px;';
-  modal.innerHTML = `<div style="background:#fff;border-radius:18px;padding:28px;width:100%;max-width:560px;box-shadow:0 24px 64px rgba(0,0,0,0.25);">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;"><div style="font-size:1rem;font-weight:800;color:#0A2F5C;">✍️ Owner Approval</div><button onclick="document.getElementById('ownerApprovalModal').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#64748b;">✕</button></div>
-    <div style="background:#f0f4f8;border-radius:10px;padding:14px 16px;margin-bottom:14px;"><div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;color:#64748b;letter-spacing:0.06em;margin-bottom:4px;">Property</div><div style="font-size:0.9rem;font-weight:700;color:#0A2F5C;">${item.property||'—'}</div></div>
-    <div style="background:#f0f4f8;border-radius:10px;padding:14px 16px;margin-bottom:14px;"><div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;color:#64748b;letter-spacing:0.06em;margin-bottom:4px;">Issue</div><div style="font-size:0.85rem;color:#0A2F5C;">${item.issue||'—'}</div></div>
-    <div style="background:#ede9fe;border:1px solid #c4b5fd;border-radius:10px;padding:14px 16px;margin-bottom:14px;">
-      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;color:#5B21B6;letter-spacing:0.06em;margin-bottom:6px;">✅ Owner Response</div>
+  const review=S.get('vicrental_owner_reviews',{})[itemId];const item=S.get(KEY_PORT,[]).find(p=>p.id===itemId);
+  if(!review||!item){if(typeof showToast==='function')showToast('Not found','err');return;}
+  const fmt=iso=>new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'})+' at '+new Date(iso).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
+  const m=document.createElement('div');m.id='ownerApprovalModal';m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9800;display:flex;align-items:center;justify-content:center;padding:20px;';
+  m.innerHTML=`<div style="background:#fff;border-radius:18px;padding:28px;width:100%;max-width:560px;box-shadow:0 24px 64px rgba(0,0,0,0.25);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;"><div style="font-size:1rem;font-weight:800;color:#0A2F5C;">✍️ Owner Approval</div><button onclick="document.getElementById('ownerApprovalModal').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;">✕</button></div>
+    <div style="background:#f0f4f8;border-radius:10px;padding:14px;margin-bottom:14px;"><div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:3px;">Property</div><div style="font-size:0.9rem;font-weight:700;color:#0A2F5C;">${item.property||'—'}</div></div>
+    <div style="background:#f0f4f8;border-radius:10px;padding:14px;margin-bottom:14px;"><div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:3px;">Issue</div><div style="font-size:0.85rem;color:#0A2F5C;">${item.issue||'—'}</div></div>
+    <div style="background:#ede9fe;border:1px solid #c4b5fd;border-radius:10px;padding:14px;margin-bottom:14px;">
+      <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:#5B21B6;margin-bottom:6px;">✅ Owner Response</div>
       <div style="font-size:0.85rem;font-weight:700;color:#5B21B6;margin-bottom:4px;">APPROVED by ${review.owner}</div>
       <div style="font-size:0.75rem;color:#64748b;margin-bottom:8px;">${fmt(review.time)}</div>
-      ${review.comment?`<div style="font-size:0.83rem;color:#1a1a2e;background:#fff;padding:8px 12px;border-radius:7px;border-left:3px solid #5B21B6;">"${review.comment}"</div>`:'<div style="font-size:0.78rem;color:#94a3b8;font-style:italic;">No additional comment provided</div>'}
+      ${review.comment?`<div style="font-size:0.83rem;background:#fff;padding:8px 12px;border-radius:7px;border-left:3px solid #5B21B6;">"${review.comment}"</div>`:'<div style="font-size:0.78rem;color:#94a3b8;font-style:italic;">No comment provided</div>'}
     </div>
     <div style="display:flex;gap:10px;justify-content:flex-end;">
-      <button onclick="document.getElementById('ownerApprovalModal').remove()" style="padding:9px 20px;background:#f0f4f8;color:#0A2F5C;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;">Close</button>
-      <button onclick="document.getElementById('ownerApprovalModal').remove();createWorkOrderFromApproval('${itemId}')" style="padding:9px 20px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;font-weight:700;">📋 Create Work Order →</button>
+      <button onclick="document.getElementById('ownerApprovalModal').remove()" style="padding:9px 20px;background:#f0f4f8;color:#0A2F5C;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;">Close</button>
+      <button onclick="document.getElementById('ownerApprovalModal').remove();createWorkOrderFromApproval('${itemId}')" style="padding:9px 20px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-weight:700;">📋 Create Work Order →</button>
     </div>
-  </div>`;
-  document.body.appendChild(modal);
+  </div>`;document.body.appendChild(m);
 }
-
 function createWorkOrderFromApproval(itemId) {
-  const review = S.get('vicrental_owner_reviews', {})[itemId];
-  const item   = S.get(KEY_PORT, []).find(p => p.id === itemId);
-  if (!review || !item) { if(typeof showToast==='function') showToast('Approval data not found','err'); return; }
-  const modal = document.createElement('div');
-  modal.id = 'crmModal';
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9900;display:flex;align-items:center;justify-content:center;padding:20px;';
-  modal.innerHTML = `<div style="background:#fff;border-radius:18px;padding:28px;width:100%;max-width:580px;box-shadow:0 24px 64px rgba(0,0,0,0.25);max-height:90vh;overflow-y:auto;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;"><div style="font-size:1rem;font-weight:800;color:#0A2F5C;">📋 Create Work Order</div><button onclick="document.getElementById('crmModal').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#64748b;">✕</button></div>
-    <div style="background:#f0f4f8;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:0.82rem;"><div style="font-weight:700;color:#0A2F5C;margin-bottom:2px;">${item.property||'—'}</div><div style="color:#475569;">${item.issue||'—'}</div><div style="color:#5B21B6;font-size:0.75rem;margin-top:4px;">✅ Approved by ${review.owner}${review.comment?' — "'+review.comment+'"':''}</div></div>
+  const review=S.get('vicrental_owner_reviews',{})[itemId];const item=S.get(KEY_PORT,[]).find(p=>p.id===itemId);
+  if(!review||!item)return;
+  const m=document.createElement('div');m.id='crmModal';m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9900;display:flex;align-items:center;justify-content:center;padding:20px;';
+  m.innerHTML=`<div style="background:#fff;border-radius:18px;padding:28px;width:100%;max-width:580px;box-shadow:0 24px 64px rgba(0,0,0,0.25);max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;"><div style="font-size:1rem;font-weight:800;color:#0A2F5C;">📋 Create Work Order</div><button onclick="document.getElementById('crmModal').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;">✕</button></div>
+    <div style="background:#f0f4f8;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:0.82rem;"><div style="font-weight:700;color:#0A2F5C;">${item.property||'—'}</div><div style="color:#475569;">${item.issue||'—'}</div><div style="color:#5B21B6;font-size:0.75rem;margin-top:4px;">✅ Approved by ${review.owner}${review.comment?' — "'+review.comment+'"':''}</div></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
-      <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Job Title</label><input type="text" id="crm_title" value="${item.issue||''}" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"></div>
-      <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Property Address</label><input type="text" id="crm_property" value="${item.property||''}" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"></div>
-      <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Trade Required</label><input type="text" id="crm_trade" value="${item.trade||''}" placeholder="e.g. Electrician" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"></div>
-      <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Priority</label><select id="crm_priority" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"><option value="critical"${item.priority==='critical'?' selected':''}>Critical</option><option value="high"${item.priority==='high'?' selected':''}>High</option><option value="routine">Routine</option></select></div>
-      <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Due Date</label><input type="date" id="crm_due" value="${item.dueDate||''}" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"></div>
-      <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Owner</label><input type="text" id="crm_owner" value="${item.ownerName||review.owner||''}" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"></div>
+      <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;display:block;margin-bottom:4px;">Job Title</label><input type="text" id="crm_title" value="${item.issue||''}" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"></div>
+      <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;display:block;margin-bottom:4px;">Property</label><input type="text" id="crm_property" value="${item.property||''}" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"></div>
+      <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;display:block;margin-bottom:4px;">Trade</label><input type="text" id="crm_trade" value="${item.trade||''}" placeholder="e.g. Electrician" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"></div>
+      <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;display:block;margin-bottom:4px;">Priority</label><select id="crm_priority" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"><option value="critical"${item.priority==='critical'?' selected':''}>Critical</option><option value="high"${item.priority==='high'?' selected':''}>High</option><option value="routine">Routine</option></select></div>
+      <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;display:block;margin-bottom:4px;">Due Date</label><input type="date" id="crm_due" value="${item.dueDate||''}" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"></div>
+      <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;display:block;margin-bottom:4px;">Owner</label><input type="text" id="crm_owner" value="${item.ownerName||review.owner||''}" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"></div>
     </div>
-    <div style="margin-bottom:14px;"><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">Notes / Owner Comment</label><textarea id="crm_notes" rows="2" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;resize:vertical;">${review.comment||''}</textarea></div>
-    <div style="margin-bottom:16px;"><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:4px;">CRM Webhook URL</label><input type="url" id="crm_webhook" placeholder="https://your-crm.com/api/jobs/create" value="${localStorage.getItem('vicrental_crm_webhook')||''}" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"><div style="font-size:0.7rem;color:#64748b;margin-top:3px;">Your CRM's API endpoint. Saved automatically.</div></div>
+    <div style="margin-bottom:14px;"><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;display:block;margin-bottom:4px;">Notes</label><textarea id="crm_notes" rows="2" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;resize:vertical;">${review.comment||''}</textarea></div>
+    <div style="margin-bottom:16px;"><label style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;display:block;margin-bottom:4px;">CRM Webhook URL</label><input type="url" id="crm_webhook" placeholder="https://your-crm.com/api/jobs" value="${localStorage.getItem('vicrental_crm_webhook')||''}" style="width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-family:'Montserrat',sans-serif;font-size:0.83rem;box-sizing:border-box;"></div>
     <div id="crmStatus" style="display:none;padding:10px 14px;border-radius:8px;font-size:0.82rem;margin-bottom:12px;"></div>
     <div style="display:flex;gap:10px;justify-content:flex-end;">
-      <button onclick="document.getElementById('crmModal').remove()" style="padding:9px 20px;background:#f0f4f8;color:#0A2F5C;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;">Cancel</button>
-      <button onclick="pushJobToCRM('${itemId}')" style="padding:9px 22px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;font-weight:700;">🚀 Push to CRM</button>
+      <button onclick="document.getElementById('crmModal').remove()" style="padding:9px 20px;background:#f0f4f8;color:#0A2F5C;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;">Cancel</button>
+      <button onclick="pushJobToCRM('${itemId}')" style="padding:9px 22px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-weight:700;">🚀 Push to CRM</button>
     </div>
-  </div>`;
-  document.body.appendChild(modal);
+  </div>`;document.body.appendChild(m);
 }
-
 async function pushJobToCRM(itemId) {
-  const webhookUrl=(document.getElementById('crm_webhook')?.value||'').trim();
-  const title=document.getElementById('crm_title')?.value||'';
-  const property=document.getElementById('crm_property')?.value||'';
-  const trade=document.getElementById('crm_trade')?.value||'';
-  const priority=document.getElementById('crm_priority')?.value||'high';
-  const dueDate=document.getElementById('crm_due')?.value||'';
-  const owner=document.getElementById('crm_owner')?.value||'';
-  const notes=document.getElementById('crm_notes')?.value||'';
-  const statusEl=document.getElementById('crmStatus');
-  if(!webhookUrl){statusEl.style.cssText='display:block;background:#fee2e2;color:#dc2626;padding:10px 14px;border-radius:8px;font-size:0.82rem;margin-bottom:12px;';statusEl.textContent='⚠ Please enter your CRM webhook URL.';return;}
-  localStorage.setItem('vicrental_crm_webhook',webhookUrl);
-  const payload={source:'VicRental Pro',job_id:itemId,title,property,trade,priority,due_date:dueDate,owner,notes,owner_approved:true,created_at:new Date().toISOString()};
-  statusEl.style.cssText='display:block;background:#eaf6fe;color:#0A2F5C;padding:10px 14px;border-radius:8px;font-size:0.82rem;margin-bottom:12px;';
-  statusEl.textContent='⏳ Pushing to CRM...';
-  try{
-    const res=await fetch(webhookUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    if(res.ok){statusEl.style.background='#dcfce7';statusEl.style.color='#16a34a';statusEl.textContent='✅ Job pushed to CRM successfully!';const wos=S.get('vicrental_workorders',[]);const idx=wos.findIndex(w=>w.id===itemId);if(idx>=0){wos[idx]._jobCreated=true;S.set('vicrental_workorders',wos);}if(typeof showToast==='function')showToast('Job pushed to CRM ✅','ok');setTimeout(()=>{document.getElementById('crmModal')?.remove();renderDashboard();},1800);}
-    else{statusEl.style.background='#fee2e2';statusEl.style.color='#dc2626';statusEl.textContent='❌ CRM returned status '+res.status+'.';}
-  }catch(err){statusEl.style.background='#fee2e2';statusEl.style.color='#dc2626';statusEl.textContent='❌ Could not reach CRM. Check the URL.';}
+  const url=(document.getElementById('crm_webhook')?.value||'').trim();const sEl=document.getElementById('crmStatus');
+  if(!url){sEl.style.cssText='display:block;background:#fee2e2;color:#dc2626;padding:10px 14px;border-radius:8px;font-size:0.82rem;margin-bottom:12px;';sEl.textContent='⚠ Enter CRM webhook URL.';return;}
+  localStorage.setItem('vicrental_crm_webhook',url);
+  const payload={source:'VicRental Pro',job_id:itemId,title:document.getElementById('crm_title')?.value||'',property:document.getElementById('crm_property')?.value||'',trade:document.getElementById('crm_trade')?.value||'',priority:document.getElementById('crm_priority')?.value||'high',due_date:document.getElementById('crm_due')?.value||'',owner:document.getElementById('crm_owner')?.value||'',notes:document.getElementById('crm_notes')?.value||'',owner_approved:true,created_at:new Date().toISOString()};
+  sEl.style.cssText='display:block;background:#eaf6fe;color:#0A2F5C;padding:10px 14px;border-radius:8px;font-size:0.82rem;margin-bottom:12px;';sEl.textContent='⏳ Pushing to CRM...';
+  try{const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(res.ok){sEl.style.background='#dcfce7';sEl.style.color='#16a34a';sEl.textContent='✅ Job pushed successfully!';const wos=S.get('vicrental_workorders',[]);const idx=wos.findIndex(w=>w.id===itemId);if(idx>=0){wos[idx]._jobCreated=true;S.set('vicrental_workorders',wos);}if(typeof showToast==='function')showToast('Job pushed to CRM ✅','ok');setTimeout(()=>{document.getElementById('crmModal')?.remove();renderDashboard();},1800);}
+    else{sEl.style.background='#fee2e2';sEl.style.color='#dc2626';sEl.textContent='❌ CRM returned status '+res.status+'.';}
+  }catch(e){sEl.style.background='#fee2e2';sEl.style.color='#dc2626';sEl.textContent='❌ Could not reach CRM.';}
 }
-
-// Address cleaning helper
-function cleanAddrDisplay(addr) {
-  if (!addr) return '';
-  const parts = addr.split(',').map(p => p.trim()).filter(Boolean);
-  const cleaned = parts.filter(p => p !== 'Australia' && p !== 'Melbourne' && !/^(City|Shire|Municipality|Borough|Greater|Region) of /i.test(p) && !/^(Victoria|VIC)$/.test(p.trim()));
-  return cleaned.slice(0, 3).join(', ') || addr;
+function updateFinaliseDate(){const v=document.getElementById('clDate')?.value;const s=v?new Date(v).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'}):'—';['clFinaliseDate','clFinaliseDate2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=s;});}
+document.addEventListener('input',e=>{if(e.target?.id==='clDate')updateFinaliseDate();});
+document.addEventListener('DOMContentLoaded',()=>setTimeout(updateFinaliseDate,800));
+function finaliseChecklist(type){
+  const isNC=type==='noncompliant';const cbId=isNC?'clNonCompliantConfirm':'clFinaliseConfirm';
+  if(!document.getElementById(cbId)?.checked){alert('Please tick the confirmation box before finalising.');return;}
+  const prop=(document.getElementById('clPropAddress')?.value||'').trim();const owner=(document.getElementById('clOwnerName')?.value||'').trim();const inspector=(document.getElementById('clInspector')?.value||'').trim();const dateVal=document.getElementById('clDate')?.value||new Date().toISOString().split('T')[0];
+  const missing=[];if(!prop)missing.push('Property Address');if(!owner)missing.push('Owner Name');if(!inspector)missing.push('Inspector');
+  if(missing.length){alert('Please complete:\n• '+missing.join('\n• '));return;}
+  const score=document.getElementById('clScoreVal')?.textContent||'—';const grade=document.getElementById('clScoreGrade')?.textContent||'';
+  const dateStr=new Date(dateVal).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});const today=new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});
+  const sc=isNC?'#dc2626':'#16a34a';const sb=isNC?'#fee2e2':'#dcfce7';const certId=(isNC?'NC':'COMP')+'-INSP-'+Date.now();const fn=(isNC?'NonCompliant':'Compliant')+'_Inspection_'+prop.replace(/[^a-z0-9]/gi,'_').substring(0,25)+'.html';
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Inspection Report</title><style>body{font-family:Arial,sans-serif;margin:40px;color:#1a1a2e;font-size:13px;}.hdr{display:flex;align-items:center;justify-content:space-between;border-bottom:4px solid #0A2F5C;padding-bottom:16px;margin-bottom:24px;}.logo{font-size:20px;font-weight:800;color:#0A2F5C;}.logo span{color:#5BB8F5;}.status{background:${sb};border:2px solid ${sc};border-radius:10px;padding:16px;text-align:center;margin:20px 0;font-size:22px;font-weight:800;color:${sc};}.sec{background:#f0f4f8;border-radius:10px;padding:16px 20px;margin-bottom:16px;}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0;}.row:last-child{border-bottom:none;}.lbl{font-size:11px;color:#666;font-weight:600;text-transform:uppercase;}.val{font-size:13px;font-weight:700;color:#0A2F5C;}.footer{margin-top:28px;border-top:2px solid #0A2F5C;padding-top:14px;font-size:10px;color:#888;}</style></head><body>
+<div class="hdr"><div><div class="logo">Vic<span>Rental</span> PRO</div></div><div style="text-align:right;font-size:15px;font-weight:700;color:#0A2F5C;">Rental Property Inspection Report</div></div>
+<div class="status">${isNC?'⚠️ NON-COMPLIANT':'✅ COMPLIANT'}</div>
+<div class="sec"><div class="row"><span class="lbl">Property</span><span class="val">${prop}</span></div><div class="row"><span class="lbl">Owner</span><span class="val">${owner||'—'}</span></div><div class="row"><span class="lbl">Inspector</span><span class="val">${inspector||'—'}</span></div><div class="row"><span class="lbl">Date</span><span class="val">${dateStr}</span></div><div class="row"><span class="lbl">Score</span><span class="val" style="color:${sc};">${score}${grade?' — '+grade:''}</span></div></div>
+<div class="footer">Generated: ${today} via VicRental Pro · Saved to vault and shared with owner.</div></body></html>`;
+  const dataUrl='data:text/html;charset=utf-8,'+encodeURIComponent(html);
+  const vault=S.get(KEY_VAULT,[]);vault.unshift({id:certId,name:(isNC?'⚠️ Non-Compliant':'✅ Compliant')+' Inspection Report — '+prop,type:'inspection_report',category:'Inspection Report',fileName:fn,property:prop,owner,inspector,date:dateVal,score,grade:isNC?'Non-Compliant':grade,uploadedAt:new Date().toISOString(),ownerVisible:true,fileType:'html',isHtml:true,dataUrl});S.set(KEY_VAULT,vault);
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'});const burl=URL.createObjectURL(blob);const a=document.createElement('a');a.href=burl;a.download=fn;a.click();setTimeout(()=>URL.revokeObjectURL(burl),2000);
+  const props2=getManagedProps();const pi=props2.findIndex(p=>p.address?.toLowerCase()===prop.toLowerCase());if(pi!==-1){props2[pi].lastInspectionDate=dateVal;props2[pi].lastInspectionGrade=isNC?'❌ Non-Compliant':grade;saveManagedProps(props2);}
+  document.getElementById('vaultPopupIcon').textContent=isNC?'⚠️':'✅';document.getElementById('vaultPopupTitle').textContent=isNC?'Non-Compliant Report Saved':'Compliant Report Saved';document.getElementById('vaultPopupProp').textContent=prop;document.getElementById('vaultPopupOwner').textContent=owner;document.getElementById('vaultPopupInspector').textContent=inspector;document.getElementById('vaultPopupDate').textContent=dateStr;document.getElementById('vaultPopupScore').textContent=score+(grade?' — '+grade:'');document.getElementById('vaultPopupScore').style.color=isNC?'#dc2626':'#16a34a';document.getElementById('vaultPopupMsg').innerHTML='📁 Report downloaded and saved to <strong>Document Vault</strong> under <strong>'+prop+'</strong>. Visible to the owner in their portal.';document.getElementById('vaultPopupModal').style.display='flex';
+  if(typeof renderVault==='function')renderVault();
 }
-
-// Finalise checklist
-function updateFinaliseDate() {
-  const val = document.getElementById('clDate')?.value;
-  const str = val ? new Date(val).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'}) : '—';
-  ['clFinaliseDate','clFinaliseDate2'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=str; });
-}
-document.addEventListener('input', e => { if(e.target?.id==='clDate') updateFinaliseDate(); });
-document.addEventListener('DOMContentLoaded', () => setTimeout(updateFinaliseDate, 800));
-
-function finaliseChecklist(type) {
-  const isNC = type === 'noncompliant';
-  const cbId = isNC ? 'clNonCompliantConfirm' : 'clFinaliseConfirm';
-  if (!document.getElementById(cbId)?.checked) { alert('Please tick the confirmation box before finalising.'); return; }
-  const prop      = (document.getElementById('clPropAddress')?.value||'').trim();
-  const owner     = (document.getElementById('clOwnerName')?.value||'').trim();
-  const inspector = (document.getElementById('clInspector')?.value||'').trim();
-  const dateVal   = document.getElementById('clDate')?.value || new Date().toISOString().split('T')[0];
-  const missing = [];
-  if (!prop) missing.push('Property Address');
-  if (!owner) missing.push('Owner Name');
-  if (!inspector) missing.push('Inspector / Completed By');
-  if (missing.length) { alert('Please complete:\n• ' + missing.join('\n• ')); return; }
-  const score   = document.getElementById('clScoreVal')?.textContent || '—';
-  const grade   = document.getElementById('clScoreGrade')?.textContent || '';
-  const dateStr = new Date(dateVal).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});
-  const today   = new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});
-  const statusColour = isNC ? '#dc2626' : '#16a34a';
-  const statusLabel  = isNC ? '⚠️ NON-COMPLIANT' : '✅ COMPLIANT';
-  const statusBg     = isNC ? '#fee2e2' : '#dcfce7';
-  const statusBorder = isNC ? '#dc2626' : '#16a34a';
-  const certId = (isNC?'NC':'COMP')+'-INSP-'+Date.now();
-  const fileName = (isNC?'NonCompliant':'Compliant')+'_Inspection_'+prop.replace(/[^a-z0-9]/gi,'_').substring(0,25)+'.html';
-  const reportHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Inspection Report — ${prop}</title><style>body{font-family:Arial,sans-serif;margin:40px;color:#1a1a2e;font-size:13px;}.hdr{display:flex;align-items:center;justify-content:space-between;border-bottom:4px solid #0A2F5C;padding-bottom:16px;margin-bottom:24px;}.logo{font-size:20px;font-weight:800;color:#0A2F5C;}.logo span{color:#5BB8F5;}.status{background:${statusBg};border:2px solid ${statusBorder};border-radius:10px;padding:16px;text-align:center;margin:20px 0;font-size:22px;font-weight:800;color:${statusColour};}.sec{background:#f0f4f8;border-radius:10px;padding:16px 20px;margin-bottom:16px;}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0;}.row:last-child{border-bottom:none;}.lbl{font-size:11px;color:#666;font-weight:600;text-transform:uppercase;}.val{font-size:13px;font-weight:700;color:#0A2F5C;}.footer{margin-top:28px;border-top:2px solid #0A2F5C;padding-top:14px;font-size:10px;color:#888;}</style></head><body>
-<div class="hdr"><div><div class="logo">Vic<span>Rental</span> PRO</div><div style="font-size:10px;color:#888;letter-spacing:0.1em;">REPORT · TRACK · COMPLY</div></div><div style="text-align:right;"><div style="font-size:15px;font-weight:700;color:#0A2F5C;">Rental Property Inspection Report</div><div style="font-size:10px;color:#888;">Residential Tenancies Act 1997 (Victoria)</div></div></div>
-<div class="status">${statusLabel}</div>
-<div class="sec"><div class="row"><span class="lbl">Property Address</span><span class="val">${prop}</span></div><div class="row"><span class="lbl">Owner</span><span class="val">${owner||'—'}</span></div><div class="row"><span class="lbl">Inspector / Property Manager</span><span class="val">${inspector||'—'}</span></div><div class="row"><span class="lbl">Date of Inspection</span><span class="val">${dateStr}</span></div><div class="row"><span class="lbl">Overall Score</span><span class="val" style="color:${statusColour};">${score}${grade?' — '+grade:''}</span></div></div>
-<div class="footer">Generated: ${today} via VicRental Pro · Saved to Document Vault and shared with owner.</div></body></html>`;
-  const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(reportHtml);
-  // Save to vault
-  const vault = S.get(KEY_VAULT, []);
-  vault.unshift({id:certId,name:(isNC?'⚠️ Non-Compliant':'✅ Compliant')+' Inspection Report — '+prop,type:'inspection_report',category:'Inspection Report',fileName,property:prop,owner,inspector,date:dateVal,score,grade:isNC?'Non-Compliant':grade,uploadedAt:new Date().toISOString(),ownerVisible:true,fileType:'html',isHtml:true,dataUrl});
-  S.set(KEY_VAULT, vault);
-  // Download
-  const blob=new Blob([reportHtml],{type:'text/html;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=fileName;a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);
-  // Update managed props
-  const props=getManagedProps();const pi=props.findIndex(p=>p.address?.toLowerCase()===prop.toLowerCase());
-  if(pi!==-1){props[pi].lastInspectionDate=dateVal;props[pi].lastInspectionGrade=isNC?'❌ Non-Compliant':grade;saveManagedProps(props);}
-  // Show popup
-  document.getElementById('vaultPopupIcon').textContent    = isNC ? '⚠️' : '✅';
-  document.getElementById('vaultPopupTitle').textContent   = isNC ? 'Non-Compliant Report Saved' : 'Compliant Report Saved';
-  document.getElementById('vaultPopupProp').textContent    = prop;
-  document.getElementById('vaultPopupOwner').textContent   = owner;
-  document.getElementById('vaultPopupInspector').textContent = inspector;
-  document.getElementById('vaultPopupDate').textContent    = dateStr;
-  document.getElementById('vaultPopupScore').textContent   = score + (grade ? ' — ' + grade : '');
-  document.getElementById('vaultPopupScore').style.color   = isNC ? '#dc2626' : '#16a34a';
-  document.getElementById('vaultPopupMsg').innerHTML       = `📁 Report downloaded and saved to <strong>Document Vault</strong> under <strong>${prop}</strong>. Visible to the owner in their portal under <strong>Documents</strong>.`;
-  document.getElementById('vaultPopupModal').style.display = 'flex';
-  if(typeof logActivity==='function') logActivity((isNC?'⚠️ Non-compliant':'✅ Compliant')+' inspection finalised: '+prop,isNC?'#dc2626':'#16a34a');
-  if(typeof renderVault==='function') renderVault();
-}
-
-function dismissVaultPopup() {
-  document.getElementById('vaultPopupModal').style.display = 'none';
-}
-
-function closePropSummary() {
-  document.getElementById('propSummaryModal').style.display = 'none';
-}
+function dismissVaultPopup(){document.getElementById('vaultPopupModal').style.display='none';}
+function renderCategories(){const container=document.getElementById('clCategories');if(!container)return;container.innerHTML=CATEGORIES.map((cat,ci)=>{const comp=cat.complianceType?buildComplianceSection(cat):'';const cleaning=cat.hasCleaningSection?buildCleaningSection():'';return `<div class="cat-accordion ${ci===0?'open':''}" id="cacc-${cat.id}"><div class="cat-head" onclick="toggleCat('${cat.id}')"><span class="cat-icon">${cat.icon}</span><div class="cat-info"><div class="cat-title">${cat.title}</div><div class="cat-sub">${cat.subtitle}</div></div><div class="cat-progress" id="catprog-${cat.id}"></div><span class="cat-chevron">▼</span></div><div class="cat-body" id="catbody-${cat.id}">${cat.items.map(item=>renderCheckItem(item,cat)).join('')}${comp}${cleaning}</div></div>`;}).join('');updateCatProgress();['electrical','gas','smoke'].forEach(restoreComplianceDates);restoreCleaningRecords();}
+function buildComplianceSection(cat){const t=cat.complianceType,freq=t==='smoke'?'Every 12 months':'Every 2 years',label=t==='electrical'?'Electrical Safety':t==='gas'?'Gas Safety':'Smoke Alarm',col=t==='electrical'?'#f59e0b':t==='gas'?'#5BB8F5':'#dc2626',inp=`width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Montserrat',sans-serif;font-size:0.82rem;background:#fff;box-sizing:border-box;`;return `<div style="margin:12px 16px 16px;background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:16px;"><div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:12px;">📋 ${label} Compliance Record <span style="background:${col};color:#fff;border-radius:5px;padding:2px 8px;font-size:0.65rem;margin-left:6px;">${freq}</span></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;"><div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Date of Last Inspection</label><input type="date" id="comp_last_${t}" onchange="autoCalcNextDate('${t}')" style="${inp}"></div><div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Next Inspection Due</label><input type="date" id="comp_next_${t}" style="${inp}"></div><div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Company / Inspector</label><input type="text" id="comp_company_${t}" placeholder="e.g. Safe Gas Pty Ltd" oninput="saveComplianceDates('${t}')" style="${inp}"></div></div><button onclick="generateComplianceCert('${t}','${label}')" style="padding:8px 20px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📜 Generate ${label} Compliance Certificate</button></div>`;}
+function buildCleaningSection(){const i=`width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Montserrat',sans-serif;font-size:0.82rem;background:#fff;box-sizing:border-box;`;return `<div style="margin:12px 16px 16px;background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:16px;"><div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:14px;">🧹 Cleaning Records</div><div style="background:#fff;border:1px solid var(--border);border-radius:9px;padding:14px;margin-bottom:12px;"><div style="font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:10px;">🏠 Professional Property Clean</div><div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:12px;align-items:center;"><label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;font-weight:600;cursor:pointer;"><input type="checkbox" id="clean_prof_done" onchange="saveCleaningRecords()" style="width:16px;height:16px;accent-color:#0A2F5C;"> Completed</label><div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Date of Clean</label><input type="date" id="clean_prof_date" onchange="saveCleaningRecords()" style="${i}"></div><div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Company</label><input type="text" id="clean_prof_company" placeholder="e.g. CleanPro" oninput="saveCleaningRecords()" style="${i}"></div><div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Receipt</label><label style="display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px dashed var(--border);border-radius:7px;cursor:pointer;background:#fafafa;font-size:0.78rem;color:var(--muted);">📎 Upload<input type="file" accept="image/*,.pdf" style="display:none;" onchange="handleCleaningReceipt(event,'prof')"></label><div id="clean_prof_receipt_name" style="font-size:0.7rem;color:#16a34a;margin-top:3px;"></div></div></div><div id="clean_prof_receipt_preview" style="margin-top:6px;"></div></div><div style="background:#fff;border:1px solid var(--border);border-radius:9px;padding:14px;"><div style="font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:10px;">🪣 Carpet Steam Clean</div><div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:12px;align-items:center;"><label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;font-weight:600;cursor:pointer;"><input type="checkbox" id="clean_carpet_done" onchange="saveCleaningRecords()" style="width:16px;height:16px;accent-color:#0A2F5C;"> Completed</label><div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Date of Clean</label><input type="date" id="clean_carpet_date" onchange="saveCleaningRecords()" style="${i}"></div><div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Company</label><input type="text" id="clean_carpet_company" placeholder="e.g. Steam King" oninput="saveCleaningRecords()" style="${i}"></div><div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Receipt</label><label style="display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px dashed var(--border);border-radius:7px;cursor:pointer;background:#fafafa;font-size:0.78rem;color:var(--muted);">📎 Upload<input type="file" accept="image/*,.pdf" style="display:none;" onchange="handleCleaningReceipt(event,'carpet')"></label><div id="clean_carpet_receipt_name" style="font-size:0.7rem;color:#16a34a;margin-top:3px;"></div></div></div><div id="clean_carpet_receipt_preview" style="margin-top:6px;"></div></div></div>`;}
+function autoCalcNextDate(t){const last=document.getElementById('comp_last_'+t)?.value;const nextEl=document.getElementById('comp_next_'+t);if(!last||!nextEl)return;const d=new Date(last);d.setMonth(d.getMonth()+(t==='smoke'?12:24));nextEl.value=d.toISOString().split('T')[0];saveComplianceDates(t);}
+function saveComplianceDates(t){localStorage.setItem('vicrental_comp_'+t,JSON.stringify({last:document.getElementById('comp_last_'+t)?.value||'',next:document.getElementById('comp_next_'+t)?.value||'',company:document.getElementById('comp_company_'+t)?.value||''}));}
+function restoreComplianceDates(t){try{const d=JSON.parse(localStorage.getItem('vicrental_comp_'+t)||'null');if(!d)return;['last','next','company'].forEach(f=>{const el=document.getElementById('comp_'+f+'_'+t);if(el&&d[f])el.value=d[f];});}catch(e){}}
+function generateComplianceCert(type,typeLabel){const prop=(document.getElementById('clPropAddress')?.value||'').trim();const owner=(document.getElementById('clOwnerName')?.value||'').trim();const lastDate=document.getElementById('comp_last_'+type)?.value||'';const nextDate=document.getElementById('comp_next_'+type)?.value||'';const company=document.getElementById('comp_company_'+type)?.value||'';if(!prop){alert('Please enter the Property Address.');return;}if(!lastDate){alert('Please enter the Date of Last Inspection.');return;}if(!company){alert('Please enter the Company / Inspector name.');return;}const fmt=iso=>iso?new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'}):'—';const freq=type==='smoke'?'Every 12 months':'Every 2 years';const today=new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});const col=type==='electrical'?'#f59e0b':type==='gas'?'#0A2F5C':'#dc2626';const certId='CERT-'+type.toUpperCase()+'-'+Date.now();const certHtml=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${typeLabel} Certificate</title><style>body{font-family:Arial,sans-serif;margin:40px;color:#1a1a2e;}.hdr{display:flex;align-items:center;justify-content:space-between;border-bottom:4px solid #0A2F5C;padding-bottom:16px;margin-bottom:24px;}.logo{font-size:22px;font-weight:800;color:#0A2F5C;}.logo span{color:#5BB8F5;}.badge{background:${col};color:#fff;padding:6px 16px;border-radius:8px;font-weight:700;}.ok{background:#dcfce7;border:2px solid #16a34a;border-radius:10px;padding:16px;text-align:center;margin:20px 0;}.ok-text{font-size:22px;font-weight:800;color:#16a34a;}.sec{background:#f0f4f8;border-radius:10px;padding:16px 20px;margin-bottom:16px;}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0;}.row:last-child{border-bottom:none;}.lbl{font-size:11px;color:#666;font-weight:600;text-transform:uppercase;}.val{font-size:13px;font-weight:700;color:#0A2F5C;}.footer{margin-top:32px;border-top:2px solid #0A2F5C;padding-top:16px;font-size:11px;color:#888;}</style></head><body><div class="hdr"><div><div class="logo">Vic<span>Rental</span> PRO</div></div><div class="badge">${typeLabel} Compliance Certificate</div></div><div class="ok"><div class="ok-text">✅ COMPLIANT</div></div><div class="sec"><div class="row"><span class="lbl">Property</span><span class="val">${prop}</span></div><div class="row"><span class="lbl">Owner</span><span class="val">${owner||'—'}</span></div></div><div class="sec"><div class="row"><span class="lbl">Date of Inspection</span><span class="val">${fmt(lastDate)}</span></div><div class="row"><span class="lbl">Next Due</span><span class="val">${fmt(nextDate)}</span></div><div class="row"><span class="lbl">Frequency</span><span class="val">${freq}</span></div><div class="row"><span class="lbl">Company / Inspector</span><span class="val">${company}</span></div></div><div class="footer">Generated: ${today} via VicRental Pro · ${certId}</div></body></html>`;const dataUrl='data:text/html;charset=utf-8,'+encodeURIComponent(certHtml);const blob=new Blob([certHtml],{type:'text/html;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=typeLabel.replace(/\s/g,'_')+'_Certificate.html';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);const vault=S.get(KEY_VAULT,[]);vault.unshift({id:certId,name:typeLabel+' Compliance Certificate — '+prop,type:'compliance_cert',category:'Compliance Certificate',fileName:typeLabel.replace(/\s/g,'_')+'_Certificate.html',property:prop,owner:owner||'',date:lastDate,nextDue:nextDate,company,uploadedAt:new Date().toISOString(),ownerVisible:true,fileType:'html',isHtml:true,dataUrl});S.set(KEY_VAULT,vault);if(typeof showToast==='function')showToast(typeLabel+' certificate saved to vault ✅','ok');if(typeof renderVault==='function')renderVault();}
+function handleCleaningReceipt(event,type){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const dataUrl=e.target.result;const n=document.getElementById('clean_'+type+'_receipt_name');const p=document.getElementById('clean_'+type+'_receipt_preview');if(n)n.textContent='✅ '+file.name;if(p)p.innerHTML=file.type.startsWith('image/')?`<img src="${dataUrl}" style="max-width:200px;max-height:120px;border-radius:6px;border:1px solid var(--border);">`:`<div style="font-size:0.78rem;color:var(--muted);padding:6px 10px;background:#f8fafc;border-radius:6px;">📄 ${file.name}</div>`;const c=JSON.parse(localStorage.getItem('vicrental_cleaning')||'{}');c[type+'_receipt']={name:file.name,dataUrl,type:file.type};localStorage.setItem('vicrental_cleaning',JSON.stringify(c));};reader.readAsDataURL(file);}
+function saveCleaningRecords(){const d={prof_done:document.getElementById('clean_prof_done')?.checked||false,prof_date:document.getElementById('clean_prof_date')?.value||'',prof_company:document.getElementById('clean_prof_company')?.value||'',carpet_done:document.getElementById('clean_carpet_done')?.checked||false,carpet_date:document.getElementById('clean_carpet_date')?.value||'',carpet_company:document.getElementById('clean_carpet_company')?.value||''};const e=JSON.parse(localStorage.getItem('vicrental_cleaning')||'{}');localStorage.setItem('vicrental_cleaning',JSON.stringify({...e,...d}));}
+function restoreCleaningRecords(){try{const d=JSON.parse(localStorage.getItem('vicrental_cleaning')||'{}');const set=(id,val)=>{const el=document.getElementById(id);if(el){if(typeof val==='boolean')el.checked=val;else el.value=val;}};set('clean_prof_done',d.prof_done||false);set('clean_prof_date',d.prof_date||'');set('clean_prof_company',d.prof_company||'');set('clean_carpet_done',d.carpet_done||false);set('clean_carpet_date',d.carpet_date||'');set('clean_carpet_company',d.carpet_company||'');['prof','carpet'].forEach(type=>{const r=d[type+'_receipt'];if(!r)return;const n=document.getElementById('clean_'+type+'_receipt_name');const p=document.getElementById('clean_'+type+'_receipt_preview');if(n)n.textContent='✅ '+r.name;if(p)p.innerHTML=r.type?.startsWith('image/')?`<img src="${r.dataUrl}" style="max-width:200px;max-height:120px;border-radius:6px;border:1px solid var(--border);">`:`<div style="font-size:0.78rem;color:var(--muted);padding:6px 10px;background:#f8fafc;border-radius:6px;">📄 ${r.name}</div>`;});}catch(e){}}
+function closePropSummary(){document.getElementById('propSummaryModal').style.display='none';}
 </script>
 
 <!-- Vault Popup Modal -->
@@ -6376,15 +6190,11 @@ function closePropSummary() {
     <div id="vaultPopupTitle" style="font-size:1.1rem;font-weight:800;color:var(--navy);margin-bottom:12px;">Report Saved</div>
     <div style="font-size:0.83rem;color:var(--muted);margin-bottom:18px;line-height:1.8;text-align:left;background:var(--warm);border-radius:10px;padding:14px 18px;">
       <strong id="vaultPopupProp" style="color:var(--navy);display:block;font-size:0.9rem;margin-bottom:4px;"></strong>
-      Owner: <strong id="vaultPopupOwner"></strong><br>
-      Inspector: <strong id="vaultPopupInspector"></strong><br>
-      Date: <strong id="vaultPopupDate"></strong><br>
-      Result: <strong id="vaultPopupScore"></strong>
+      Owner: <strong id="vaultPopupOwner"></strong><br>Inspector: <strong id="vaultPopupInspector"></strong><br>Date: <strong id="vaultPopupDate"></strong><br>Result: <strong id="vaultPopupScore"></strong>
     </div>
     <div id="vaultPopupMsg" style="font-size:0.83rem;color:var(--text);line-height:1.6;margin-bottom:22px;text-align:left;"></div>
     <button onclick="dismissVaultPopup()" style="padding:10px 28px;background:var(--navy);color:#fff;border:none;border-radius:9px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;font-weight:700;">OK — Close</button>
   </div>
 </div>
-
 </body>
 </html>
