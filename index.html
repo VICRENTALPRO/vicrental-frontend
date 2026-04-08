@@ -6146,12 +6146,12 @@ function seedDemo() {}
 
       <!-- Compliance card -->
       <div id="psmCompliance" style="border:1px solid var(--border);border-radius:12px;overflow:hidden;">
-        <div style="background:var(--warm);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="showPage('portal')">
+        <div style="background:var(--warm);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" id="psmComplianceHeader">
           <div>
             <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);">📋 Compliance</div>
             <div id="psmComplianceStatus" style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-top:3px;">—</div>
           </div>
-          <div style="font-size:0.75rem;color:var(--muted);">View certificates in vault →</div>
+          <div style="font-size:0.75rem;color:var(--muted);">View documents in vault →</div>
         </div>
         <div id="psmComplianceDocs" style="padding:12px 16px;font-size:0.8rem;color:var(--muted);"></div>
       </div>
@@ -6224,6 +6224,7 @@ function openPropertySummaryByAddr(address) {
       <span style="flex:1;">${w.issue||w.category||'—'}</span>
     </div>`).join('') || '<div style="color:var(--muted);font-style:italic;">No work orders for this property.</div>';
   document.getElementById('psmWOHeader').onclick = () => { closePropSummary(); filterWOsByProp(dec); };
+  document.getElementById('psmComplianceHeader').onclick = () => { closePropSummary(); goToVaultForProp(dec); };
 
   // Tenant Requests
   const reqs = S.get(KEY_TREQS, []).filter(r => r.property && r.property.toLowerCase() === dec.toLowerCase());
@@ -6348,6 +6349,20 @@ function buildInspectionReportHtml({ prop, owner, inspector, dateVal, dateStr, t
 
 function dismissVaultPopup() {
   document.getElementById('vaultPopupModal').style.display = 'none';
+}
+
+function goToVaultForProp(address) {
+  closePropSummary();
+  showPage('vault');
+  setTimeout(() => {
+    const search = document.getElementById('vaultSearch');
+    if (search) {
+      // Use just the street part for searching
+      const streetPart = (address || '').split(',')[0].trim();
+      search.value = streetPart;
+      search.dispatchEvent(new Event('input'));
+    }
+  }, 250);
 }
 
 function closePropSummary() {
