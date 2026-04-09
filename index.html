@@ -5796,6 +5796,16 @@ function addProperty() {
 }
 
 async function registerOwnerOnBackend(name, password) {
+  // Always save locally first so the owner portal fallback works
+  const accounts = JSON.parse(localStorage.getItem('vicrental_owner_accounts') || '[]');
+  const existingIdx = accounts.findIndex(a => a.name?.toLowerCase() === name.toLowerCase());
+  if (existingIdx !== -1) {
+    accounts[existingIdx].password = password;
+  } else {
+    accounts.push({ name, password, createdAt: new Date().toISOString() });
+  }
+  localStorage.setItem('vicrental_owner_accounts', JSON.stringify(accounts));
+
   try {
     const res = await fetch(`${BACKEND}/auth/owner/register`, {
       method: 'POST',
@@ -5817,6 +5827,16 @@ async function registerOwnerOnBackend(name, password) {
 }
 
 async function updateOwnerPasswordOnBackend(name, password) {
+  // Save locally so owner portal fallback works
+  const accounts = JSON.parse(localStorage.getItem('vicrental_owner_accounts') || '[]');
+  const existingIdx = accounts.findIndex(a => a.name?.toLowerCase() === name.toLowerCase());
+  if (existingIdx !== -1) {
+    accounts[existingIdx].password = password;
+  } else {
+    accounts.push({ name, password, createdAt: new Date().toISOString() });
+  }
+  localStorage.setItem('vicrental_owner_accounts', JSON.stringify(accounts));
+
   try {
     // Try to find the owner ID from the list
     const res = await fetch(`${BACKEND}/auth/owner/list`, { headers: getAuthHeaders() });
