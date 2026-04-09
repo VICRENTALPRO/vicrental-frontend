@@ -3404,10 +3404,10 @@ function renderPortal() {
               ${rows.map(([l,v])=>`<div style="display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid #f1f5f9;"><span style="font-size:0.75rem;color:var(--muted);">${l}</span><span style="font-size:0.82rem;font-weight:700;color:var(--navy);text-align:right;max-width:55%;">${v}</span></div>`).join('')}
             </div>
             <div style="padding:10px 14px;background:#f8fafc;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-              <button onclick="pushPropToOwnerPortal(${idx})" id="pushBtn_${idx}" style="flex:1;padding:8px 14px;background:${isPushed?'#16a34a':'#0A2F5C'};color:#fff;border:none;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">
-                ${isPushed ? '✅ Pushed to Owner Portal' : '🚀 Push to Owner Portal'}
+              <button onclick="sendOwnerDataLink(${idx})" style="flex:1;padding:8px 14px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">
+                📤 Send Data to Owner
               </button>
-              <button onclick="generateOwnerLoginLink(${idx})" style="padding:8px 12px;background:#fff;color:#0A2F5C;border:2px solid #0A2F5C;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;" title="Generate a one-click login link for this owner">🔗 Login Link</button>
+              <button onclick="generateOwnerLoginLink(${idx})" style="padding:8px 12px;background:#fff;color:#0A2F5C;border:2px solid #0A2F5C;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;" title="Copy login link to clipboard">🔗 Copy Link</button>
               <button onclick="filterPortalByProp('${(p.address||'').replace(/'/g,"\\'")}');" style="padding:8px 12px;background:var(--warm);color:var(--navy);border:1px solid var(--border);border-radius:8px;font-size:0.78rem;cursor:pointer;font-family:'Montserrat',sans-serif;">View Issues</button>
             </div>
           </div>`;
@@ -3577,43 +3577,40 @@ function autoSyncAllPropsToOwnerPortal() {
   getManagedProps().filter(p => !p.archived && p.owner).forEach(p => autoPushToOwnerPortal(p));
 }
 
-function generateOwnerLoginLink(propIdx) {
+function buildOwnerLink(propIdx) {
   const allProps = getManagedProps().filter(p => !p.archived);
   const p = allProps[propIdx];
-  if (!p || !p.owner) { if(typeof showToast==='function') showToast('Property must have an owner assigned', 'err'); return; }
-
+  if (!p || !p.owner) return null;
   const accounts = JSON.parse(localStorage.getItem('vicrental_owner_accounts') || '[]');
   const acc = accounts.find(a => a.name?.toLowerCase() === p.owner.toLowerCase());
   const password = acc?.password || '';
-
-  if (!password) {
-    alert('No password found for ' + p.owner + '.\n\nPlease set a password first:\n• Go to Manage Owners → Edit → set a New Password, or\n• Use the + Add Owner form in Manage Owners.');
-    return;
-  }
-
-  const ownerPortalUrl = 'https://scintillating-salmiakki-33c677.netlify.app';
-
-  // Use base64 encoding to keep URL short and clean
+  if (!password) return null;
   const payload = {
-    n:  p.owner,
-    pw: password,
-    a:  p.address || '',
-    oe: p.ownerEmail || '',
-    t:  p.tenant || '',
-    te: p.tenantEmail || '',
-    mi: p.tenantMoveIn || '',
-    ls: p.leaseStart || '',
-    le: p.leaseEnd || '',
-    r:  p.rentPcm || '',
-    rr: p.lastRentReview || '',
-    lt: p.leaseType || '',
-    is: p.lastInspectionScore || '',
-    ig: p.lastInspectionGrade || '',
-    id: p.lastInspectionDate || '',
+    n: p.owner, pw: password, a: p.address || '', oe: p.ownerEmail || '',
+    t: p.tenant || '', te: p.tenantEmail || '', mi: p.tenantMoveIn || '',
+    ls: p.leaseStart || '', le: p.leaseEnd || '', r: p.rentPcm || '',
+    rr: p.lastRentReview || '', lt: p.leaseType || '',
+    is: p.lastInspectionScore || '', ig: p.lastInspectionGrade || '', id: p.lastInspectionDate || '',
   };
+  return { p, password, link: 'https://scintillating-salmiakki-33c677.netlify.app#vr=' + btoa(unescape(encodeURIComponent(JSON.stringify(payload)))) };
+}
 
-  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-  const loginLink = ownerPortalUrl + '#vr=' + encoded;
+function sendOwnerDataLink(propIdx) {
+  const result = buildOwnerLink(propIdx);
+  if (!result) { alert('No password set for this owner.\n\nGo to Manage Owners → Edit → set a New Password first.'); return; }
+  const { p, link } = result;
+  const firstName = (p.owner||'').split(' ')[0] || 'Owner';
+  const subject = encodeURIComponent('Your VicRental Pro Owner Portal — ' + (p.address||'').split(',')[0].trim());
+  const body = encodeURIComponent('Dear ' + firstName + ',\n\nYour property details have been updated in the VicRental Pro Owner Portal.\n\nClick the link below to view your property summary, compliance status and documents:\n\n' + link + '\n\nThis link saves your login details automatically.\n\nIf you have questions please contact your property manager.\n\nKind regards,\nVicRental Pro');
+  window.open('mailto:' + (p.ownerEmail||'') + '?subject=' + subject + '&body=' + body, '_blank');
+  if (typeof showToast === 'function') showToast('Email client opened for ' + p.owner, 'ok');
+}
+
+function generateOwnerLoginLink(propIdx) {
+  const result = buildOwnerLink(propIdx);
+  if (!result) { alert('No password set for this owner.\n\nGo to Manage Owners → Edit → set a New Password first.'); return; }
+  const { p, link } = result;
+  const loginLink = link;
 
   const existing = document.getElementById('loginLinkModal');
   if (existing) existing.remove();
@@ -3634,33 +3631,16 @@ function generateOwnerLoginLink(propIdx) {
         <div style="font-size:0.7rem;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em;">Login Link for ${p.owner}</div>
         <div style="font-size:0.75rem;color:#0A2F5C;word-break:break-all;font-family:monospace;" id="loginLinkText">${loginLink}</div>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button onclick="navigator.clipboard.writeText(document.getElementById('loginLinkText').textContent).then(()=>{this.textContent='✅ Copied!';setTimeout(()=>{this.textContent='📋 Copy Link'},2000)})" style="flex:1;padding:10px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📋 Copy Link</button>
-        <button onclick="sendLoginLinkEmail('${p.ownerEmail||''}','${p.owner.replace(/'/g,"\\'")}','${(p.address||'').replace(/'/g,"\\'")}','loginLinkText')" style="flex:1;padding:10px;background:#fff;color:#0A2F5C;border:2px solid #0A2F5C;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📧 Email Link</button>
-      </div>
-      <div style="margin-top:12px;text-align:center;">
-        <button onclick="document.getElementById('loginLinkModal').remove()" style="padding:8px 20px;background:#f0f4f8;color:#64748b;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.82rem;">Close</button>
+      <div style="display:flex;gap:8px;">
+        <button onclick="navigator.clipboard.writeText(document.getElementById('loginLinkText').textContent).then(()=>{this.textContent='✅ Copied!';setTimeout(()=>this.textContent='📋 Copy Link',2000)})" style="flex:1;padding:10px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📋 Copy Link</button>
+        <button onclick="sendOwnerDataLink(${propIdx});document.getElementById('loginLinkModal').remove()" style="flex:1;padding:10px;background:#fff;color:#0A2F5C;border:2px solid #0A2F5C;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📧 Email to Owner</button>
+        <button onclick="document.getElementById('loginLinkModal').remove()" style="padding:10px 16px;background:#f0f4f8;color:#64748b;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;">Close</button>
       </div>
     </div>`;
   document.body.appendChild(modal);
 }
 
-function sendLoginLinkEmail(email, ownerName, address, linkElId) {
-  const link = document.getElementById(linkElId)?.textContent || '';
-  const firstName = ownerName.split(' ')[0] || 'Owner';
-  const subject = encodeURIComponent('Your VicRental Pro Owner Portal Access — ' + address);
-  const body = encodeURIComponent(
-    'Dear ' + firstName + ',\n\n' +
-    'Here is your personalised login link for the VicRental Pro Owner Portal:\n\n' +
-    link + '\n\n' +
-    'Simply open this link and click Sign In — your details will be pre-filled automatically.\n\n' +
-    'After your first login you can log in directly at:\n' +
-    'https://scintillating-salmiakki-33c677.netlify.app\n\n' +
-    'If you have any questions please contact your property manager.\n\n' +
-    'Kind regards,\nVicRental Pro'
-  );
-  window.open('mailto:' + email + '?subject=' + subject + '&body=' + body, '_blank');
-}
+
 
 function pushPropToOwnerPortal(propIdx) {
   const allProps = getManagedProps().filter(p => !p.archived);
