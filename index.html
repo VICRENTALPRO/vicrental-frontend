@@ -1809,25 +1809,39 @@ window.addEventListener('DOMContentLoaded', function() {
       <!-- ═══ OWNER PORTAL ═══ -->
       <div class="page" id="page-portal">
         <div class="notice notice-gold">
-          <span style="font-size:1.1rem;flex-shrink:0;">⚖️</span>
-          <div><strong>Victoria Rental Compliance — Owner View.</strong> Failed inspection items are shown here. Under the <em>Residential Tenancies Act 1997</em>, these standards must be met. Items remain Non-Compliant until a work order is completed with verified evidence.</div>
+          <span style="font-size:1.1rem;flex-shrink:0;">🏠</span>
+          <div><strong>Owner Portal — Property Overview.</strong> Managed properties are shown below. Click <strong>Push to Owner Portal</strong> on any tile to send the property summary and tenancy details to the owner's portal. Owners log in at the Owner Portal to view their documents and approve work orders.</div>
         </div>
 
-        <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;">
-          <div class="kpi-card kpi-red"><div class="kpi-label">Non-Compliant</div><div class="kpi-value" id="pNC">0</div><div class="kpi-icon">⚠️</div></div>
-          <div class="kpi-card kpi-amber"><div class="kpi-label">In Progress</div><div class="kpi-value" id="pIP">0</div><div class="kpi-icon">🔨</div></div>
-          <div class="kpi-card kpi-green"><div class="kpi-label">Resolved</div><div class="kpi-value" id="pOK">0</div><div class="kpi-icon">✅</div></div>
-          <div class="kpi-card kpi-slate"><div class="kpi-label">Total Issues</div><div class="kpi-value" id="pTotal">0</div><div class="kpi-icon">📋</div></div>
-        </div>
+        <!-- Property tiles grid -->
+        <div id="portalPropTiles" style="margin-bottom:24px;"></div>
 
-        <div class="filter-row" id="portalFilterRow">
-          <div class="filter-pill fp-all active" onclick="setPortalFilter('all')">All Issues</div>
-          <div class="filter-pill fp-nc" onclick="setPortalFilter('nc')">Non-Compliant</div>
-          <div class="filter-pill fp-ip" onclick="setPortalFilter('ip')">In Progress</div>
-          <div class="filter-pill fp-ok" onclick="setPortalFilter('ok')">Resolved</div>
-        </div>
+        <!-- Compliance issues panel (shown when a property is selected) -->
+        <div id="portalIssuesPanel" style="display:none;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div>
+              <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:3px;">Compliance Issues —</div>
+              <div style="font-size:1rem;font-weight:800;color:var(--navy);" id="portalSelectedAddr">All Properties</div>
+            </div>
+            <button onclick="clearPortalPropFilter()" style="padding:6px 14px;background:var(--warm);color:var(--navy);border:1px solid var(--border);border-radius:8px;font-size:0.78rem;cursor:pointer;font-family:'Montserrat',sans-serif;">← All Properties</button>
+          </div>
 
-        <div id="portalContent"></div>
+          <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;">
+            <div class="kpi-card kpi-red"><div class="kpi-label">Non-Compliant</div><div class="kpi-value" id="pNC">0</div><div class="kpi-icon">⚠️</div></div>
+            <div class="kpi-card kpi-amber"><div class="kpi-label">In Progress</div><div class="kpi-value" id="pIP">0</div><div class="kpi-icon">🔨</div></div>
+            <div class="kpi-card kpi-green"><div class="kpi-label">Resolved</div><div class="kpi-value" id="pOK">0</div><div class="kpi-icon">✅</div></div>
+            <div class="kpi-card kpi-slate"><div class="kpi-label">Total Issues</div><div class="kpi-value" id="pTotal">0</div><div class="kpi-icon">📋</div></div>
+          </div>
+
+          <div class="filter-row" id="portalFilterRow">
+            <div class="filter-pill fp-all active" onclick="setPortalFilter('all')">All Issues</div>
+            <div class="filter-pill fp-nc" onclick="setPortalFilter('nc')">Non-Compliant</div>
+            <div class="filter-pill fp-ip" onclick="setPortalFilter('ip')">In Progress</div>
+            <div class="filter-pill fp-ok" onclick="setPortalFilter('ok')">Resolved</div>
+          </div>
+
+          <div id="portalContent"></div>
+        </div>
       </div>
 
       <!-- ═══ WORK ORDERS ═══ -->
@@ -3316,18 +3330,67 @@ function renderDashboard() {
 // ═══════════════════════════════════════════════
 // OWNER PORTAL
 // ═══════════════════════════════════════════════
-let portalFilter = 'all';
-
-function setPortalFilter(f) {
-  portalFilter = f;
-  document.querySelectorAll('#portalFilterRow .filter-pill').forEach(p => p.classList.remove('active'));
-  const map = { all:'fp-all', nc:'fp-nc', ip:'fp-ip', ok:'fp-ok' };
-  const target = document.querySelector(`#portalFilterRow .${map[f]}`);
-  if (target) target.classList.add('active');
-  renderPortal();
-}
-
 function renderPortal() {
+  // ── Render property tiles at top ──────────────────────────────────────────
+  const allProps = getManagedProps().filter(p => !p.archived);
+  const tilesEl  = document.getElementById('portalPropTiles');
+  if (tilesEl) {
+    const fmt = iso => { try { return iso ? new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'}) : '—'; } catch(e){ return '—'; } };
+    const fmtMoney = v => v ? '$' + Number(v).toLocaleString('en-AU') + ' /month' : '—';
+    const cleanAddr = addr => { if(!addr)return''; const p=addr.split(',').map(x=>x.trim()).filter(Boolean); return p.filter(x=>x!=='Australia'&&x!=='Melbourne'&&!/^(City|Shire|Municipality|Borough|Greater|Region) of /i.test(x)&&!/^(Victoria|VIC)$/.test(x.trim())).slice(0,3).join(', ')||addr; };
+    const wos = getWOs();
+    const portal = S.get(KEY_PORT, []);
+    const reviews = S.get('vicrental_owner_reviews', {});
+
+    if (!allProps.length) {
+      tilesEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">No managed properties yet. Add a property under Manage Properties.</div>';
+    } else {
+      tilesEl.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:18px;">' +
+        allProps.map((p, idx) => {
+          const addr = cleanAddr(p.address || '');
+          const tenantFirst = (p.tenant||'').split(' ')[0] || '—';
+          const propIssues  = portal.filter(i => i.property?.toLowerCase() === (p.address||'').toLowerCase());
+          const nc = propIssues.filter(i => { const wo=wos.find(w=>w.id===i.id); return !wo||wo.status==='open'; }).length;
+          const ip = propIssues.filter(i => { const wo=wos.find(w=>w.id===i.id); return wo&&wo.status==='inprogress'; }).length;
+          const badge = nc > 0 ? `<span style="background:#dc2626;color:#fff;border-radius:6px;padding:3px 9px;font-size:0.68rem;font-weight:700;">⚠️ ${nc} Non-Compliant</span>`
+            : ip > 0 ? `<span style="background:#d97706;color:#fff;border-radius:6px;padding:3px 9px;font-size:0.68rem;font-weight:700;">🔨 In Progress</span>`
+            : p.lastInspectionScore ? `<span style="background:#16a34a;color:#fff;border-radius:6px;padding:3px 9px;font-size:0.68rem;font-weight:700;">✅ ${p.lastInspectionScore}% Compliant</span>`
+            : `<span style="background:#e2e8f0;color:#64748b;border-radius:6px;padding:3px 9px;font-size:0.68rem;font-weight:600;">No inspection</span>`;
+          // Check if already pushed
+          const pushKey = 'vrprop_' + (p.owner||'').toLowerCase().replace(/\s+/g,'_');
+          const pushed = JSON.parse(localStorage.getItem(pushKey)||'[]');
+          const isPushed = pushed.some(x => x.address?.toLowerCase() === (p.address||'').toLowerCase());
+
+          const rows = [
+            ['Tenant', tenantFirst],
+            ['Move-in Date', fmt(p.tenantMoveIn)],
+            ['Lease Commenced', fmt(p.leaseStart)],
+            ['Lease Expiry', fmt(p.leaseEnd)],
+            ['Rent (pcm)', fmtMoney(p.rentPcm)],
+            ['Last Rent Review', fmt(p.lastRentReview)],
+            ['Lease Type', p.leaseType || '—'],
+          ];
+          return `<div style="background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+            <div style="background:linear-gradient(135deg,#0A2F5C,#0d3870);padding:14px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+              <div style="flex:1;min-width:0;"><div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.55);margin-bottom:3px;">Property Address</div>
+              <div style="font-weight:800;font-size:0.9rem;color:#fff;line-height:1.35;">${addr}</div>
+              <div style="font-size:0.75rem;color:rgba(255,255,255,0.7);margin-top:3px;">👤 ${p.owner||'—'}</div></div>
+              <div style="flex-shrink:0;margin-top:2px;">${badge}</div>
+            </div>
+            <div style="padding:12px 18px;">
+              ${rows.map(([l,v])=>`<div style="display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid #f1f5f9;"><span style="font-size:0.75rem;color:var(--muted);">${l}</span><span style="font-size:0.82rem;font-weight:700;color:var(--navy);text-align:right;max-width:55%;">${v}</span></div>`).join('')}
+            </div>
+            <div style="padding:10px 14px;background:#f8fafc;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;">
+              <button onclick="pushPropToOwnerPortal(${idx})" id="pushBtn_${idx}" style="flex:1;padding:8px 14px;background:${isPushed?'#16a34a':'#0A2F5C'};color:#fff;border:none;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">
+                ${isPushed ? '✅ Pushed to Owner Portal' : '🚀 Push to Owner Portal'}
+              </button>
+              <button onclick="filterPortalByProp('${(p.address||'').replace(/'/g,"\\'")}');" style="padding:8px 12px;background:var(--warm);color:var(--navy);border:1px solid var(--border);border-radius:8px;font-size:0.78rem;cursor:pointer;font-family:'Montserrat',sans-serif;">View Issues</button>
+            </div>
+          </div>`;
+        }).join('') + '</div>';
+    }
+  }
+
   const items = S.get(KEY_PORT, []);
   const wos = getWOs();
 
@@ -3349,20 +3412,17 @@ function renderPortal() {
 
   document.getElementById('pNC').textContent = nc;
   document.getElementById('pIP').textContent = ip;
-  document.getElementById('pOK').textContent = ok;
-  document.getElementById('pTotal').textContent = total;
-
-  let filtered = withStatus;
-  if (portalFilter === 'nc') filtered = withStatus.filter(i => i.es === 'nc');
-  else if (portalFilter === 'ip') filtered = withStatus.filter(i => i.es === 'ip');
-  else if (portalFilter === 'ok') filtered = withStatus.filter(i => i.es === 'ok');
-
   const container = document.getElementById('portalContent');
 
+  // Show issues panel only when a property is selected
+  const issuesPanel = document.getElementById('portalIssuesPanel');
+
   if (total === 0) {
-    container.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><h3>No Inspection Data</h3><p>When a property manager marks an item as failed in the Inspection Checklist, it will appear here with a linked work order.</p></div>';
+    if (issuesPanel) issuesPanel.style.display = 'none';
     return;
   }
+
+  if (issuesPanel) issuesPanel.style.display = '';
 
   if (filtered.length === 0) {
     container.innerHTML = '<div class="empty"><div class="empty-icon">✅</div><h3>No items in this category</h3></div>';
@@ -3429,6 +3489,77 @@ function renderPortal() {
       <div>${cards}</div>
     </div>`;
   }).join('');
+}
+
+let portalFilter = 'all';
+function setPortalFilter(f) {
+  portalFilter = f;
+  document.querySelectorAll('#portalFilterRow .filter-pill').forEach(el => el.classList.remove('active'));
+  document.querySelector(`#portalFilterRow .fp-${f}`)?.classList.add('active');
+  renderPortal();
+}
+
+function filterPortalByProp(address) {
+  const issuesPanel = document.getElementById('portalIssuesPanel');
+  const addrEl = document.getElementById('portalSelectedAddr');
+  if (issuesPanel) issuesPanel.style.display = '';
+  if (addrEl) addrEl.textContent = address;
+  // scroll to panel
+  setTimeout(() => issuesPanel?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+function clearPortalPropFilter() {
+  const addrEl = document.getElementById('portalSelectedAddr');
+  if (addrEl) addrEl.textContent = 'All Properties';
+}
+
+// ── Push property to Owner Portal ─────────────────────────────────────────────
+function buildPropSummary(p) {
+  return {
+    address:             p.address || '',
+    owner:               p.owner || '',
+    ownerEmail:          p.ownerEmail || '',
+    tenant:              p.tenant || '',
+    tenantEmail:         p.tenantEmail || '',
+    tenantMoveIn:        p.tenantMoveIn || '',
+    leaseStart:          p.leaseStart || '',
+    leaseEnd:            p.leaseEnd || '',
+    rentPcm:             p.rentPcm || '',
+    lastRentReview:      p.lastRentReview || '',
+    leaseType:           p.leaseType || '',
+    lastInspectionScore: p.lastInspectionScore || '',
+    lastInspectionGrade: p.lastInspectionGrade || '',
+    lastInspectionDate:  p.lastInspectionDate || '',
+    pushedAt:            new Date().toISOString(),
+  };
+}
+
+function autoPushToOwnerPortal(p) {
+  if (!p || !p.owner) return;
+  const ownerKey = 'vrprop_' + p.owner.toLowerCase().replace(/\s+/g,'_');
+  const existing = JSON.parse(localStorage.getItem(ownerKey) || '[]');
+  const summary  = buildPropSummary(p);
+  const filtered = existing.filter(x => x.address?.toLowerCase() !== (p.address||'').toLowerCase());
+  filtered.unshift(summary);
+  localStorage.setItem(ownerKey, JSON.stringify(filtered));
+}
+
+function pushPropToOwnerPortal(propIdx) {
+  const allProps = getManagedProps().filter(p => !p.archived);
+  const p = allProps[propIdx];
+  if (!p || !p.owner) { if(typeof showToast==='function') showToast('Property must have an owner assigned', 'err'); return; }
+
+  autoPushToOwnerPortal(p);
+
+  // Update button
+  const btn = document.getElementById('pushBtn_' + propIdx);
+  if (btn) { btn.textContent = '✅ Pushed to Owner Portal'; btn.style.background = '#16a34a'; }
+
+  if (typeof showToast === 'function') showToast('Property pushed to ' + p.owner + "'s Owner Portal ✅", 'ok');
+  if (typeof logActivity === 'function') logActivity('Property pushed to owner portal: ' + (p.address||''), '#1d7a50');
+
+  // Re-render tiles to update badge
+  renderPortal();
 }
 
 function clearPortalData() {
@@ -5620,6 +5751,10 @@ function addProperty() {
   renderManagedProps();
   if (typeof updateSidebarBadges === 'function') updateSidebarBadges();
   if (typeof logActivity === 'function') logActivity('Property added: ' + address, '#1d7a50');
+  // Auto-push to owner portal immediately
+  const newProps = getManagedProps();
+  const newPropObj = newProps.find(p => (p.address||'').toLowerCase() === address.toLowerCase());
+  if (newPropObj) autoPushToOwnerPortal(newPropObj);
   // Show invitation popup — does NOT auto-send any email
   showPortalInviteModal({ address, owner, ownerEmail, ownerPassword, tenant, tenantEmail, tenantPassword });
 }
@@ -5832,6 +5967,8 @@ function saveEditProp() {
   saveManagedProps(props);
   closeEditPropModal();
   renderManagedProps();
+  // Auto-push updated data to owner portal
+  autoPushToOwnerPortal(props[idx]);
 }
 
 function goToProperty(address) {
