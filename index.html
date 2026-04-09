@@ -3576,7 +3576,6 @@ function generateOwnerLoginLink(propIdx) {
   const p = allProps[propIdx];
   if (!p || !p.owner) { if(typeof showToast==='function') showToast('Property must have an owner assigned', 'err'); return; }
 
-  // Get stored password
   const accounts = JSON.parse(localStorage.getItem('vicrental_owner_accounts') || '[]');
   const acc = accounts.find(a => a.name?.toLowerCase() === p.owner.toLowerCase());
   const password = acc?.password || '';
@@ -3588,30 +3587,28 @@ function generateOwnerLoginLink(propIdx) {
 
   const ownerPortalUrl = 'https://scintillating-salmiakki-33c677.netlify.app';
 
-  // First push the full property data to the vrprop_ key (same-device scenario)
-  autoPushToOwnerPortal(p);
-
-  // Build a clean short link with just name + password as base64
-  // Property data is already in vrprop_ for same-device use
-  // For cross-device: encode a compact payload in base64
-  const payload = btoa(encodeURIComponent(JSON.stringify({
-    n: p.owner,
+  // Use base64 encoding to keep URL short and clean
+  const payload = {
+    n:  p.owner,
     pw: password,
     a:  p.address || '',
-    t:  (p.tenant||'').split(' ')[0] || '',
+    oe: p.ownerEmail || '',
+    t:  p.tenant || '',
+    te: p.tenantEmail || '',
     mi: p.tenantMoveIn || '',
     ls: p.leaseStart || '',
     le: p.leaseEnd || '',
     r:  p.rentPcm || '',
     rr: p.lastRentReview || '',
     lt: p.leaseType || '',
-    oe: p.ownerEmail || '',
-    te: p.tenantEmail || '',
-  })));
+    is: p.lastInspectionScore || '',
+    ig: p.lastInspectionGrade || '',
+    id: p.lastInspectionDate || '',
+  };
 
-  const loginLink = ownerPortalUrl + '#vr=' + payload;
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+  const loginLink = ownerPortalUrl + '#vr=' + encoded;
 
-  // Show modal with the link
   const existing = document.getElementById('loginLinkModal');
   if (existing) existing.remove();
   const modal = document.createElement('div');
@@ -3624,22 +3621,39 @@ function generateOwnerLoginLink(propIdx) {
         <button onclick="document.getElementById('loginLinkModal').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#64748b;">✕</button>
       </div>
       <div style="background:#eaf6fe;border:1px solid #5BB8F5;border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:0.82rem;color:#0A2F5C;line-height:1.7;">
-        Send this link to <strong>${p.owner}</strong>. When they open it, their name and password will be pre-filled automatically — they just click Sign In.<br><br>
-        <strong>⚠️ This link contains their password.</strong> Send via a secure channel (SMS or private email). The link only needs to be used once — after that they can log in normally.
+        Send this link to <strong>${p.owner}</strong>. When they open it, all property details and login credentials are loaded automatically — they just click Sign In.<br><br>
+        <strong>⚠️ This link contains their password.</strong> Send via SMS or private email. Each time you update property details, generate a fresh link.
       </div>
       <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:16px;">
         <div style="font-size:0.7rem;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em;">Login Link for ${p.owner}</div>
-        <div style="font-size:0.78rem;color:#0A2F5C;word-break:break-all;font-family:monospace;" id="loginLinkText">${loginLink}</div>
+        <div style="font-size:0.75rem;color:#0A2F5C;word-break:break-all;font-family:monospace;" id="loginLinkText">${loginLink}</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button onclick="navigator.clipboard.writeText('${loginLink.replace(/'/g,"\\'")}').then(()=>{this.textContent='✅ Copied!';setTimeout(()=>this.textContent='📋 Copy Link',2000)})" style="flex:1;padding:10px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📋 Copy Link</button>
-        <button onclick="window.open('mailto:${p.ownerEmail||''}?subject=${encodeURIComponent('Your Owner Portal Login — ' + (p.address||''))}&body=${encodeURIComponent('Hi ' + p.owner.split(' ')[0] + ',\\n\\nHere is your one-click login link for the VicRental Pro Owner Portal:\\n\\n' + loginLink + '\\n\\nAfter your first login, you can log in normally using your name and password.\\n\\nKind regards,\\nVicRental Pro')}','_blank')" style="flex:1;padding:10px;background:#fff;color:#0A2F5C;border:2px solid #0A2F5C;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📧 Email Link</button>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('loginLinkText').textContent).then(()=>{this.textContent='✅ Copied!';setTimeout(()=>{this.textContent='📋 Copy Link'},2000)})" style="flex:1;padding:10px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📋 Copy Link</button>
+        <button onclick="sendLoginLinkEmail('${p.ownerEmail||''}','${p.owner.replace(/'/g,"\\'")}','${(p.address||'').replace(/'/g,"\\'")}','loginLinkText')" style="flex:1;padding:10px;background:#fff;color:#0A2F5C;border:2px solid #0A2F5C;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📧 Email Link</button>
       </div>
       <div style="margin-top:12px;text-align:center;">
         <button onclick="document.getElementById('loginLinkModal').remove()" style="padding:8px 20px;background:#f0f4f8;color:#64748b;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.82rem;">Close</button>
       </div>
     </div>`;
   document.body.appendChild(modal);
+}
+
+function sendLoginLinkEmail(email, ownerName, address, linkElId) {
+  const link = document.getElementById(linkElId)?.textContent || '';
+  const firstName = ownerName.split(' ')[0] || 'Owner';
+  const subject = encodeURIComponent('Your VicRental Pro Owner Portal Access — ' + address);
+  const body = encodeURIComponent(
+    'Dear ' + firstName + ',\n\n' +
+    'Here is your personalised login link for the VicRental Pro Owner Portal:\n\n' +
+    link + '\n\n' +
+    'Simply open this link and click Sign In — your details will be pre-filled automatically.\n\n' +
+    'After your first login you can log in directly at:\n' +
+    'https://scintillating-salmiakki-33c677.netlify.app\n\n' +
+    'If you have any questions please contact your property manager.\n\n' +
+    'Kind regards,\nVicRental Pro'
+  );
+  window.open('mailto:' + email + '?subject=' + subject + '&body=' + body, '_blank');
 }
 
 function pushPropToOwnerPortal(propIdx) {
