@@ -2784,7 +2784,7 @@ function showPage(id) {
 
   // Render page
   if (id === 'dashboard') { loadTenantReqs().then(() => renderDashboard()); renderDashboard(); }
-  else if (id === 'portal') renderPortal();
+  else if (id === 'portal') { autoSyncAllPropsToOwnerPortal(); renderPortal(); }
   else if (id === 'workorders') renderWOs();
   else if (id === 'properties') renderProperties();
   else if (id === 'reports') renderReports();
@@ -3569,6 +3569,12 @@ function autoPushToOwnerPortal(p) {
   const filtered = existing.filter(x => x.address?.toLowerCase() !== (p.address||'').toLowerCase());
   filtered.unshift(summary);
   localStorage.setItem(ownerKey, JSON.stringify(filtered));
+}
+
+function autoSyncAllPropsToOwnerPortal() {
+  // Silently push every active property to its owner's vrprop_ key
+  // so the owner portal always has fresh data without manual push
+  getManagedProps().filter(p => !p.archived && p.owner).forEach(p => autoPushToOwnerPortal(p));
 }
 
 function generateOwnerLoginLink(propIdx) {
