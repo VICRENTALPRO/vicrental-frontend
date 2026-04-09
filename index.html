@@ -3587,7 +3587,28 @@ function generateOwnerLoginLink(propIdx) {
   }
 
   const ownerPortalUrl = 'https://scintillating-salmiakki-33c677.netlify.app';
-  const params = new URLSearchParams({ name: p.owner, pw: password });
+
+  // Embed full property data so it shows on first login (no push required)
+  const propData = JSON.stringify({
+    address:             p.address || '',
+    owner:               p.owner || '',
+    ownerEmail:          p.ownerEmail || '',
+    tenant:              p.tenant || '',
+    tenantEmail:         p.tenantEmail || '',
+    tenantMoveIn:        p.tenantMoveIn || '',
+    leaseStart:          p.leaseStart || '',
+    leaseEnd:            p.leaseEnd || '',
+    rentPcm:             p.rentPcm || '',
+    lastRentReview:      p.lastRentReview || '',
+    leaseType:           p.leaseType || '',
+    lastInspectionScore: p.lastInspectionScore || '',
+    lastInspectionGrade: p.lastInspectionGrade || '',
+    lastInspectionDate:  p.lastInspectionDate || '',
+    portalPassword:      password,
+    pushedAt:            new Date().toISOString(),
+  });
+
+  const params = new URLSearchParams({ name: p.owner, pw: password, prop: propData });
   const loginLink = ownerPortalUrl + '#setup:' + params.toString();
 
   // Show modal with the link
