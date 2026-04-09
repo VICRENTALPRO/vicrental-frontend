@@ -2247,6 +2247,9 @@ window.addEventListener('DOMContentLoaded', function() {
           </div>
           <div id="propAddError" style="display:none;margin-top:10px;color:var(--red);font-size:0.8rem;"></div>
           <div id="propAddSuccess" style="display:none;margin-top:10px;color:var(--green);font-size:0.8rem;font-weight:600;"></div>
+          <div style="margin-top:12px;padding:10px 14px;background:#eaf6fe;border:1px solid #5BB8F5;border-radius:8px;font-size:0.75rem;color:#0A2F5C;line-height:1.6;">
+            🔐 <strong>Portal login:</strong> Owners log in using their <strong>full name</strong> + <strong>Owner Password</strong>. Tenants log in using their <strong>email</strong> + <strong>Tenant Password</strong>. A password is required for portal access — accounts are registered automatically when the property is saved.
+          </div>
         </div>
       </div>
 
@@ -5770,12 +5773,84 @@ function addProperty() {
   renderManagedProps();
   if (typeof updateSidebarBadges === 'function') updateSidebarBadges();
   if (typeof logActivity === 'function') logActivity('Property added: ' + address, '#1d7a50');
-  // Auto-push to owner portal immediately
+
+  // Register owner on backend so they can log into the Owner Portal
+  if (owner && ownerPassword) {
+    registerOwnerOnBackend(owner, ownerPassword).then(ok => {
+      if (ok) logActivity('Owner portal account created: ' + owner, '#1d7a50');
+    });
+  }
+  // Register tenant on backend so they can log into the Tenant Portal
+  if (tenant && tenantPassword) {
+    registerTenantOnBackend(tenant, tenantEmail, tenantPassword, address).then(ok => {
+      if (ok) logActivity('Tenant portal account created: ' + tenant, '#1d7a50');
+    });
+  }
+
+  // Auto-push to owner portal
   const newProps = getManagedProps();
   const newPropObj = newProps.find(p => (p.address||'').toLowerCase() === address.toLowerCase());
   if (newPropObj) autoPushToOwnerPortal(newPropObj);
-  // Show invitation popup — does NOT auto-send any email
+  // Show invitation popup
   showPortalInviteModal({ address, owner, ownerEmail, ownerPassword, tenant, tenantEmail, tenantPassword });
+}
+
+async function registerOwnerOnBackend(name, password) {
+  try {
+    const res = await fetch(`${BACKEND}/auth/owner/register`, {
+      method: 'POST',
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, password })
+    });
+    if (res.ok) return true;
+    const data = await res.json().catch(() => ({}));
+    // If already exists, try to update password instead
+    if (res.status === 409 || (data.error||'').toLowerCase().includes('exist')) {
+      return updateOwnerPasswordOnBackend(name, password);
+    }
+    console.warn('Owner register failed:', res.status, data.error);
+    return false;
+  } catch(e) {
+    console.warn('Owner register error:', e.message);
+    return false;
+  }
+}
+
+async function updateOwnerPasswordOnBackend(name, password) {
+  try {
+    // Try to find the owner ID from the list
+    const res = await fetch(`${BACKEND}/auth/owner/list`, { headers: getAuthHeaders() });
+    if (!res.ok) return false;
+    const data = await res.json();
+    const owners = data.owners || data || [];
+    const found = owners.find(o => (o.name||o.username||'').toLowerCase() === name.toLowerCase());
+    if (!found || !found.id) return false;
+    const upd = await fetch(`${BACKEND}/auth/owner/${encodeURIComponent(found.id)}`, {
+      method: 'PUT',
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, password })
+    });
+    return upd.ok;
+  } catch(e) {
+    console.warn('Owner password update error:', e.message);
+    return false;
+  }
+}
+
+async function registerTenantOnBackend(name, email, password, property) {
+  try {
+    const firstName = name.split(' ')[0] || name;
+    const lastName  = name.split(' ').slice(1).join(' ') || '';
+    const res = await fetch(`${BACKEND}/auth/tenant/register`, {
+      method: 'POST',
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ firstName, lastName, email, password, property })
+    });
+    return res.ok;
+  } catch(e) {
+    console.warn('Tenant register error:', e.message);
+    return false;
+  }
 }
 
 function showPortalInviteModal({ address, owner, ownerEmail, ownerPassword, tenant, tenantEmail, tenantPassword }) {
@@ -6313,7 +6388,7 @@ function closeEditOwner() {
   window._editingOwner = null;
 }
 
-async function saveEditOwner() {
+function saveEditOwner() {
   const id       = document.getElementById('editOwnerId').value;
   const name     = (document.getElementById('editOwnerName').value || '').trim();
   const email    = (document.getElementById('editOwnerEmail').value || '').trim();
@@ -6329,21 +6404,14 @@ async function saveEditOwner() {
     return;
   }
 
-  // Update backend if we have an ID (not a local-only owner)
-  if (id && !id.startsWith('auto-') && !id.startsWith('local-')) {
-    try {
-      const payload = { name, email, phone };
-      if (password) payload.password = password;
-      const res = await fetch(`${BACKEND}/auth/owner/${encodeURIComponent(id)}`, {
-        method: 'PUT',
-        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) throw new Error(`Server error ${res.status}`);
-    } catch(e) {
-      // Backend update failed — continue with local update only
-      console.warn('Backend owner update failed:', e.message);
-    }
+  // Update backend password if provided
+  if (password) {
+    updateOwnerPasswordOnBackend(name, password).then(ok => {
+      if (!ok) {
+        // Try registering as new if update failed
+        registerOwnerOnBackend(name, password);
+      }
+    });
   }
 
   // Always update local owners list
