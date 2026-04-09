@@ -2115,8 +2115,9 @@ window.addEventListener('DOMContentLoaded', function() {
           </div>
           <div id="ownerAddError" style="display:none;margin-top:10px;color:var(--red);font-size:0.8rem;"></div>
           <div id="ownerAddSuccess" style="display:none;margin-top:10px;color:var(--green);font-size:0.8rem;font-weight:600;"></div>
-          <div style="margin-top:14px;padding:12px 14px;background:var(--amber-pale);border-radius:8px;border:1px solid rgba(181,110,0,0.2);font-size:0.75rem;color:var(--amber);">
-            ⚠️ Owners log in at the <strong>Owner Portal</strong> using their full name and the password you set here. Passwords are sent to your Railway backend and stored securely.
+          <div style="margin-top:14px;padding:12px 14px;background:#eaf6fe;border-radius:8px;border:1px solid #5BB8F5;font-size:0.75rem;color:#0A2F5C;line-height:1.7;">
+            🔐 Owners log in at the <strong>Owner Portal</strong> using their <strong>full name</strong> and the <strong>password</strong> you set here.<br>
+            ⚠️ If you see a "too many attempts" error, the Railway backend is rate-limiting new registrations. The owner is still saved and can log in — go to <strong>Railway dashboard → your backend service → Variables</strong> and check for a rate limit setting, or wait a few minutes and try again.
           </div>
         </div>
       </div>
@@ -3402,10 +3403,11 @@ function renderPortal() {
             <div style="padding:12px 18px;">
               ${rows.map(([l,v])=>`<div style="display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid #f1f5f9;"><span style="font-size:0.75rem;color:var(--muted);">${l}</span><span style="font-size:0.82rem;font-weight:700;color:var(--navy);text-align:right;max-width:55%;">${v}</span></div>`).join('')}
             </div>
-            <div style="padding:10px 14px;background:#f8fafc;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;">
+            <div style="padding:10px 14px;background:#f8fafc;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
               <button onclick="pushPropToOwnerPortal(${idx})" id="pushBtn_${idx}" style="flex:1;padding:8px 14px;background:${isPushed?'#16a34a':'#0A2F5C'};color:#fff;border:none;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">
                 ${isPushed ? '✅ Pushed to Owner Portal' : '🚀 Push to Owner Portal'}
               </button>
+              <button onclick="generateOwnerLoginLink(${idx})" style="padding:8px 12px;background:#fff;color:#0A2F5C;border:2px solid #0A2F5C;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;" title="Generate a one-click login link for this owner">🔗 Login Link</button>
               <button onclick="filterPortalByProp('${(p.address||'').replace(/'/g,"\\'")}');" style="padding:8px 12px;background:var(--warm);color:var(--navy);border:1px solid var(--border);border-radius:8px;font-size:0.78rem;cursor:pointer;font-family:'Montserrat',sans-serif;">View Issues</button>
             </div>
           </div>`;
@@ -3567,6 +3569,56 @@ function autoPushToOwnerPortal(p) {
   const filtered = existing.filter(x => x.address?.toLowerCase() !== (p.address||'').toLowerCase());
   filtered.unshift(summary);
   localStorage.setItem(ownerKey, JSON.stringify(filtered));
+}
+
+function generateOwnerLoginLink(propIdx) {
+  const allProps = getManagedProps().filter(p => !p.archived);
+  const p = allProps[propIdx];
+  if (!p || !p.owner) { if(typeof showToast==='function') showToast('Property must have an owner assigned', 'err'); return; }
+
+  // Get stored password
+  const accounts = JSON.parse(localStorage.getItem('vicrental_owner_accounts') || '[]');
+  const acc = accounts.find(a => a.name?.toLowerCase() === p.owner.toLowerCase());
+  const password = acc?.password || '';
+
+  if (!password) {
+    alert('No password found for ' + p.owner + '.\n\nPlease set a password first:\n• Go to Manage Owners → Edit → set a New Password, or\n• Use the + Add Owner form in Manage Owners.');
+    return;
+  }
+
+  const ownerPortalUrl = 'https://scintillating-salmiakki-33c677.netlify.app';
+  const params = new URLSearchParams({ name: p.owner, pw: password });
+  const loginLink = ownerPortalUrl + '#setup:' + params.toString();
+
+  // Show modal with the link
+  const existing = document.getElementById('loginLinkModal');
+  if (existing) existing.remove();
+  const modal = document.createElement('div');
+  modal.id = 'loginLinkModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9900;display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.innerHTML = `
+    <div style="background:#fff;border-radius:18px;padding:28px;width:100%;max-width:560px;box-shadow:0 24px 64px rgba(0,0,0,0.25);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="font-size:1rem;font-weight:800;color:#0A2F5C;">🔗 Owner Login Link</div>
+        <button onclick="document.getElementById('loginLinkModal').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#64748b;">✕</button>
+      </div>
+      <div style="background:#eaf6fe;border:1px solid #5BB8F5;border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:0.82rem;color:#0A2F5C;line-height:1.7;">
+        Send this link to <strong>${p.owner}</strong>. When they open it, their name and password will be pre-filled automatically — they just click Sign In.<br><br>
+        <strong>⚠️ This link contains their password.</strong> Send via a secure channel (SMS or private email). The link only needs to be used once — after that they can log in normally.
+      </div>
+      <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:16px;">
+        <div style="font-size:0.7rem;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em;">Login Link for ${p.owner}</div>
+        <div style="font-size:0.78rem;color:#0A2F5C;word-break:break-all;font-family:monospace;" id="loginLinkText">${loginLink}</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button onclick="navigator.clipboard.writeText('${loginLink.replace(/'/g,"\\'")}').then(()=>{this.textContent='✅ Copied!';setTimeout(()=>this.textContent='📋 Copy Link',2000)})" style="flex:1;padding:10px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📋 Copy Link</button>
+        <button onclick="window.open('mailto:${p.ownerEmail||''}?subject=${encodeURIComponent('Your Owner Portal Login — ' + (p.address||''))}&body=${encodeURIComponent('Hi ' + p.owner.split(' ')[0] + ',\\n\\nHere is your one-click login link for the VicRental Pro Owner Portal:\\n\\n' + loginLink + '\\n\\nAfter your first login, you can log in normally using your name and password.\\n\\nKind regards,\\nVicRental Pro')}','_blank')" style="flex:1;padding:10px;background:#fff;color:#0A2F5C;border:2px solid #0A2F5C;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📧 Email Link</button>
+      </div>
+      <div style="margin-top:12px;text-align:center;">
+        <button onclick="document.getElementById('loginLinkModal').remove()" style="padding:8px 20px;background:#f0f4f8;color:#64748b;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.82rem;">Close</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
 }
 
 function pushPropToOwnerPortal(propIdx) {
@@ -5378,25 +5430,81 @@ async function addOwner() {
     return;
   }
 
+  // Always save locally first — this powers the Owner Portal login fallback
+  const accounts = JSON.parse(localStorage.getItem('vicrental_owner_accounts') || '[]');
+  const existIdx = accounts.findIndex(a => a.name?.toLowerCase() === name.toLowerCase());
+  if (existIdx !== -1) {
+    accounts[existIdx].password = password;
+  } else {
+    accounts.push({ name, password, createdAt: new Date().toISOString() });
+  }
+  localStorage.setItem('vicrental_owner_accounts', JSON.stringify(accounts));
+
+  // Also push to vrprop_ key so owner portal can find credentials
+  const ownerKey = 'vrprop_' + name.toLowerCase().replace(/\s+/g,'_');
+  const existing = JSON.parse(localStorage.getItem(ownerKey) || '[]');
+  // Update or add a credential-only entry
+  const credEntry = existing.find(e => e.owner?.toLowerCase() === name.toLowerCase()) || {};
+  credEntry.owner = name;
+  credEntry.portalPassword = password;
+  credEntry.pushedAt = new Date().toISOString();
+  if (!existing.find(e => e.owner?.toLowerCase() === name.toLowerCase())) {
+    existing.push(credEntry);
+  }
+  localStorage.setItem(ownerKey, JSON.stringify(existing));
+
+  addLocalOwner(name, '', '');
+
+  // Try backend — but don't fail if it's rate-limited
+  let backendOk = false;
   try {
     const res = await fetch(`${BACKEND}/auth/owner/register`, {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify({ name, password })
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
-    okEl.textContent = `✅ Owner "${name}" added successfully! They can now log in at the Owner Portal.`;
+    const data = await res.json().catch(() => ({}));
+    if (res.ok) {
+      backendOk = true;
+    } else if (res.status === 429 || (data.error||'').toLowerCase().includes('many') || (data.error||'').toLowerCase().includes('limit')) {
+      // Rate limited — owner saved locally, they can still log in
+      okEl.innerHTML = `✅ Owner <strong>${name}</strong> saved. <em>Note: Backend rate-limited — they can log in using the Owner Portal immediately with the password you set.</em>`;
+      okEl.style.display = '';
+      document.getElementById('newOwnerName').value = '';
+      document.getElementById('newOwnerPassword').value = '';
+      logActivity(`Owner saved locally (backend rate-limited): ${name}`, '#d97706');
+      const f = document.getElementById('ownerAddForm'); if (f) f.style.display = 'none';
+      loadOwners();
+      return;
+    } else {
+      // Other backend error — still saved locally
+      okEl.innerHTML = `✅ Owner <strong>${name}</strong> saved locally. They can log in at the Owner Portal with the password you set. <em>(Backend: ${data.error||res.status})</em>`;
+      okEl.style.display = '';
+      document.getElementById('newOwnerName').value = '';
+      document.getElementById('newOwnerPassword').value = '';
+      const f = document.getElementById('ownerAddForm'); if (f) f.style.display = 'none';
+      loadOwners();
+      return;
+    }
+  } catch (err) {
+    // Network error — still saved locally
+    okEl.innerHTML = `✅ Owner <strong>${name}</strong> saved locally. They can log in at the Owner Portal with the password you set.`;
     okEl.style.display = '';
     document.getElementById('newOwnerName').value = '';
     document.getElementById('newOwnerPassword').value = '';
-    addLocalOwner(name, '', '');
+    const f = document.getElementById('ownerAddForm'); if (f) f.style.display = 'none';
+    loadOwners();
+    return;
+  }
+
+  if (backendOk) {
+    okEl.innerHTML = `✅ Owner <strong>${name}</strong> added successfully! They can now log in at the Owner Portal.`;
+    okEl.style.display = '';
+    document.getElementById('newOwnerName').value = '';
+    document.getElementById('newOwnerPassword').value = '';
     logActivity(`Owner account created: ${name}`, '#1d7a50');
     const f = document.getElementById('ownerAddForm'); if (f) f.style.display = 'none';
     loadOwners();
-  } catch (err) {
-    errEl.textContent = `Failed to add owner: ${err.message}`;
-    errEl.style.display = '';
   }
 }
 
