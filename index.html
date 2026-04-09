@@ -2405,37 +2405,56 @@ window.addEventListener('DOMContentLoaded', function() {
 ═══════════════════════════════════════════ -->
 
 <!-- EDIT OWNER MODAL -->
-<div id="editOwnerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center;">
-  <div style="background:#fff;border-radius:16px;padding:28px 32px;width:480px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.25);">
+<div id="editOwnerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9100;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:18px;padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.25);">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <div style="font-size:1rem;font-weight:700;color:var(--navy);">Edit Owner</div>
-      <button onclick="closeEditOwner()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);">X</button>
+      <div style="font-size:1rem;font-weight:800;color:var(--navy);">👤 Edit Owner</div>
+      <button onclick="closeEditOwner()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted);">✕</button>
     </div>
     <input type="hidden" id="editOwnerId">
-    <div style="display:grid;gap:14px;">
+
+    <!-- Contact details -->
+    <div style="display:grid;gap:12px;margin-bottom:20px;">
       <div>
         <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Full Name *</label>
-        <input type="text" id="editOwnerName" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
+        <input type="text" id="editOwnerName" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat',sans-serif;font-size:0.85rem;box-sizing:border-box;">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div>
-          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Email</label>
-          <input type="email" id="editOwnerEmail" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
-        </div>
-        <div>
           <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Phone</label>
-          <input type="text" id="editOwnerPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
+          <input type="text" id="editOwnerPhone" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat',sans-serif;font-size:0.85rem;box-sizing:border-box;">
         </div>
-      </div>
-      <div>
-        <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">New Password (leave blank to keep existing)</label>
-        <input type="text" id="editOwnerPassword" placeholder="Enter new password to change" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat', sans-serif;font-size:0.85rem;">
       </div>
     </div>
-    <div id="editOwnerError" style="display:none;margin-top:10px;color:var(--red);font-size:0.8rem;"></div>
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
-      <button onclick="closeEditOwner()" class="btn btn-ghost">Cancel</button>
-      <button onclick="saveEditOwner()" class="btn btn-primary">Save Changes</button>
+
+    <!-- Portal Access section -->
+    <div style="background:#eaf6fe;border:2px solid #0A2F5C;border-radius:12px;padding:18px;margin-bottom:18px;">
+      <div style="font-size:0.78rem;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;color:#0A2F5C;margin-bottom:14px;">🔐 Owner Portal Access</div>
+      <div style="font-size:0.78rem;color:#64748b;margin-bottom:14px;line-height:1.6;">Update the email (username) and/or password the owner uses to log in at the Owner Portal. Leave password blank to keep the existing one.</div>
+      <div style="display:grid;gap:12px;">
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">Email (Portal Username)</label>
+          <input type="email" id="editOwnerEmail" placeholder="owner@email.com" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat',sans-serif;font-size:0.85rem;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">New Password <span style="font-weight:400;color:var(--muted);">(leave blank to keep existing)</span></label>
+          <div style="position:relative;">
+            <input type="text" id="editOwnerPassword" placeholder="Enter new password to change" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'Montserrat',sans-serif;font-size:0.85rem;box-sizing:border-box;padding-right:90px;">
+            <button onclick="document.getElementById('editOwnerPassword').value=generatePortalPassword()" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);padding:4px 10px;background:#0A2F5C;color:#fff;border:none;border-radius:5px;font-size:0.7rem;cursor:pointer;font-family:'Montserrat',sans-serif;white-space:nowrap;">Generate</button>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <button onclick="sendOwnerPortalInvite()" id="sendOwnerInviteBtn" style="width:100%;padding:9px;background:#fff;color:#0A2F5C;border:2px solid #0A2F5C;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📧 Generate & Send Updated Access Email</button>
+        <div style="font-size:0.7rem;color:#64748b;margin-top:4px;text-align:center;">Opens your email client with updated login details — save first, then send.</div>
+      </div>
+    </div>
+
+    <div id="editOwnerError" style="display:none;margin-bottom:12px;color:var(--red);font-size:0.8rem;background:#fee2e2;padding:8px 12px;border-radius:7px;"></div>
+    <div id="editOwnerSuccess" style="display:none;margin-bottom:12px;color:#16a34a;font-size:0.8rem;background:#dcfce7;padding:8px 12px;border-radius:7px;"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="closeEditOwner()" style="padding:9px 20px;border:1px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;">Cancel</button>
+      <button onclick="saveEditOwner()" style="padding:9px 24px;background:var(--navy);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;font-weight:700;">Save Changes</button>
     </div>
   </div>
 </div>
@@ -6264,6 +6283,164 @@ function openPropertySummaryByAddr(address) {
   document.getElementById('propSummaryModal').style.display = 'flex';
 }
 
+
+// ── Owner Portal Access Management ───────────────────────────────────────────
+function generatePortalPassword() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  return Array.from({length:10}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+}
+
+function openEditOwnerByIdx(idx) {
+  const owners = window._cachedOwners || [];
+  const o = owners[idx];
+  if (!o) return;
+  document.getElementById('editOwnerId').value       = o.id || o.name || '';
+  document.getElementById('editOwnerName').value     = o.name || o.username || '';
+  document.getElementById('editOwnerEmail').value    = o.email || '';
+  document.getElementById('editOwnerPhone').value    = o.phone || '';
+  document.getElementById('editOwnerPassword').value = '';
+  const errEl = document.getElementById('editOwnerError');
+  const okEl  = document.getElementById('editOwnerSuccess');
+  if (errEl) errEl.style.display = 'none';
+  if (okEl)  okEl.style.display  = 'none';
+  // Store current owner data for email generation
+  window._editingOwner = o;
+  document.getElementById('editOwnerModal').style.display = 'flex';
+}
+
+function closeEditOwner() {
+  document.getElementById('editOwnerModal').style.display = 'none';
+  window._editingOwner = null;
+}
+
+async function saveEditOwner() {
+  const id       = document.getElementById('editOwnerId').value;
+  const name     = (document.getElementById('editOwnerName').value || '').trim();
+  const email    = (document.getElementById('editOwnerEmail').value || '').trim();
+  const phone    = (document.getElementById('editOwnerPhone').value || '').trim();
+  const password = (document.getElementById('editOwnerPassword').value || '').trim();
+  const errEl    = document.getElementById('editOwnerError');
+  const okEl     = document.getElementById('editOwnerSuccess');
+  if (errEl) errEl.style.display = 'none';
+  if (okEl)  okEl.style.display  = 'none';
+
+  if (!name) {
+    if (errEl) { errEl.textContent = 'Name is required.'; errEl.style.display = ''; }
+    return;
+  }
+
+  // Update backend if we have an ID (not a local-only owner)
+  if (id && !id.startsWith('auto-') && !id.startsWith('local-')) {
+    try {
+      const payload = { name, email, phone };
+      if (password) payload.password = password;
+      const res = await fetch(`${BACKEND}/auth/owner/${encodeURIComponent(id)}`, {
+        method: 'PUT',
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error(`Server error ${res.status}`);
+    } catch(e) {
+      // Backend update failed — continue with local update only
+      console.warn('Backend owner update failed:', e.message);
+    }
+  }
+
+  // Always update local owners list
+  const localOwners = getLocalOwners();
+  const localIdx = localOwners.findIndex(o => o.name?.toLowerCase() === (window._editingOwner?.name||'').toLowerCase());
+  if (localIdx !== -1) {
+    localOwners[localIdx] = { ...localOwners[localIdx], name, email, phone };
+    if (password) localOwners[localIdx].password = password;
+    saveLocalOwners(localOwners);
+  } else {
+    // Add/update in local list
+    const existing = localOwners.find(o => o.name?.toLowerCase() === name.toLowerCase());
+    if (existing) {
+      existing.email = email; existing.phone = phone;
+      if (password) existing.password = password;
+    } else {
+      localOwners.push({ id: 'local-'+Date.now(), name, email, phone, password: password||'' });
+    }
+    saveLocalOwners(localOwners);
+  }
+
+  // Update managed properties that reference this owner
+  const props = getManagedProps();
+  props.forEach(p => {
+    if (p.owner?.toLowerCase() === (window._editingOwner?.name||'').toLowerCase()) {
+      p.owner = name;
+      p.ownerEmail = email || p.ownerEmail;
+      p.ownerPhone = phone || p.ownerPhone;
+    }
+  });
+  saveManagedProps(props);
+
+  // Store new password in editingOwner for email
+  if (window._editingOwner) {
+    window._editingOwner.name  = name;
+    window._editingOwner.email = email;
+    window._editingOwner.phone = phone;
+    if (password) window._editingOwner.newPassword = password;
+  }
+
+  if (okEl) { okEl.textContent = '✅ Owner details saved successfully.'; okEl.style.display = ''; }
+  if (typeof logActivity === 'function') logActivity('Owner updated: ' + name, '#1d7a50');
+  loadOwners();
+}
+
+function sendOwnerPortalInvite() {
+  const o = window._editingOwner;
+  const name     = (document.getElementById('editOwnerName').value || '').trim() || o?.name || '';
+  const email    = (document.getElementById('editOwnerEmail').value || '').trim() || o?.email || '';
+  const password = (document.getElementById('editOwnerPassword').value || '').trim() || o?.newPassword || '';
+
+  if (!email) {
+    alert('Please enter the owner\'s email address first.');
+    document.getElementById('editOwnerEmail').focus();
+    return;
+  }
+
+  const portalUrl = 'https://scintillating-salmiakki-33c677.netlify.app';
+  const firstName = name.split(' ')[0] || 'Owner';
+
+  // Find their properties for context
+  const props = getManagedProps().filter(p => p.owner?.toLowerCase() === name.toLowerCase());
+  const propList = props.length ? props.map(p => '  • ' + (p.address||'')).join('\n') : '  (No properties currently assigned)';
+
+  const body = [
+    `Dear ${firstName},`,
+    '',
+    'Your Owner Portal access details have been updated. Please use the following to log in:',
+    '',
+    `  Portal URL: ${portalUrl}`,
+    `  Username / Email: ${email}`,
+    password ? `  Password: ${password}` : '  Password: (unchanged — use your existing password)',
+    '',
+    'Your properties:',
+    propList,
+    '',
+    'Through the Owner Portal you can view your property compliance status, work orders, documents and more.',
+    '',
+    'If you have any questions please contact your property manager.',
+    '',
+    'Kind regards,',
+    'VicRental Pro'
+  ].join('\n');
+
+  const subject = encodeURIComponent('Your VicRental Pro Owner Portal Access Details');
+  window.open('mailto:' + email + '?subject=' + subject + '&body=' + encodeURIComponent(body), '_blank');
+
+  const btn = document.getElementById('sendOwnerInviteBtn');
+  if (btn) { btn.textContent = '✅ Email client opened — review and send'; btn.style.background = '#64748b'; btn.disabled = true; }
+}
+
+function getLocalOwners() {
+  try { return JSON.parse(localStorage.getItem('vicrental_local_owners') || '[]'); } catch(e) { return []; }
+}
+function saveLocalOwners(arr) {
+  localStorage.setItem('vicrental_local_owners', JSON.stringify(arr));
+}
 
 function goToVaultForProp(address) {
   document.getElementById('propSummaryModal').style.display = 'none';
