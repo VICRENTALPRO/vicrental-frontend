@@ -3587,29 +3587,8 @@ function generateOwnerLoginLink(propIdx) {
   }
 
   const ownerPortalUrl = 'https://scintillating-salmiakki-33c677.netlify.app';
-
-  // First push the full property data to the vrprop_ key (same-device scenario)
-  autoPushToOwnerPortal(p);
-
-  // Build a clean short link with just name + password as base64
-  // Property data is already in vrprop_ for same-device use
-  // For cross-device: encode a compact payload in base64
-  const payload = btoa(encodeURIComponent(JSON.stringify({
-    n: p.owner,
-    pw: password,
-    a:  p.address || '',
-    t:  (p.tenant||'').split(' ')[0] || '',
-    mi: p.tenantMoveIn || '',
-    ls: p.leaseStart || '',
-    le: p.leaseEnd || '',
-    r:  p.rentPcm || '',
-    rr: p.lastRentReview || '',
-    lt: p.leaseType || '',
-    oe: p.ownerEmail || '',
-    te: p.tenantEmail || '',
-  })));
-
-  const loginLink = ownerPortalUrl + '#vr=' + payload;
+  const params = new URLSearchParams({ name: p.owner, pw: password });
+  const loginLink = ownerPortalUrl + '#setup:' + params.toString();
 
   // Show modal with the link
   const existing = document.getElementById('loginLinkModal');
