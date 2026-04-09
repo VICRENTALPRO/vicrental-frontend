@@ -3537,6 +3537,8 @@ function clearPortalPropFilter() {
 
 // ── Push property to Owner Portal ─────────────────────────────────────────────
 function buildPropSummary(p) {
+  const accounts = JSON.parse(localStorage.getItem('vicrental_owner_accounts') || '[]');
+  const acc = accounts.find(a => a.name?.toLowerCase() === (p.owner||'').toLowerCase());
   return {
     address:             p.address || '',
     owner:               p.owner || '',
@@ -3552,6 +3554,7 @@ function buildPropSummary(p) {
     lastInspectionScore: p.lastInspectionScore || '',
     lastInspectionGrade: p.lastInspectionGrade || '',
     lastInspectionDate:  p.lastInspectionDate || '',
+    portalPassword:      acc?.password || '',
     pushedAt:            new Date().toISOString(),
   };
 }
@@ -5787,7 +5790,16 @@ function addProperty() {
     });
   }
 
-  // Auto-push to owner portal
+  // Store password locally BEFORE auto-push so buildPropSummary picks it up
+  if (owner && ownerPassword) {
+    const accts = JSON.parse(localStorage.getItem('vicrental_owner_accounts') || '[]');
+    const aidx = accts.findIndex(a => a.name?.toLowerCase() === owner.toLowerCase());
+    if (aidx !== -1) { accts[aidx].password = ownerPassword; }
+    else { accts.push({ name: owner, password: ownerPassword, createdAt: new Date().toISOString() }); }
+    localStorage.setItem('vicrental_owner_accounts', JSON.stringify(accts));
+  }
+
+  // Auto-push to owner portal (now includes password in summary)
   const newProps = getManagedProps();
   const newPropObj = newProps.find(p => (p.address||'').toLowerCase() === address.toLowerCase());
   if (newPropObj) autoPushToOwnerPortal(newPropObj);
@@ -6424,14 +6436,18 @@ function saveEditOwner() {
     return;
   }
 
-  // Update backend password if provided
+  // Store password locally and update backend
   if (password) {
+    const accts2 = JSON.parse(localStorage.getItem('vicrental_owner_accounts') || '[]');
+    const ai = accts2.findIndex(a => a.name?.toLowerCase() === name.toLowerCase());
+    if (ai !== -1) { accts2[ai].password = password; } else { accts2.push({ name, password, createdAt: new Date().toISOString() }); }
+    localStorage.setItem('vicrental_owner_accounts', JSON.stringify(accts2));
     updateOwnerPasswordOnBackend(name, password).then(ok => {
-      if (!ok) {
-        // Try registering as new if update failed
-        registerOwnerOnBackend(name, password);
-      }
+      if (!ok) registerOwnerOnBackend(name, password);
     });
+    // Re-push all properties for this owner so the password is included
+    const allProps2 = getManagedProps();
+    allProps2.filter(p => p.owner?.toLowerCase() === name.toLowerCase()).forEach(p => autoPushToOwnerPortal(p));
   }
 
   // Always update local owners list
