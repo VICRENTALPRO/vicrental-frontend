@@ -4642,38 +4642,41 @@ function downloadInspectionReport() {
   window.open(url, '_blank');
   setTimeout(() => URL.revokeObjectURL(url), 30000);
 
-  // Save to vault
+  // Save to vault — store HTML directly to avoid FileReader/dataUrl size limits
   const safeAddr = address.replace(/[^a-z0-9]/gi,'_').substring(0,40);
   const filename  = 'InspectionReport_' + safeAddr + '_' + (dateVal||'undated') + '.html';
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const docs = getVaultDocs();
-    const docName = 'Inspection Report — ' + address + ' — ' + date;
-    if (!docs.find(d => d.name === docName)) {
-      docs.unshift({
-        id: Date.now(),
-        name: docName,
-        category: 'Inspection Report',
-        property: address,
-        owner: owner,
-        inspector: inspector,
-        date: dateVal,
-        score: scoreText,
-        grade: gradeLabel,
-        ownerVisible: owner ? 'yes' : 'no',
-        ownerName: owner,
-        fileName: filename,
-        fileType: 'html',
-        isHtml: true,
-        dataUrl: e.target.result,
-        uploadedAt: new Date().toISOString(),
-      });
-      saveVaultDocs(docs);
-      if (typeof renderVault === 'function') renderVault();
-      if (typeof showToast === 'function') showToast('Inspection report saved to vault ✅', 'ok');
-    }
-  };
-  reader.readAsDataURL(blob);
+  const docName   = 'Inspection Report — ' + address + ' — ' + date;
+  const docId     = 'INSP-' + Date.now();
+
+  // Store HTML in a separate key to avoid localStorage size limits
+  try { localStorage.setItem('vault_html_' + docId, html); } catch(e) {
+    console.warn('Report HTML too large for localStorage:', e);
+  }
+
+  const docs = getVaultDocs();
+  if (!docs.find(d => d.name === docName)) {
+    docs.unshift({
+      id: docId,
+      name: docName,
+      category: 'Inspection Report',
+      property: address,
+      owner: owner,
+      inspector: inspector,
+      date: dateVal,
+      score: scoreText,
+      grade: gradeLabel,
+      ownerVisible: owner ? 'yes' : 'no',
+      ownerName: owner,
+      fileName: filename,
+      fileType: 'html',
+      isHtml: true,
+      htmlKey: 'vault_html_' + docId,
+      uploadedAt: new Date().toISOString(),
+    });
+    saveVaultDocs(docs);
+    if (typeof renderVault === 'function') renderVault();
+    if (typeof showToast === 'function') showToast('Inspection report saved to vault ✅', 'ok');
+  }
 }
 function getQuotes() { return S.get(KEY_QUOTES, []); }
 function saveQuotes(q) { S.set(KEY_QUOTES, q); }
@@ -5046,10 +5049,23 @@ function renderVault() {
   }).join('')}</div>`;
 }
 
+function resolveDocDataUrl(doc) {
+  // If doc has a direct dataUrl, use it
+  if (doc.dataUrl) return doc.dataUrl;
+  // If doc has htmlKey, retrieve HTML from separate localStorage key
+  if (doc.htmlKey) {
+    const html = localStorage.getItem(doc.htmlKey);
+    if (html) return 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
+  }
+  return null;
+}
+
 function openDocPreview(docId) {
   const docs = getVaultDocs();
   const doc = docs.find(d => String(d.id) === String(docId));
   if (!doc) return;
+
+  const dataUrl = resolveDocDataUrl(doc);
 
   document.getElementById('docLightboxTitle').textContent = doc.name;
   document.getElementById('docLightboxCat').textContent = doc.category;
@@ -5058,26 +5074,57 @@ function openDocPreview(docId) {
   const dlLink = document.getElementById('docLightboxDownload');
 
   if (doc.isImage) {
-    body.innerHTML = `<img src="${doc.dataUrl}" alt="${doc.name}" style="max-width:100%;max-height:60vh;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.15);">`;
+    body.innerHTML = `<img src="${dataUrl}" alt="${doc.name}" style="max-width:100%;max-height:60vh;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.15);">`;
   } else if (doc.isPDF) {
     body.innerHTML = `<div style="text-align:center;padding:32px;">
       <div style="font-size:4rem;margin-bottom:16px;">📄</div>
       <div style="font-size:1rem;font-weight:600;margin-bottom:6px;">${escHtmlVault(doc.fileName)}</div>
       <div style="font-size:0.82rem;color:var(--muted);margin-bottom:20px;">PDF document — click Download to open</div>
-      <a class="btn btn-primary" href="${doc.dataUrl}" download="${doc.fileName}">⬇ Download PDF</a>
+      <a class="btn btn-primary" href="${dataUrl}" download="${doc.fileName}">⬇ Download PDF</a>
+    </div>`;
+  } else if (doc.isHtml || doc.htmlKey) {
+    // HTML report — open in new tab for best viewing and print-to-PDF
+    body.innerHTML = `<div style="text-align:center;padding:32px;">
+      <div style="font-size:4rem;margin-bottom:16px;">${VAULT_ICONS[doc.category] || '📁'}</div>
+      <div style="font-size:1rem;font-weight:600;margin-bottom:6px;">${escHtmlVault(doc.fileName)}</div>
+      <div style="font-size:0.82rem;color:var(--muted);margin-bottom:20px;">Click to open this report. Use Print → Save as PDF to export.</div>
+      <button class="btn btn-primary" onclick="openVaultHtmlDoc('${doc.id}')">📄 Open Report</button>
     </div>`;
   } else {
     body.innerHTML = `<div style="text-align:center;padding:32px;">
       <div style="font-size:4rem;margin-bottom:16px;">${VAULT_ICONS[doc.category] || '📁'}</div>
       <div style="font-size:1rem;font-weight:600;margin-bottom:6px;">${escHtmlVault(doc.fileName)}</div>
       <div style="font-size:0.82rem;color:var(--muted);margin-bottom:20px;">Click Download to save this file</div>
-      <a class="btn btn-primary" href="${doc.dataUrl}" download="${doc.fileName}">⬇ Download</a>
+      <a class="btn btn-primary" href="${dataUrl || '#'}" download="${doc.fileName}">⬇ Download</a>
     </div>`;
   }
 
-  dlLink.href = doc.dataUrl;
+  dlLink.href = dataUrl || '#';
   dlLink.download = doc.fileName;
+  if (doc.isHtml || doc.htmlKey) {
+    dlLink.onclick = function(e) { e.preventDefault(); openVaultHtmlDoc(docId); };
+  } else {
+    dlLink.onclick = null;
+  }
   document.getElementById('docLightbox').classList.add('open');
+}
+
+function openVaultHtmlDoc(docId) {
+  const docs = getVaultDocs();
+  const doc  = docs.find(d => String(d.id) === String(docId));
+  if (!doc) return;
+  const dataUrl = resolveDocDataUrl(doc);
+  if (!dataUrl) { alert('Document content not found.'); return; }
+  // Convert dataUrl back to blob URL for new tab
+  if (dataUrl.startsWith('data:')) {
+    const html = decodeURIComponent(dataUrl.split(',').slice(1).join(','));
+    const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+    const url  = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+  } else {
+    window.open(dataUrl, '_blank');
+  }
 }
 
 function closeDocLightbox() {
@@ -5087,8 +5134,14 @@ function closeDocLightbox() {
 function downloadVaultDoc(docId) {
   const doc = getVaultDocs().find(d => String(d.id) === String(docId));
   if (!doc) return;
+  if (doc.isHtml || doc.htmlKey) {
+    openVaultHtmlDoc(docId);
+    return;
+  }
+  const dataUrl = resolveDocDataUrl(doc);
+  if (!dataUrl) { alert('Document content not found.'); return; }
   const a = document.createElement('a');
-  a.href = doc.dataUrl;
+  a.href = dataUrl;
   a.download = doc.fileName;
   a.click();
   toast(`Downloading ${doc.fileName}`, 'success');
