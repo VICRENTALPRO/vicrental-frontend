@@ -5050,7 +5050,7 @@ function renderVault() {
   grid.innerHTML = sortedKeys.map(propKey => {
     const propDocs = groups[propKey];
     const addr     = cleanAddr(propKey);
-    const badge    = propPropKey !== NO_PROP ? propBadge(propDocs) : '';
+    const badge    = propKey !== NO_PROP ? propBadge(propDocs) : '';
     const propId   = 'vp_' + propKey.replace(/[^a-z0-9]/gi, '_').substring(0, 30);
     const count    = propDocs.length;
 
