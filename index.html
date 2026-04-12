@@ -4518,7 +4518,7 @@ function downloadInspectionReport() {
         '<span style="font-size:16px;">🚨</span>' +
         '<div style="font-size:15px;font-weight:700;color:#fff;font-family:Arial,sans-serif;">Urgent Actions Required (' + failedItems.length + ' item' + (failedItems.length!==1?'s':'') + ')</div>' +
       '</div>' +
-      '<div style="background:#fff5f5;">' +
+      '<div style="background:#fff;">' +
         failedItems.map(function(item, i) {
           return '<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 16px;border-bottom:1px solid #fecaca;">' +
             '<span style="font-size:12px;font-weight:700;color:#dc2626;min-width:20px;margin-top:2px;">' + (i+1) + '</span>' +
@@ -4535,7 +4535,7 @@ function downloadInspectionReport() {
     const rows = cat.items.map(function(item) {
       const s = clStatuses[item.id];
       const sLabel = s==='pass' ? '✓ Pass' : s==='fail' ? '✗ Fail' : s==='na' ? 'N/A' : '—';
-      const bg  = s==='pass' ? '#f0fdf4' : s==='fail' ? '#fff5f5' : s==='na' ? '#f8fafc' : '#fff';
+      const bg  = s==='pass' ? '#fff' : s==='fail' ? '#fff' : s==='na' ? '#f8fafc' : '#fff';
       const col = s==='pass' ? '#16a34a' : s==='fail' ? '#dc2626' : s==='na' ? '#64748b' : '#94a3b8';
       const photos = clPhotos[item.id] || [];
       const photosHtml = photos.length > 0
