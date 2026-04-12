@@ -4975,7 +4975,7 @@ function handleVaultUpload(event) {
 }
 
 function renderVault() {
-  const search = (document.getElementById('vaultSearch')?.value || '').toLowerCase();
+  const search    = (document.getElementById('vaultSearch')?.value || '').toLowerCase();
   const catFilter = document.getElementById('vaultCatFilter')?.value || 'all';
   const ownerFilter = document.getElementById('vaultOwnerFilter')?.value || 'all';
   let docs = getVaultDocs();
@@ -4989,14 +4989,13 @@ function renderVault() {
   }
   if (search) {
     docs = docs.filter(d =>
-      d.name.toLowerCase().includes(search) ||
-      d.category.toLowerCase().includes(search) ||
-      (d.property || '').toLowerCase().includes(search) ||
-      d.fileName.toLowerCase().includes(search)
+      (d.name||'').toLowerCase().includes(search) ||
+      (d.category||'').toLowerCase().includes(search) ||
+      (d.property||'').toLowerCase().includes(search) ||
+      (d.fileName||'').toLowerCase().includes(search)
     );
   }
 
-  // Update count
   const allDocs = getVaultDocs();
   document.getElementById('vaultDocCount').textContent = `${allDocs.length} document${allDocs.length !== 1 ? 's' : ''}`;
 
@@ -5004,51 +5003,120 @@ function renderVault() {
   if (!grid) return;
 
   if (allDocs.length === 0) {
-    grid.innerHTML = `<div class="empty"><div class="empty-icon">🗄️</div><h3>No documents yet</h3><p>Upload compliance certificates, invoices, inspection reports and other documents. Mark them as visible to owners to share via the Owner Portal.</p></div>`;
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">🗄️</div><h3>No documents yet</h3><p>Upload compliance certificates, invoices, inspection reports and other documents.</p></div>`;
     return;
   }
-
   if (docs.length === 0) {
     grid.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>No documents match</h3><p>Try adjusting your search or filters.</p></div>`;
     return;
   }
 
-  const formatSize = (bytes) => bytes < 1024 * 1024 ? `${(bytes/1024).toFixed(0)} KB` : `${(bytes/1024/1024).toFixed(1)} MB`;
-  const formatDate = (iso) => new Date(iso).toLocaleDateString('en-AU', { day:'2-digit', month:'short', year:'numeric' });
+  const formatDate = iso => { try { return new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'}); } catch(e) { return '—'; } };
+  const ICONS = VAULT_ICONS || {};
 
-  grid.innerHTML = `<div class="vault-grid">${docs.map(doc => {
-    const icon = VAULT_ICONS[doc.category] || '📁';
-    const previewContent = doc.isImage
-      ? `<img src="${doc.dataUrl}" alt="${doc.name}" loading="lazy">`
-      : `<span style="font-size:3rem;position:relative;z-index:1;">${icon}</span>`;
+  // Group by property
+  const groups = {};
+  const NO_PROP = '__no_property__';
+  docs.forEach(doc => {
+    const key = (doc.property || '').trim() || NO_PROP;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(doc);
+  });
 
-    return `<div class="vault-card">
-      <div class="vault-card-preview" onclick="openDocPreview('${doc.id}')">
-        ${previewContent}
-        <span class="vault-owner-badge ${doc.ownerVisible === 'yes' ? 'vob-yes' : 'vob-no'}">${doc.ownerVisible === 'yes' ? '👁 Owner' : '🔒 Internal'}</span>
-      </div>
-      <div class="vault-card-body">
-        <div class="vault-card-cat">${doc.category}</div>
-        <div class="vault-card-name">${escHtmlVault(doc.name)}</div>
-        ${doc.property ? `<div class="vault-card-prop">📍 ${escHtmlVault(doc.property)}</div>` : ''}
-        <div class="vault-card-meta">
-          <span>${doc.fileName}</span>
-          <span>·</span>
-          <span>${formatSize(doc.fileSize)}</span>
-          <span>·</span>
-          <span>${formatDate(doc.uploadedAt)}</span>
+  // Sort: properties alphabetically, no-property last
+  const sortedKeys = Object.keys(groups).sort((a, b) => {
+    if (a === NO_PROP) return 1;
+    if (b === NO_PROP) return -1;
+    return a.localeCompare(b);
+  });
+
+  const cleanAddr = addr => {
+    if (!addr || addr === NO_PROP) return 'No Property Assigned';
+    const parts = addr.split(',').map(p => p.trim()).filter(Boolean);
+    return parts.filter(p => p !== 'Australia' && p !== 'Melbourne' &&
+      !/^(City|Shire|Municipality|Borough|Greater|Region) of /i.test(p) &&
+      !/^(Victoria|VIC)$/.test(p.trim())).slice(0, 3).join(', ') || addr;
+  };
+
+  // Get compliance badge for property
+  const propBadge = (propDocs) => {
+    const hasInspection = propDocs.find(d => d.category === 'Inspection Report');
+    const nc = propDocs.find(d => (d.grade||'').toLowerCase().includes('non-compliant') || (d.name||'').includes('Non-Compliant'));
+    if (nc) return '<span style="background:#dc2626;color:#fff;border-radius:6px;padding:2px 9px;font-size:0.65rem;font-weight:700;white-space:nowrap;">⚠️ Non-Compliant</span>';
+    if (hasInspection) return '<span style="background:#16a34a;color:#fff;border-radius:6px;padding:2px 9px;font-size:0.65rem;font-weight:700;white-space:nowrap;">✅ Compliant</span>';
+    return '';
+  };
+
+  grid.innerHTML = sortedKeys.map(propKey => {
+    const propDocs = groups[propKey];
+    const addr     = cleanAddr(propKey);
+    const badge    = propPropKey !== NO_PROP ? propBadge(propDocs) : '';
+    const propId   = 'vp_' + propKey.replace(/[^a-z0-9]/gi, '_').substring(0, 30);
+    const count    = propDocs.length;
+
+    const docRows = propDocs.map(doc => {
+      const icon     = ICONS[doc.category] || '📁';
+      const ownerBadge = doc.ownerVisible === 'yes'
+        ? '<span style="background:#eaf6fe;color:#0A2F5C;border-radius:4px;padding:1px 7px;font-size:0.65rem;font-weight:700;">👁 Owner</span>'
+        : '<span style="background:#f1f5f9;color:#64748b;border-radius:4px;padding:1px 7px;font-size:0.65rem;font-weight:700;">🔒 Internal</span>';
+      return `<div style="display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid #f1f5f9;background:#fff;">
+        <div style="width:36px;height:36px;background:#eaf6fe;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">${icon}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.82rem;font-weight:700;color:#0A2F5C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtmlVault(doc.name)}</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:3px;flex-wrap:wrap;">
+            <span style="font-size:0.7rem;color:#64748b;">${doc.category}</span>
+            <span style="color:#e2e8f0;">·</span>
+            <span style="font-size:0.7rem;color:#64748b;">${formatDate(doc.uploadedAt)}</span>
+            ${ownerBadge}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0;">
+          <button onclick="openDocPreview('${doc.id}')" style="padding:5px 10px;background:#0A2F5C;color:#fff;border:none;border-radius:6px;font-size:0.72rem;cursor:pointer;font-family:'Montserrat',sans-serif;font-weight:600;">👁 View</button>
+          <button onclick="downloadVaultDoc('${doc.id}')" style="padding:5px 10px;background:#f0f4f8;color:#0A2F5C;border:1px solid #e2e8f0;border-radius:6px;font-size:0.72rem;cursor:pointer;font-family:'Montserrat',sans-serif;font-weight:600;">⬇</button>
+          <button onclick="toggleOwnerVis('${doc.id}')" style="padding:5px 10px;background:#f0f4f8;color:#0A2F5C;border:1px solid #e2e8f0;border-radius:6px;font-size:0.72rem;cursor:pointer;font-family:'Montserrat',sans-serif;font-weight:600;" title="${doc.ownerVisible === 'yes' ? 'Make internal' : 'Share with owner'}">${doc.ownerVisible === 'yes' ? '🔒' : '👁'}</button>
+          <button onclick="deleteVaultDoc('${doc.id}')" style="padding:5px 10px;background:#fff;color:#dc2626;border:1px solid #fca5a5;border-radius:6px;font-size:0.72rem;cursor:pointer;font-family:'Montserrat',sans-serif;font-weight:600;">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    return `<div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+      <div style="background:linear-gradient(135deg,#0A2F5C,#0d3870);padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="toggleVaultProp('${propId}')">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.55);margin-bottom:2px;">Property</div>
+          <div style="font-size:0.9rem;font-weight:800;color:#fff;">${addr}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+          ${badge}
+          <span style="background:rgba(255,255,255,0.15);color:#fff;border-radius:6px;padding:3px 10px;font-size:0.72rem;font-weight:700;">${count} doc${count!==1?'s':''}</span>
+          <span id="chevron_${propId}" style="color:rgba(255,255,255,0.7);font-size:0.8rem;transition:transform 0.2s;">▼</span>
         </div>
       </div>
-      <div class="vault-card-actions">
-        <button class="vault-action-btn" onclick="openDocPreview('${doc.id}')">👁 View</button>
-        <button class="vault-action-btn" onclick="downloadVaultDoc('${doc.id}')">⬇ Download</button>
-        <button class="vault-action-btn" onclick="toggleOwnerVis('${doc.id}')" title="${doc.ownerVisible === 'yes' ? 'Make internal only' : 'Share with owner'}">${doc.ownerVisible === 'yes' ? '🔒 Hide' : '👁 Share'}</button>
-        <button class="vault-action-btn del" onclick="deleteVaultDoc('${doc.id}')">✕</button>
+      <div id="${propId}" style="display:block;">
+        ${docRows}
+        <div style="padding:10px 18px;background:#f8fafc;border-top:1px solid #f1f5f9;">
+          <button onclick="showUploadForProp(${JSON.stringify(propKey === NO_PROP ? '' : propKey)})" style="padding:6px 14px;background:#fff;color:#0A2F5C;border:2px solid #0A2F5C;border-radius:7px;font-size:0.75rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">+ Add Document</button>
+        </div>
       </div>
     </div>`;
-  }).join('')}</div>`;
+  }).join('');
 }
 
+function toggleVaultProp(propId) {
+  const el = document.getElementById(propId);
+  const ch = document.getElementById('chevron_' + propId);
+  if (!el) return;
+  const open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : 'block';
+  if (ch) ch.style.transform = open ? 'rotate(-90deg)' : 'rotate(0deg)';
+}
+
+function showUploadForProp(prop) {
+  // Pre-fill property in upload form and scroll to it
+  const propSel = document.getElementById('uploadPropSearch') || document.getElementById('uploadProp');
+  if (propSel) propSel.value = prop;
+  const uploadSection = document.getElementById('vaultUploadSection') || document.querySelector('.vault-upload');
+  if (uploadSection) uploadSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 function resolveDocDataUrl(doc) {
   // If doc has a direct dataUrl, use it
   if (doc.dataUrl) return doc.dataUrl;
