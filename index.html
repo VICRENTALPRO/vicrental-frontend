@@ -6780,24 +6780,50 @@ function updateFinaliseDate(){const v=document.getElementById('clDate')?.value;c
 document.addEventListener('input',e=>{if(e.target?.id==='clDate')updateFinaliseDate();});
 document.addEventListener('DOMContentLoaded',()=>setTimeout(updateFinaliseDate,800));
 function finaliseChecklist(type){
-  const isNC=type==='noncompliant';const cbId=isNC?'clNonCompliantConfirm':'clFinaliseConfirm';
+  const isNC=type==='noncompliant';
+  const cbId=isNC?'clNonCompliantConfirm':'clFinaliseConfirm';
   if(!document.getElementById(cbId)?.checked){alert('Please tick the confirmation box before finalising.');return;}
-  const prop=(document.getElementById('clPropAddress')?.value||'').trim();const owner=(document.getElementById('clOwnerName')?.value||'').trim();const inspector=(document.getElementById('clInspector')?.value||'').trim();const dateVal=document.getElementById('clDate')?.value||new Date().toISOString().split('T')[0];
-  const missing=[];if(!prop)missing.push('Property Address');if(!owner)missing.push('Owner Name');if(!inspector)missing.push('Inspector');
+  const prop=(document.getElementById('clPropAddress')?.value||'').trim();
+  const owner=(document.getElementById('clOwnerName')?.value||'').trim();
+  const inspector=(document.getElementById('clInspector')?.value||'').trim();
+  const dateVal=document.getElementById('clDate')?.value||new Date().toISOString().split('T')[0];
+  const missing=[];
+  if(!prop)missing.push('Property Address');
+  if(!owner)missing.push('Owner Name');
+  if(!inspector)missing.push('Inspector');
   if(missing.length){alert('Please complete:\n• '+missing.join('\n• '));return;}
-  const score=document.getElementById('clScoreVal')?.textContent||'—';const grade=document.getElementById('clScoreGrade')?.textContent||'';
-  const dateStr=new Date(dateVal).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});const today=new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});
-  const sc=isNC?'#dc2626':'#16a34a';const sb=isNC?'#fee2e2':'#dcfce7';const certId=(isNC?'NC':'COMP')+'-INSP-'+Date.now();const fn=(isNC?'NonCompliant':'Compliant')+'_Inspection_'+prop.replace(/[^a-z0-9]/gi,'_').substring(0,25)+'.html';
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Inspection Report</title><style>body{font-family:Arial,sans-serif;margin:40px;color:#1a1a2e;font-size:13px;}.hdr{display:flex;align-items:center;justify-content:space-between;border-bottom:4px solid #0A2F5C;padding-bottom:16px;margin-bottom:24px;}.logo{font-size:20px;font-weight:800;color:#0A2F5C;}.logo span{color:#5BB8F5;}.status{background:${sb};border:2px solid ${sc};border-radius:10px;padding:16px;text-align:center;margin:20px 0;font-size:22px;font-weight:800;color:${sc};}.sec{background:#f0f4f8;border-radius:10px;padding:16px 20px;margin-bottom:16px;}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0;}.row:last-child{border-bottom:none;}.lbl{font-size:11px;color:#666;font-weight:600;text-transform:uppercase;}.val{font-size:13px;font-weight:700;color:#0A2F5C;}.footer{margin-top:28px;border-top:2px solid #0A2F5C;padding-top:14px;font-size:10px;color:#888;}</style></head><body>
-<div class="hdr"><div><div class="logo">Vic<span>Rental</span> PRO</div></div><div style="text-align:right;font-size:15px;font-weight:700;color:#0A2F5C;">Rental Property Inspection Report</div></div>
-<div class="status">${isNC?'⚠️ NON-COMPLIANT':'✅ COMPLIANT'}</div>
-<div class="sec"><div class="row"><span class="lbl">Property</span><span class="val">${prop}</span></div><div class="row"><span class="lbl">Owner</span><span class="val">${owner||'—'}</span></div><div class="row"><span class="lbl">Inspector</span><span class="val">${inspector||'—'}</span></div><div class="row"><span class="lbl">Date</span><span class="val">${dateStr}</span></div><div class="row"><span class="lbl">Score</span><span class="val" style="color:${sc};">${score}${grade?' — '+grade:''}</span></div></div>
-<div class="footer">Generated: ${today} via VicRental Pro · Saved to vault and shared with owner.</div></body></html>`;
-  const dataUrl='data:text/html;charset=utf-8,'+encodeURIComponent(html);
-  const vault=S.get(KEY_VAULT,[]);vault.unshift({id:certId,name:(isNC?'⚠️ Non-Compliant':'✅ Compliant')+' Inspection Report — '+prop,type:'inspection_report',category:'Inspection Report',fileName:fn,property:prop,owner,inspector,date:dateVal,score,grade:isNC?'Non-Compliant':grade,uploadedAt:new Date().toISOString(),ownerVisible:true,fileType:'html',isHtml:true,dataUrl});S.set(KEY_VAULT,vault);
-  const blob=new Blob([html],{type:'text/html;charset=utf-8'});const burl=URL.createObjectURL(blob);const a=document.createElement('a');a.href=burl;a.download=fn;a.click();setTimeout(()=>URL.revokeObjectURL(burl),2000);
-  const props2=getManagedProps();const pi=props2.findIndex(p=>p.address?.toLowerCase()===prop.toLowerCase());if(pi!==-1){props2[pi].lastInspectionDate=dateVal;props2[pi].lastInspectionGrade=isNC?'❌ Non-Compliant':grade;saveManagedProps(props2);}
-  document.getElementById('vaultPopupIcon').textContent=isNC?'⚠️':'✅';document.getElementById('vaultPopupTitle').textContent=isNC?'Non-Compliant Report Saved':'Compliant Report Saved';document.getElementById('vaultPopupProp').textContent=prop;document.getElementById('vaultPopupOwner').textContent=owner;document.getElementById('vaultPopupInspector').textContent=inspector;document.getElementById('vaultPopupDate').textContent=dateStr;document.getElementById('vaultPopupScore').textContent=score+(grade?' — '+grade:'');document.getElementById('vaultPopupScore').style.color=isNC?'#dc2626':'#16a34a';document.getElementById('vaultPopupMsg').innerHTML='📁 Report downloaded and saved to <strong>Document Vault</strong> under <strong>'+prop+'</strong>. Visible to the owner in their portal.';document.getElementById('vaultPopupModal').style.display='flex';
+
+  // Use the full detailed report generator — includes all checklist items and photos
+  downloadInspectionReport();
+
+  // Update property compliance status
+  const score=document.getElementById('clScoreVal')?.textContent||'—';
+  const grade=document.getElementById('clScoreGrade')?.textContent||'';
+  const props2=getManagedProps();
+  const pi=props2.findIndex(p=>p.address?.toLowerCase()===prop.toLowerCase());
+  if(pi!==-1){
+    props2[pi].lastInspectionDate=dateVal;
+    props2[pi].lastInspectionGrade=isNC?'❌ Non-Compliant':grade;
+    props2[pi].lastInspectionScore=score;
+    saveManagedProps(props2);
+  }
+
+  // Show vault confirmation popup
+  const dateStr=new Date(dateVal).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});
+  const sc=isNC?'#dc2626':'#16a34a';
+  const popupModal=document.getElementById('vaultPopupModal');
+  if(popupModal){
+    document.getElementById('vaultPopupIcon').textContent=isNC?'⚠️':'✅';
+    document.getElementById('vaultPopupTitle').textContent=isNC?'Non-Compliant Report Saved':'Compliant Report Saved';
+    document.getElementById('vaultPopupProp').textContent=prop;
+    document.getElementById('vaultPopupOwner').textContent=owner;
+    document.getElementById('vaultPopupInspector').textContent=inspector;
+    document.getElementById('vaultPopupDate').textContent=dateStr;
+    document.getElementById('vaultPopupScore').textContent=score+(grade?' — '+grade:'');
+    document.getElementById('vaultPopupScore').style.color=sc;
+    document.getElementById('vaultPopupMsg').innerHTML='📁 Full inspection report downloaded and saved to <strong>Document Vault</strong> under <strong>'+prop+'</strong>. Includes all checklist items and photos. Visible to the owner in their portal.';
+    popupModal.style.display='flex';
+  }
   if(typeof renderVault==='function')renderVault();
 }
 function dismissVaultPopup(){document.getElementById('vaultPopupModal').style.display='none';}
