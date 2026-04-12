@@ -2751,6 +2751,7 @@ const KEY_CL    = 'vicrental_checklist';
 const KEY_PHOTOS= 'vicrental_photos';
 const KEY_VAULT  = 'vicrental_vault';
 const KEY_QUOTES = 'vicrental_quotes';
+let qSelectedFile = null;
 const KEY_TREQS  = 'vicrental_tenant_requests';
 
 // ═══════════════════════════════════════════════
@@ -2875,11 +2876,9 @@ function updateSidebarBadges() {
   const portBadge = document.getElementById('navBadgePortal');
   const propCount = [...new Set(wos.map(w => w.property))].length;
 
-  woBadge.textContent = openWOs;
-  woBadge.style.display = openWOs > 0 ? '' : 'none';
-  portBadge.textContent = ncPortal;
-  portBadge.style.display = ncPortal > 0 ? '' : 'none';
-  document.getElementById('sidebarPropCount').textContent = propCount;
+  if(woBadge){woBadge.textContent = openWOs; woBadge.style.display = openWOs > 0 ? '' : 'none';}
+  if(portBadge){portBadge.textContent = ncPortal; portBadge.style.display = ncPortal > 0 ? '' : 'none';}
+  const spc = document.getElementById('sidebarPropCount'); if(spc) spc.textContent = propCount;
 
   // Quotes badge — count pending quotes awaiting owner approval
   const now = new Date();
@@ -4729,6 +4728,7 @@ function autoFillQuoteOwner() {
 }
 
 function submitQuote() {
+  try {
   const property  = document.getElementById('qProperty').value.trim();
   const ownerName = document.getElementById('qOwnerName').value.trim();
   const desc      = document.getElementById('qDescription').value.trim();
@@ -4786,6 +4786,7 @@ function submitQuote() {
 
   // Show notification modal
   showQuoteNotifyModal(quote);
+  } catch(e) { console.error('submitQuote error:', e); toast('Error: ' + e.message, 'error'); }
 }
 
 function closeQuoteNotifyModal(){var m=document.getElementById('quoteNotifyModal');if(m)m.remove();}
@@ -6411,12 +6412,32 @@ function renderManagedProps() {
   const cleanAddr = addr => { if(!addr)return''; const p=addr.split(',').map(x=>x.trim()).filter(Boolean); return p.filter(x=>x!=='Australia'&&x!=='Melbourne'&&!/^(City|Shire|Municipality|Borough|Greater|Region) of /i.test(x)&&!/^(Victoria|VIC)$/.test(x.trim())).slice(0,3).join(', ')||addr; };
   const badge = p => { if(p.lastInspectionGrade?.includes('Non-Compliant'))return`<span style="background:#dc2626;color:#fff;border-radius:6px;padding:3px 9px;font-size:0.68rem;font-weight:700;white-space:nowrap;">⚠️ Non-Compliant</span>`;if(p.lastInspectionScore){const s=parseInt(p.lastInspectionScore),bg=s>=80?'#16a34a':s>=50?'#d97706':'#dc2626';return`<span style="background:${bg};color:#fff;border-radius:6px;padding:3px 9px;font-size:0.68rem;font-weight:700;white-space:nowrap;">${s}% · ${p.lastInspectionGrade||'Compliant'}</span>`;}return`<span style="background:#e2e8f0;color:#64748b;border-radius:6px;padding:3px 9px;font-size:0.68rem;font-weight:600;white-space:nowrap;">No inspection</span>`; };
   const active=props.filter(p=>!p.archived); const archived=props.filter(p=>p.archived);
+  const allQuotes = S.get(KEY_QUOTES, []);
+  const getOpenQuotes = addr => allQuotes.filter(q =>
+    q.status === 'pending' &&
+    (q.property||'').toLowerCase().trim() === (addr||'').toLowerCase().trim()
+  );
+
   const renderTile = p => { const propId=(p.id||p.address).replace(/'/g,"&#39;"); const addr=cleanAddr(p.address||''); const parts=addr.split(','); const line1=parts[0]?.trim()||'—'; const line2=parts.slice(1).join(',').trim();
+    const openQuotes = getOpenQuotes(p.address||'');
+    const quotesHtml = openQuotes.length > 0
+      ? '<div style="padding:10px 14px;background:#fffbeb;border-bottom:1px solid #fcd34d;display:flex;align-items:center;justify-content:space-between;gap:10px;">' +
+          '<div style="display:flex;align-items:center;gap:8px;">' +
+            '<span style="font-size:1rem;">💰</span>' +
+            '<div>' +
+              '<div style="font-size:0.72rem;font-weight:800;color:#92400e;">' + openQuotes.length + ' Open Quote' + (openQuotes.length!==1?'s':'') + ' Awaiting Owner Approval</div>' +
+              '<div style="font-size:0.68rem;color:#b45309;">' + openQuotes.map(q => q.id + ' — $' + Number(q.amount||0).toLocaleString('en-AU',{minimumFractionDigits:2})).join(' · ') + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<button onclick="showPage(\'quotes\')" style="padding:4px 10px;background:#d97706;color:#fff;border:none;border-radius:6px;font-size:0.7rem;font-weight:700;cursor:pointer;font-family:\'Montserrat\',sans-serif;white-space:nowrap;">View Quotes</button>' +
+        '</div>'
+      : '';
     return `<div style="background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
       <div style="background:linear-gradient(135deg,#0A2F5C,#0d3870);padding:14px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
         <div style="flex:1;min-width:0;cursor:pointer;" onclick="showPage('properties')"><div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.55);margin-bottom:3px;">Property Address</div><div style="font-weight:800;font-size:0.92rem;color:#fff;line-height:1.35;text-decoration:underline;text-underline-offset:3px;">${line1}${line2?'<span style="font-weight:500;font-size:0.8rem;opacity:0.8;">, '+line2+'</span>':''}</div></div>
         <div style="flex-shrink:0;margin-top:2px;">${badge(p)}</div>
       </div>
+      ${quotesHtml}
       <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);">
         <div style="padding:12px 14px;border-right:1px solid var(--border);"><div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:5px;">👤 Owner</div><div style="font-weight:700;font-size:0.82rem;color:var(--navy);margin-bottom:3px;cursor:pointer;text-decoration:underline;text-underline-offset:2px;" onclick="window.open('https://scintillating-salmiakki-33c677.netlify.app','_blank')">${p.owner||'—'}</div>${p.ownerEmail?'<div style="font-size:0.7rem;color:var(--muted);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="mailto:'+p.ownerEmail+'" style="color:var(--navy);text-decoration:none;">✉ '+p.ownerEmail+'</a></div>':''}${p.ownerPhone?'<div style="font-size:0.7rem;color:var(--muted);margin-top:1px;"><a href="tel:'+p.ownerPhone+'" style="color:var(--navy);text-decoration:none;">📞 '+p.ownerPhone+'</a></div>':''}</div>
         <div style="padding:12px 14px;"><div style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:5px;">🏡 Tenant</div><div style="font-weight:700;font-size:0.82rem;color:var(--navy);margin-bottom:3px;">${p.tenant||'No tenant'}</div>${p.tenantEmail?'<div style="font-size:0.7rem;color:var(--muted);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="mailto:'+p.tenantEmail+'" style="color:var(--navy);text-decoration:none;">✉ '+p.tenantEmail+'</a></div>':''}${p.tenantPhone?'<div style="font-size:0.7rem;color:var(--muted);margin-top:1px;"><a href="tel:'+p.tenantPhone+'" style="color:var(--navy);text-decoration:none;">📞 '+p.tenantPhone+'</a></div>':''}</div>
