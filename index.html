@@ -2014,7 +2014,7 @@ window.addEventListener('DOMContentLoaded', function() {
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
               <div>
                 <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Property Address *</label>
-                <input type="text" id="qProperty" placeholder="42 Sample Street, Richmond VIC 3121" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;">
+                <input type="text" id="qProperty" placeholder="42 Sample Street, Richmond VIC 3121" onblur="autoFillQuoteOwner()" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;">
               </div>
               <div>
                 <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Owner Name *</label>
@@ -2060,6 +2060,16 @@ window.addEventListener('DOMContentLoaded', function() {
               <div style="font-size:0.82rem;font-weight:600;color:var(--navy);margin-bottom:3px;" id="qFileLabel">Attach quote document (optional)</div>
               <div style="font-size:0.7rem;color:var(--muted);">PDF, JPG, PNG — max 10MB</div>
               <input type="file" id="qFileInput" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="handleQFileSelect(event)">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;padding:14px;background:#eaf6fe;border:1px solid #5BB8F5;border-radius:10px;">
+              <div>
+                <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Owner Email (for notification)</label>
+                <input type="email" id="qOwnerEmail" placeholder="owner@email.com" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;">
+              </div>
+              <div>
+                <label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Owner Mobile (for SMS)</label>
+                <input type="text" id="qOwnerPhone" placeholder="04XX XXX XXX" style="width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Montserrat', sans-serif;font-size:0.82rem;">
+              </div>
             </div>
             <div style="text-align:right;">
               <button class="btn btn-primary" onclick="submitQuote()" style="min-width:180px;">📤 Send Quote to Owner</button>
@@ -4703,6 +4713,21 @@ function handleQFileSelect(event) {
   reader.readAsDataURL(file);
 }
 
+function autoFillQuoteOwner() {
+  const propVal = (document.getElementById('qProperty')?.value || '').trim().toLowerCase();
+  if (!propVal) return;
+  const props = getManagedProps();
+  const match = props.find(p => (p.address||'').toLowerCase().includes(propVal) || propVal.includes((p.address||'').toLowerCase()));
+  if (match) {
+    const nameEl  = document.getElementById('qOwnerName');
+    const emailEl = document.getElementById('qOwnerEmail');
+    const phoneEl = document.getElementById('qOwnerPhone');
+    if (nameEl  && !nameEl.value)  nameEl.value  = match.owner || '';
+    if (emailEl && !emailEl.value) emailEl.value = match.ownerEmail || '';
+    if (phoneEl && !phoneEl.value) phoneEl.value = match.ownerPhone || '';
+  }
+}
+
 function submitQuote() {
   const property  = document.getElementById('qProperty').value.trim();
   const ownerName = document.getElementById('qOwnerName').value.trim();
@@ -4716,9 +4741,13 @@ function submitQuote() {
   const amountNum = parseFloat(amount.replace(/[^0-9.]/g, ''));
   if (isNaN(amountNum)) { toast('Please enter a valid quote amount', 'error'); return; }
 
+  const ownerEmail = (document.getElementById('qOwnerEmail')?.value || '').trim();
+  const ownerPhone = (document.getElementById('qOwnerPhone')?.value || '').trim();
+
   const quote = {
     id: 'Q-' + String(getQuotes().length + 1).padStart(4, '0'),
-    property, ownerName, description: desc,
+    property, ownerName, ownerEmail, ownerPhone,
+    description: desc,
     contractor: document.getElementById('qContractor').value.trim(),
     amount: amountNum,
     category: document.getElementById('qCategory').value,
@@ -4735,8 +4764,11 @@ function submitQuote() {
   quotes.unshift(quote);
   saveQuotes(quotes);
 
+  // Push quote to owner portal via vrprop_ key
+  pushQuoteToOwnerPortal(quote);
+
   // Reset form
-  ['qProperty','qOwnerName','qDescription','qContractor','qAmount','qExpiry','qNotes'].forEach(id => {
+  ['qProperty','qOwnerName','qOwnerEmail','qOwnerPhone','qDescription','qContractor','qAmount','qExpiry','qNotes'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   document.getElementById('qLinkWO').value = '';
@@ -4746,11 +4778,77 @@ function submitQuote() {
   document.getElementById('qUploadZone').style.borderColor = '';
   qSelectedFile = null;
 
-  logActivity(`Quote ${quote.id} sent to ${ownerName} for ${property}`, '#8b5cf6');
-  toast(`Quote ${quote.id} sent to owner for approval`, 'success');
+  logActivity('Quote ' + quote.id + ' sent to ' + ownerName + ' for ' + property, '#8b5cf6');
+  toast('Quote ' + quote.id + ' saved — send notifications below', 'success');
   updateSidebarBadges();
   renderQuotes();
   updatePropFilterDropdown();
+
+  // Show notification modal
+  showQuoteNotifyModal(quote);
+}
+
+function closeQuoteNotifyModal(){var m=document.getElementById('quoteNotifyModal');if(m)m.remove();}
+
+function pushQuoteToOwnerPortal(quote) {
+  if (!quote.ownerName) return;
+  const ownerKey = 'vrprop_quotes_' + quote.ownerName.toLowerCase().replace(/\s+/g,'_');
+  const existing = JSON.parse(localStorage.getItem(ownerKey) || '[]');
+  // Remove old version of same quote, add new
+  const filtered = existing.filter(q => q.id !== quote.id);
+  filtered.unshift(quote);
+  localStorage.setItem(ownerKey, JSON.stringify(filtered));
+}
+
+function showQuoteNotifyModal(quote) {
+  const ex = document.getElementById('quoteNotifyModal');
+  if (ex) ex.remove();
+
+  const portalUrl = 'https://scintillating-salmiakki-33c677.netlify.app';
+  const firstName = (quote.ownerName||'Owner').split(' ')[0];
+  const amtFmt = '$' + Number(quote.amount).toLocaleString('en-AU', {minimumFractionDigits:2});
+
+  const emailSubject = encodeURIComponent('Repair Quote Requiring Your Approval — ' + (quote.property||'').split(',')[0].trim());
+  const emailBodyText = 'Dear '+firstName+',\n\nA repair quote has been submitted for your property and requires your approval.\n\nQuote Reference: '+quote.id+'\nProperty: '+(quote.property||'—')+'\nDescription: '+(quote.description||'—')+'\nContractor: '+(quote.contractor||'—')+'\nAmount: '+amtFmt+'\n'+(quote.expiry?'Quote Expiry: '+new Date(quote.expiry).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'})+'\n':'')+(quote.notes?'Notes: '+quote.notes+'\n':'')+'\nPlease log in to your Owner Portal to approve or reject this quote:\n'+portalUrl+'\n\nKind regards,\nVicRental Pro';
+  const emailBody = encodeURIComponent(emailBodyText);
+
+  const smsText = encodeURIComponent(
+    'Hi ' + firstName + ', a repair quote (' + quote.id + ') for ' + amtFmt + ' at ' +
+    (quote.property||'').split(',')[0].trim() + ' needs your approval. Log in: ' + portalUrl
+  );
+
+  const modal = document.createElement('div');
+  modal.id = 'quoteNotifyModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9900;display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.innerHTML = '<div style="background:#fff;border-radius:18px;padding:28px;width:100%;max-width:520px;box-shadow:0 24px 64px rgba(0,0,0,0.25);">' +
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">' +
+      '<div style="font-size:1rem;font-weight:800;color:#0A2F5C;">📬 Notify Owner</div>' +
+      '<button onclick="document.getElementById(\'quoteNotifyModal\').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#64748b;">✕</button>' +
+    '</div>' +
+    '<div style="background:#eaf6fe;border:1px solid #5BB8F5;border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:0.82rem;color:#0A2F5C;line-height:1.7;">' +
+      '<strong>Quote ' + quote.id + '</strong> has been saved. Notify <strong>' + (quote.ownerName||'the owner') + '</strong> via email and/or SMS so they can approve or reject it in their Owner Portal.' +
+    '</div>' +
+    '<div style="display:grid;gap:10px;">' +
+      (quote.ownerEmail ?
+        '<a href="mailto:' + quote.ownerEmail + '?subject=' + emailSubject + '&body=' + emailBody + '" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:#0A2F5C;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:0.88rem;font-family:Montserrat,sans-serif;">' +
+          '<span style="font-size:1.4rem;">📧</span>' +
+          '<div><div>Send Email Notification</div><div style="font-size:0.72rem;font-weight:400;opacity:0.8;">' + quote.ownerEmail + '</div></div>' +
+        '</a>' :
+        '<div style="padding:12px 16px;background:#f1f5f9;border-radius:10px;font-size:0.82rem;color:#64748b;">No owner email — add it to the quote form to enable email notifications.</div>'
+      ) +
+      (quote.ownerPhone ?
+        '<a href="sms:' + quote.ownerPhone.replace(/\s/g,'') + '?body=' + smsText + '" style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:#16a34a;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:0.88rem;font-family:Montserrat,sans-serif;">' +
+          '<span style="font-size:1.4rem;">💬</span>' +
+          '<div><div>Send SMS Notification</div><div style="font-size:0.72rem;font-weight:400;opacity:0.8;">' + quote.ownerPhone + '</div></div>' +
+        '</a>' :
+        '<div style="padding:12px 16px;background:#f1f5f9;border-radius:10px;font-size:0.82rem;color:#64748b;">No owner mobile — add it to the quote form to enable SMS notifications.</div>'
+      ) +
+    '</div>' +
+    '<div style="margin-top:16px;text-align:center;">' +
+      '<button onclick="closeQuoteNotifyModal()" style="padding:9px 28px;background:#f0f4f8;color:#0A2F5C;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;font-family:Montserrat,sans-serif;font-size:0.85rem;">Done — Close</button>' +
+    '</div>' +
+  '</div>';
+  document.body.appendChild(modal);
 }
 
 function setQuoteFilter(f) {
