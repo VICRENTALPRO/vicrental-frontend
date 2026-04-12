@@ -4486,201 +4486,195 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // ─ Inspection Report Download ─
 function downloadInspectionReport() {
-  const address = document.getElementById('clPropAddress').value || 'Address not specified';
-  const inspector = document.getElementById('clInspector').value || 'Not specified';
-  const dateVal = document.getElementById('clDate').value;
-  const date = dateVal ? new Date(dateVal).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'}) : 'Not specified';
+  const address   = (document.getElementById('clPropAddress')?.value || 'Address not specified').trim();
+  const inspector = (document.getElementById('clInspector')?.value || 'Not specified').trim();
+  const owner     = (document.getElementById('clOwnerName')?.value || '').trim();
+  const dateVal   = document.getElementById('clDate')?.value || '';
+  const date      = dateVal ? new Date(dateVal).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'}) : 'Not specified';
+  const today     = new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});
 
   const vals = Object.values(clStatuses);
   const pass = vals.filter(v=>v==='pass').length;
   const fail = vals.filter(v=>v==='fail').length;
-  const na = vals.filter(v=>v==='na').length;
+  const na   = vals.filter(v=>v==='na').length;
   const assessed = pass + fail;
   const score = assessed > 0 ? Math.round(pass/assessed*100) : null;
   const scoreText = score !== null ? score + '%' : 'N/A';
+  const gradeLabel = score === null ? 'Not Assessed' : score >= 90 ? 'Excellent' : score >= 75 ? 'Good' : score >= 50 ? 'Fair' : 'Needs Attention';
+  const gradeBg    = score === null ? '#e2e8f0' : score >= 75 ? '#dcfce7' : score >= 50 ? '#fef9c3' : '#fee2e2';
+  const gradeColor = score === null ? '#475569' : score >= 75 ? '#16a34a' : score >= 50 ? '#92400e' : '#dc2626';
 
-  let gradeLabel = 'Awaiting Results', gradeColor = '#5a6a8a', gradeBg = '#eef0f5';
-  if (score !== null) {
-    if (score === 100) { gradeLabel = 'Fully Compliant'; gradeColor = '#1a7a4a'; gradeBg = '#e8f5ee'; }
-    else if (score >= 80) { gradeLabel = 'Mostly Compliant'; gradeColor = '#b56e00'; gradeBg = '#fff4e0'; }
-    else if (score >= 50) { gradeLabel = 'Partially Compliant'; gradeColor = '#b56e00'; gradeBg = '#fff4e0'; }
-    else { gradeLabel = 'Non-Compliant'; gradeColor = '#c0392b'; gradeBg = '#fdecea'; }
-  }
-
+  // Failed items for urgent section
   const failedItems = [];
   CATEGORIES.forEach(cat => cat.items.forEach(item => {
     if (clStatuses[item.id] === 'fail') failedItems.push({ ...item, catTitle: cat.title });
   }));
 
+  // Build urgent actions block
   let urgentHtml = '';
   if (failedItems.length > 0) {
-    urgentHtml = `<div style="margin-bottom:28px;border:2px solid #c0392b;border-radius:12px;overflow:hidden;">
-      <div style="background:#c0392b;padding:12px 18px;display:flex;align-items:center;gap:10px;">
-        <span style="font-size:18px;">🚨</span>
-        <div style="font-size:16px;color:#fff;font-family:Georgia,serif;flex:1;">Urgent Actions Required</div>
-        <span style="background:rgba(255,255,255,0.25);color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:12px;">${failedItems.length} item${failedItems.length!==1?'s':''}</span>
-      </div>
-      <div style="background:#fff5f4;">
-        ${failedItems.map((item, i) => {
-          const isCrit = CRITICAL_ITEMS.has(item.id);
-          const action = URGENT_ACTIONS[item.id] || 'Arrange repair or replacement as soon as possible.';
-          return `<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 16px;border-bottom:1px solid #fcd8d4;">
-            <span style="font-size:12px;font-weight:700;color:#c0392b;min-width:20px;margin-top:2px;">${i+1}</span>
-            <div>
-              <div style="font-size:10px;font-weight:700;color:#c0392b;text-transform:uppercase;">${item.catTitle}</div>
-              <div style="font-size:13px;color:#1a1a2e;font-weight:500;margin:2px 0;">${item.label}</div>
-              <div style="font-size:11px;color:#7a8099;">→ ${action}</div>
-            </div>
-            <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:${isCrit?'#fdecea':'#fff4e0'};color:${isCrit?'#c0392b':'#b56e00'};flex-shrink:0;">${isCrit?'🔴 Critical':'🟡 High'}</span>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>`;
+    urgentHtml = '<div style="margin-bottom:28px;border:2px solid #dc2626;border-radius:10px;overflow:hidden;">' +
+      '<div style="background:#dc2626;padding:12px 18px;display:flex;align-items:center;gap:10px;">' +
+        '<span style="font-size:16px;">🚨</span>' +
+        '<div style="font-size:15px;font-weight:700;color:#fff;font-family:Arial,sans-serif;">Urgent Actions Required (' + failedItems.length + ' item' + (failedItems.length!==1?'s':'') + ')</div>' +
+      '</div>' +
+      '<div style="background:#fff5f5;">' +
+        failedItems.map(function(item, i) {
+          return '<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 16px;border-bottom:1px solid #fecaca;">' +
+            '<span style="font-size:12px;font-weight:700;color:#dc2626;min-width:20px;margin-top:2px;">' + (i+1) + '</span>' +
+            '<div><div style="font-size:10px;font-weight:700;color:#dc2626;text-transform:uppercase;">' + item.catTitle + '</div>' +
+            '<div style="font-size:13px;color:#1a1a2e;font-weight:500;margin:2px 0;">' + item.label + '</div>' +
+            (item.sub ? '<div style="font-size:11px;color:#64748b;">' + item.sub + '</div>' : '') + '</div>' +
+          '</div>';
+        }).join('') +
+      '</div></div>';
   }
 
-  const catResultsHtml = CATEGORIES.map(cat => {
-    const rows = cat.items.map(item => {
+  // Build category results
+  const catResultsHtml = CATEGORIES.map(function(cat) {
+    const rows = cat.items.map(function(item) {
       const s = clStatuses[item.id];
-      const sLabel = s==='pass'?'✓ Pass':s==='fail'?'✗ Fail':s==='na'?'N/A':'—';
-      const bg = s==='pass'?'#e8f5ee':s==='fail'?'#fdecea':s==='na'?'#eef0f5':'#fafaf7';
-      const col = s==='pass'?'#1a7a4a':s==='fail'?'#c0392b':s==='na'?'#5a6a8a':'#aaa';
+      const sLabel = s==='pass' ? '✓ Pass' : s==='fail' ? '✗ Fail' : s==='na' ? 'N/A' : '—';
+      const bg  = s==='pass' ? '#f0fdf4' : s==='fail' ? '#fff5f5' : s==='na' ? '#f8fafc' : '#fff';
+      const col = s==='pass' ? '#16a34a' : s==='fail' ? '#dc2626' : s==='na' ? '#64748b' : '#94a3b8';
       const photos = clPhotos[item.id] || [];
       const photosHtml = photos.length > 0
-        ? `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">${photos.map(p=>`<img src="${p.dataUrl}" style="width:80px;height:60px;object-fit:cover;border-radius:5px;border:1px solid #ddd;">`).join('')}</div>`
+        ? '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">' +
+            photos.map(function(p){ return '<img src="' + p.dataUrl + '" style="width:90px;height:68px;object-fit:cover;border-radius:5px;border:1px solid #e2e8f0;">'; }).join('') +
+          '</div>'
         : '';
-      return `<tr><td style="padding:9px 12px;font-size:12.5px;color:#1a1a2e;line-height:1.4;">${item.label}${item.legal?`<br><span style="font-size:9px;background:#0c1b35;color:#334155;padding:1px 6px;border-radius:3px;">${item.legal}</span>`:''} ${photosHtml}</td><td style="padding:9px 12px;text-align:center;background:${bg};color:${col};font-weight:700;font-size:12px;white-space:nowrap;">${sLabel}</td></tr>`;
+      return '<tr style="background:' + bg + ';border-bottom:1px solid #e2e8f0;">' +
+        '<td style="padding:9px 14px;font-size:12px;color:#1a1a2e;line-height:1.5;">' +
+          item.label +
+          (item.legal ? '<br><span style="font-size:9px;background:#eaf6fe;color:#0A2F5C;padding:1px 6px;border-radius:3px;font-weight:600;">' + item.legal + '</span>' : '') +
+          photosHtml +
+        '</td>' +
+        '<td style="padding:9px 14px;text-align:center;font-weight:700;font-size:12px;color:' + col + ';white-space:nowrap;width:70px;">' + sLabel + '</td>' +
+        '</tr>';
     }).join('');
-    return `<div style="margin-bottom:20px;border:1px solid #ddd9cc;border-radius:10px;overflow:hidden;">
-      <div style="background:#0c1b35;padding:12px 16px;display:flex;align-items:center;gap:10px;">
-        <span style="font-size:16px;">${cat.icon}</span>
-        <div><div style="font-family:Georgia,serif;font-size:14px;color:#fff;">${cat.title}</div><div style="font-size:10px;color:rgba(255,255,255,0.6);">${cat.subtitle}</div></div>
-      </div>
-      <table style="width:100%;border-collapse:collapse;">
-        <thead><tr style="background:#f5f2eb;"><th style="padding:6px 12px;text-align:left;font-size:10px;color:#7a8099;text-transform:uppercase;letter-spacing:0.05em;">Item</th><th style="padding:6px 12px;text-align:center;font-size:10px;color:#7a8099;text-transform:uppercase;width:70px;">Status</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>`;
+
+    return '<div style="margin-bottom:18px;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;">' +
+      '<div style="background:#0A2F5C;padding:11px 16px;display:flex;align-items:center;gap:10px;">' +
+        '<span style="font-size:15px;">' + cat.icon + '</span>' +
+        '<div><div style="font-size:13px;font-weight:700;color:#fff;">' + cat.title + '</div>' +
+        '<div style="font-size:10px;color:rgba(255,255,255,0.6);">' + cat.subtitle + '</div></div>' +
+      '</div>' +
+      '<table style="width:100%;border-collapse:collapse;">' +
+        '<thead><tr style="background:#f0f4f8;">' +
+          '<th style="padding:7px 14px;text-align:left;font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;">Checklist Item</th>' +
+          '<th style="padding:7px 14px;text-align:center;font-size:10px;color:#64748b;text-transform:uppercase;width:70px;">Result</th>' +
+        '</tr></thead>' +
+        '<tbody>' + rows + '</tbody>' +
+      '</table></div>';
   }).join('');
 
-  const generated = new Date().toLocaleString('en-AU',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  const html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
+    '<title>Inspection Report — ' + address + '</title>' +
+    '<style>' +
+      '*{box-sizing:border-box;margin:0;padding:0;}' +
+      'body{font-family:Arial,Helvetica,sans-serif;background:#f0f4f8;color:#1a1a2e;-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
+      '@media print{body{background:#fff;}@page{margin:15mm;size:A4;}}' +
+    '</style></head><body>' +
 
-  const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Inspection Report — ${address}</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:'DM Sans',Georgia,sans-serif;background:#faf8f3;color:#1a1a2e;}@media print{body{background:#fff;}}</style>
-<scr` + `ipt>
-const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
-</scr` + `ipt>
-</head><body>
-<div style="background:linear-gradient(135deg,#0c1b35 0%,#1e3460 100%);padding:40px 48px 32px;color:#fff;">
-  <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;">
-    <div style="width:52px;height:52px;background:linear-gradient(135deg,#c9973a,#e8b84b);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;">🏠</div>
-    <div>
-      <div style="font-family:'DM Serif Display',Georgia,serif;font-size:22px;line-height:1.2;">Victoria Rental Minimum Standards</div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;margin-top:3px;">Inspection Report — Residential Tenancies Act 1997</div>
-    </div>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:24px;">
-    <div><div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Property Address</div><div style="font-size:14px;font-weight:600;">${address}</div></div>
-    <div><div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Inspector</div><div style="font-size:14px;font-weight:600;">${inspector}</div></div>
-    <div><div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Date</div><div style="font-size:14px;font-weight:600;">${date}</div></div>
-  </div>
-  <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:20px 24px;display:flex;align-items:center;gap:28px;flex-wrap:wrap;">
-    <div style="text-align:center;"><div style="font-family:'Montserrat', sans-serif;font-size:40px;color:#e8b84b;line-height:1;">${scoreText}</div><div style="font-size:10px;color:#64748b;text-transform:uppercase;margin-top:3px;">Compliance Score</div></div>
-    <div style="flex:1;min-width:180px;">
-      <div style="display:inline-block;padding:4px 14px;border-radius:20px;background:${gradeBg};color:${gradeColor};font-size:12px;font-weight:700;text-transform:uppercase;margin-bottom:10px;">${gradeLabel}</div>
-      <div style="display:flex;gap:16px;flex-wrap:wrap;">
-        <div style="display:flex;align-items:center;gap:5px;font-size:12px;"><span style="width:8px;height:8px;background:#4ade80;border-radius:50%;display:inline-block;"></span><span style="color:#334155;">Pass: <strong style="color:#fff;">${pass}</strong></span></div>
-        <div style="display:flex;align-items:center;gap:5px;font-size:12px;"><span style="width:8px;height:8px;background:#f87171;border-radius:50%;display:inline-block;"></span><span style="color:#334155;">Fail: <strong style="color:#fff;">${fail}</strong></span></div>
-        <div style="display:flex;align-items:center;gap:5px;font-size:12px;"><span style="width:8px;height:8px;background:#94a3b8;border-radius:50%;display:inline-block;"></span><span style="color:#334155;">N/A: <strong style="color:#fff;">${na}</strong></span></div>
-      </div>
-    </div>
-  </div>
-  <div style="margin-top:12px;font-size:10px;color:rgba(255,255,255,0.35);">Generated: ${generated} via VicRental Pro</div>
-</div>
-<div style="max-width:860px;margin:0 auto;padding:36px 32px 60px;">
-  ${urgentHtml}
-  <div style="font-family:'Montserrat', sans-serif;font-size:20px;color:#0c1b35;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #ddd9cc;">Detailed Checklist Results</div>
-  ${catResultsHtml}
-  <div style="margin-top:32px;font-size:11px;color:#7a8099;line-height:1.8;border-top:1px solid #ddd9cc;padding-top:16px;">
-    <strong>Disclaimer:</strong> This report is a general guide based on Victoria's rental minimum standards under the <em>Residential Tenancies Act 1997</em> (as amended, effective 29 March 2021). It is not legal advice. Visit Consumer Affairs Victoria for official guidance.
-  </div>
-</div>
-</body></html>`;
+    // Header
+    '<div style="background:linear-gradient(135deg,#0A2F5C,#0d3870);padding:36px 48px 28px;color:#fff;">' +
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;">' +
+        '<div>' +
+          '<div style="font-size:22px;font-weight:800;margin-bottom:4px;">Vic<span style="color:#5BB8F5;">Rental</span> PRO</div>' +
+          '<div style="font-size:11px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.1em;">Property Inspection Report</div>' +
+        '</div>' +
+        '<div style="text-align:right;font-size:11px;color:rgba(255,255,255,0.6);">Generated: ' + today + '</div>' +
+      '</div>' +
 
-  const blob = new Blob([html], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
+      // Property details grid
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px;">' +
+        '<div style="background:rgba(255,255,255,0.08);border-radius:8px;padding:12px 16px;">' +
+          '<div style="font-size:9px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Property Address</div>' +
+          '<div style="font-size:13px;font-weight:700;">' + address + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(255,255,255,0.08);border-radius:8px;padding:12px 16px;">' +
+          '<div style="font-size:9px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Inspector</div>' +
+          '<div style="font-size:13px;font-weight:700;">' + inspector + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(255,255,255,0.08);border-radius:8px;padding:12px 16px;">' +
+          '<div style="font-size:9px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Inspection Date</div>' +
+          '<div style="font-size:13px;font-weight:700;">' + date + '</div>' +
+        '</div>' +
+      '</div>' +
+
+      // Score summary
+      '<div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:18px 24px;display:flex;align-items:center;gap:32px;flex-wrap:wrap;">' +
+        '<div style="text-align:center;">' +
+          '<div style="font-size:44px;font-weight:800;color:#5BB8F5;line-height:1;">' + scoreText + '</div>' +
+          '<div style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-top:4px;">Compliance Score</div>' +
+        '</div>' +
+        '<div style="flex:1;min-width:160px;">' +
+          '<div style="display:inline-block;padding:4px 14px;border-radius:20px;background:' + gradeBg + ';color:' + gradeColor + ';font-size:12px;font-weight:700;text-transform:uppercase;margin-bottom:12px;">' + gradeLabel + '</div>' +
+          '<div style="display:flex;gap:20px;flex-wrap:wrap;">' +
+            '<div style="font-size:12px;color:rgba(255,255,255,0.7);">✅ Pass: <strong style="color:#fff;">' + pass + '</strong></div>' +
+            '<div style="font-size:12px;color:rgba(255,255,255,0.7);">❌ Fail: <strong style="color:#fff;">' + fail + '</strong></div>' +
+            '<div style="font-size:12px;color:rgba(255,255,255,0.7);">— N/A: <strong style="color:#fff;">' + na + '</strong></div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    // Body
+    '<div style="max-width:900px;margin:0 auto;padding:32px 40px 60px;">' +
+      urgentHtml +
+      '<div style="font-size:16px;font-weight:800;color:#0A2F5C;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #e2e8f0;">Detailed Checklist Results</div>' +
+      catResultsHtml +
+      (owner ? '<div style="margin-top:32px;border-top:1px solid #e2e8f0;padding-top:20px;"><div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px;">Owner</div><div style="font-size:13px;font-weight:700;color:#0A2F5C;">' + owner + '</div></div>' : '') +
+      '<div style="margin-top:24px;font-size:10px;color:#94a3b8;line-height:1.8;border-top:1px solid #e2e8f0;padding-top:14px;">' +
+        '<strong>Disclaimer:</strong> This report is a general guide based on Victoria\'s rental minimum standards under the <em>Residential Tenancies Act 1997</em> (effective 29 March 2021). It is not legal advice. Visit Consumer Affairs Victoria for official guidance.' +
+      '</div>' +
+    '</div>' +
+    // Print button (hidden when printing)
+    '<div style="position:fixed;bottom:20px;right:20px;display:flex;gap:10px;" class="no-print">' +
+      '<button onclick="window.print()" style="padding:10px 20px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif;box-shadow:0 4px 12px rgba(0,0,0,0.2);">🖨️ Print / Save as PDF</button>' +
+    '</div>' +
+    '<style>.no-print{} @media print{.no-print{display:none!important;}}</style>' +
+    '</body></html>';
+
+  // Open in new tab (allows Print → Save as PDF)
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  window.open(url, '_blank');
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+
+  // Save to vault
   const safeAddr = address.replace(/[^a-z0-9]/gi,'_').substring(0,40);
-  const filename = `inspection-report-${safeAddr}-${dateVal||'undated'}.html`;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-
-  // ── Update property compliance status ──────────────────────
-  const props = getManagedProps();
-  const propIdx = props.findIndex(p => p.address.toLowerCase() === address.toLowerCase());
-  if (propIdx >= 0) {
-    props[propIdx].lastInspectionDate  = dateVal || new Date().toISOString().split('T')[0];
-    props[propIdx].lastInspectionScore = score;
-    props[propIdx].lastInspectionGrade = gradeLabel;
-    props[propIdx].lastInspectionColor = gradeColor;
-    saveManagedProps(props);
-    renderManagedProps();
-    renderProperties();
-  }
-
-  // ── Save report to Document Vault ──────────────────────────
-  const ownerName = document.getElementById('clOwnerName')?.value?.trim() || '';
-  // Convert HTML blob to dataUrl for vault storage
+  const filename  = 'InspectionReport_' + safeAddr + '_' + (dateVal||'undated') + '.html';
   const reader = new FileReader();
-  reader.onload = (e) => {
+  reader.onload = function(e) {
     const docs = getVaultDocs();
-    const docName = `Inspection Report — ${address} — ${date}`;
-    // Avoid duplicates (same address + date)
-    const alreadyExists = docs.find(d => d.name === docName);
-    if (!alreadyExists) {
+    const docName = 'Inspection Report — ' + address + ' — ' + date;
+    if (!docs.find(d => d.name === docName)) {
       docs.unshift({
         id: Date.now(),
         name: docName,
         category: 'Inspection Report',
         property: address,
-        ownerVisible: ownerName ? 'yes' : 'no',
-        ownerName: ownerName,
+        owner: owner,
+        inspector: inspector,
+        date: dateVal,
+        score: scoreText,
+        grade: gradeLabel,
+        ownerVisible: owner ? 'yes' : 'no',
+        ownerName: owner,
         fileName: filename,
-        fileType: 'text/html',
-        fileSize: blob.size,
-        isImage: false,
-        isPDF: false,
+        fileType: 'html',
+        isHtml: true,
         dataUrl: e.target.result,
         uploadedAt: new Date().toISOString(),
-        uploadedBy: 'Property Manager',
-        inspectionScore: score,
-        inspectionGrade: gradeLabel,
       });
       saveVaultDocs(docs);
-      logActivity(`Inspection report saved to vault: ${address} (${gradeLabel} ${scoreText})`, '#8b5cf6');
-      toast(`Report downloaded & saved to Document Vault (${gradeLabel} · ${scoreText})`, 'success');
-    } else {
-      toast('Inspection report downloaded', 'success');
+      if (typeof renderVault === 'function') renderVault();
+      if (typeof showToast === 'function') showToast('Inspection report saved to vault ✅', 'ok');
     }
-    if (typeof renderVault === 'function') renderVault();
   };
   reader.readAsDataURL(blob);
 }
-
-// ═══════════════════════════════════════════════
-// REPAIR QUOTES
-// ═══════════════════════════════════════════════
-const QUOTE_CAT_ICONS = {
-  'Smoke Alarms':'🔴','Heating/Cooling':'🌡️','Plumbing':'🚿','Electrical':'⚡',
-  'Locks & Security':'🔒','Mould & Dampness':'🌿','Structural':'🏗️',
-  'General Maintenance':'🔧','Appliances':'🍳','Other':'📋'
-};
-
-let quoteFilter = 'all';
-let qSelectedFile = null;
-
 function getQuotes() { return S.get(KEY_QUOTES, []); }
 function saveQuotes(q) { S.set(KEY_QUOTES, q); }
 
