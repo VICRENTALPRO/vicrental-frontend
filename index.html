@@ -1636,10 +1636,45 @@ function launchPMApp() {
   }
   try { seedDemo(); } catch(e) { console.log('seedDemo skipped:', e.message); }
   try { showPage('dashboard'); } catch(e) { console.log('showPage error:', e.message); }
+  // Show notification if a doc was just received from owner portal
+  if (window._pendingVaultDoc) {
+    setTimeout(() => {
+      if (typeof showToast === 'function') showToast('📄 Document added to vault: ' + window._pendingVaultDoc, 'ok');
+      window._pendingVaultDoc = null;
+    }, 1500);
+  }
 }
 
 // Check existing session on load
 window.addEventListener('DOMContentLoaded', function() {
+  // Handle document pushed from owner portal via #vrdoc= hash
+  (function checkVaultDocHash() {
+    try {
+      const hash = window.location.hash;
+      if (!hash.startsWith('#vrdoc=')) return;
+      const payload = JSON.parse(decodeURIComponent(escape(atob(hash.slice(7)))));
+      window.history.replaceState(null, '', window.location.pathname);
+      if (payload.type === 'vault_doc' && payload.doc) {
+        const d = payload.doc;
+        const html = d.htmlContent || '';
+        delete d.htmlContent; // don't store large HTML in vault array
+        // Store HTML separately
+        if (html) localStorage.setItem('vault_html_' + d.id, html);
+        d.dataUrl = html ? 'data:text/html;charset=utf-8,' + encodeURIComponent(html) : '';
+        d.ownerVisible = true;
+        d.source = 'owner_portal';
+        // Save to PM vault
+        const vault = S.get(KEY_VAULT, []);
+        if (!vault.find(v => v.id === d.id)) {
+          vault.unshift(d);
+          S.set(KEY_VAULT, vault);
+        }
+        // Show notification after login
+        window._pendingVaultDoc = d.name;
+      }
+    } catch(e) { console.warn('vrdoc hash error:', e); }
+  })();
+
   const token = localStorage.getItem('vr_token');
   const user  = (() => { try { return JSON.parse(localStorage.getItem('vr_user') || 'null'); } catch { return null; } })();
   if (token && user && user.email) launchPMApp();
