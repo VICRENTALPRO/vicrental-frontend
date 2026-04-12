@@ -5024,11 +5024,25 @@ function renderVault() {
     }).slice(0,3).join(', ') || addr;
   };
 
-  // Group docs by property
+  // Normalise a property string to a consistent grouping key
+  const normaliseKey = function(addr) {
+    if (!addr) return NO_PROP;
+    return addr.split(',').map(function(p){ return p.trim(); }).filter(function(p){
+      return p && p !== 'Australia' && p !== 'Melbourne' &&
+        !/^(City|Shire|Municipality|Borough|Greater|Region) of /i.test(p) &&
+        !/^(Victoria|VIC)$/i.test(p.trim());
+    }).slice(0,3).join(', ').toLowerCase().replace(/\s+/g,' ').trim() || NO_PROP;
+  };
+
+  // Group docs by normalised property key, keep the raw address for display
   const groups = {};
+  const displayAddr = {};
   docs.forEach(function(doc) {
-    var key = (doc.property || '').trim() || NO_PROP;
-    if (!groups[key]) groups[key] = [];
+    var raw = (doc.property || '').trim();
+    var key = raw ? normaliseKey(raw) : NO_PROP;
+    if (!groups[key]) { groups[key] = []; displayAddr[key] = raw; }
+    // Prefer the longest/most complete address as the display value
+    if (raw.length > (displayAddr[key]||'').length) displayAddr[key] = raw;
     groups[key].push(doc);
   });
 
@@ -5044,7 +5058,7 @@ function renderVault() {
 
   sortedKeys.forEach(function(propKey) {
     var propDocs = groups[propKey];
-    var addr     = cleanAddr(propKey);
+    var addr     = cleanAddr(displayAddr[propKey] || propKey);
     var count    = propDocs.length;
     var tileId   = 'vtile_' + propKey.replace(/[^a-z0-9]/gi,'_').substring(0,30);
 
