@@ -7044,39 +7044,40 @@ function updateFinaliseDate(){const v=document.getElementById('clDate')?.value;c
 document.addEventListener('input',e=>{if(e.target?.id==='clDate')updateFinaliseDate();});
 document.addEventListener('DOMContentLoaded',()=>setTimeout(updateFinaliseDate,800));
 function finaliseChecklist(type){
+  console.log('finaliseChecklist called with type:', type);
+  try {
   const isNC=type==='noncompliant';
   const cbId=isNC?'clNonCompliantConfirm':'clFinaliseConfirm';
-  if(!document.getElementById(cbId)?.checked){alert('Please tick the confirmation box before finalising.');return;}
+  const cb = document.getElementById(cbId);
+  console.log('Checkbox element:', cb, 'checked:', cb?.checked);
+  if(!cb?.checked){alert('Please tick the confirmation box before finalising.');return;}
   const prop=(document.getElementById('clPropAddress')?.value||'').trim();
   const owner=(document.getElementById('clOwnerName')?.value||'').trim();
   const inspector=(document.getElementById('clInspector')?.value||'').trim();
   const dateVal=document.getElementById('clDate')?.value||new Date().toISOString().split('T')[0];
+  console.log('Fields:', {prop, owner, inspector, dateVal});
   const missing=[];
   if(!prop)missing.push('Property Address');
   if(!owner)missing.push('Owner Name');
   if(!inspector)missing.push('Inspector');
   if(missing.length){alert('Please complete:\n• '+missing.join('\n• '));return;}
 
-  // Read score/grade FIRST before using them
   const score=document.getElementById('clScoreVal')?.textContent||'—';
   const grade=document.getElementById('clScoreGrade')?.textContent||'';
+  console.log('Score/grade:', score, grade);
 
-  // Store cert data for registry push
   _lastCertData = {
-    property: prop,
-    certType: 'Inspection Report',
+    property: prop, certType: 'Inspection Report',
     status: isNC ? 'Non-Compliant' : 'Compliant',
-    date: dateVal,
-    grade: isNC ? 'Non-Compliant' : grade,
+    date: dateVal, grade: isNC ? 'Non-Compliant' : grade,
     score: score && score !== '—' ? score.replace('%','') : null,
-    inspector: inspector,
-    notes: null,
+    inspector: inspector, notes: null,
   };
 
-  // Generate the full detailed report
-  try { downloadInspectionReport(); } catch(e) { console.error('Report error:', e); toast('Report error: '+e.message,'error'); }
+  // Generate report — don't let this block the popup
+  try { downloadInspectionReport(); console.log('Report generated OK'); }
+  catch(e) { console.error('downloadInspectionReport failed:', e); toast('Report error: '+e.message,'error'); }
 
-  // Update property compliance status
   const props2=getManagedProps();
   const pi=props2.findIndex(p=>p.address?.toLowerCase()===prop.toLowerCase());
   if(pi!==-1){
@@ -7086,10 +7087,10 @@ function finaliseChecklist(type){
     saveManagedProps(props2);
   }
 
-  // Show vault confirmation popup
   const dateStr=new Date(dateVal).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});
   const sc=isNC?'#dc2626':'#16a34a';
   const popupModal=document.getElementById('vaultPopupModal');
+  console.log('Popup modal element:', popupModal);
   if(popupModal){
     document.getElementById('vaultPopupIcon').textContent=isNC?'⚠️':'✅';
     document.getElementById('vaultPopupTitle').textContent=isNC?'Non-Compliant Report Saved':'Compliant Report Saved';
@@ -7099,18 +7100,22 @@ function finaliseChecklist(type){
     document.getElementById('vaultPopupDate').textContent=dateStr;
     document.getElementById('vaultPopupScore').textContent=score+(grade?' — '+grade:'');
     document.getElementById('vaultPopupScore').style.color=sc;
-    document.getElementById('vaultPopupMsg').innerHTML='📁 Full inspection report downloaded and saved to <strong>Document Vault</strong> under <strong>'+prop+'</strong>. Includes all checklist items and photos. Visible to the owner in their portal.';
-    // Show registry push button, update its state based on login status
+    document.getElementById('vaultPopupMsg').innerHTML='📁 Full inspection report downloaded and saved to <strong>Document Vault</strong> under <strong>'+prop+'</strong>. Visible to the owner in their portal.';
     const regBtn=document.getElementById('vaultPopupRegBtn');
-    if(regBtn){
-      regBtn.style.display='';
-      regBtn.textContent = regUser ? '📤 Push to VIC Registry' : '📤 Push to VIC Registry (sign in required)';
-    }
-    const regStatus=document.getElementById('vaultPopupRegStatus');
-    if(regStatus) regStatus.textContent = regUser ? '✅ Signed in as '+( regProfile?.full_name||regUser.email) : 'Not signed in to registry — click to sign in first';
+    if(regBtn){ regBtn.style.display=''; regBtn.textContent='📤 Push to VIC Registry'; }
+    const regSt=document.getElementById('vaultPopupRegStatus');
+    if(regSt) regSt.textContent = regUser ? '✅ Signed in as '+(regProfile?.full_name||regUser.email) : '⚠️ Not signed in to registry — click button to sign in first';
     popupModal.style.display='flex';
+    console.log('Popup shown');
+  } else {
+    console.error('vaultPopupModal not found in DOM!');
+    toast(isNC?'Non-Compliant report saved':'Compliant report saved','success');
   }
-  if(typeof renderVault==='function')renderVault();
+  try { if(typeof renderVault==='function')renderVault(); } catch(e){}
+  } catch(e) {
+    console.error('finaliseChecklist outer error:', e);
+    toast('Error: '+e.message,'error');
+  }
 }
 function dismissVaultPopup(){document.getElementById('vaultPopupModal').style.display='none';const s=document.getElementById('vaultPopupRegStatus');if(s)s.textContent='';const b=document.getElementById('vaultPopupRegBtn');if(b)b.style.display='';}
 function renderCategories(){const container=document.getElementById('clCategories');if(!container)return;container.innerHTML=CATEGORIES.map((cat,ci)=>{const comp=cat.complianceType?buildComplianceSection(cat):'';const cleaning=cat.hasCleaningSection?buildCleaningSection():'';return `<div class="cat-accordion ${ci===0?'open':''}" id="cacc-${cat.id}"><div class="cat-head" onclick="toggleCat('${cat.id}')"><span class="cat-icon">${cat.icon}</span><div class="cat-info"><div class="cat-title">${cat.title}</div><div class="cat-sub">${cat.subtitle}</div></div><div class="cat-progress" id="catprog-${cat.id}"></div><span class="cat-chevron">▼</span></div><div class="cat-body" id="catbody-${cat.id}">${cat.items.map(item=>renderCheckItem(item,cat)).join('')}${comp}${cleaning}</div></div>`;}).join('');updateCatProgress();['electrical','gas','smoke'].forEach(restoreComplianceDates);restoreCleaningRecords();}
