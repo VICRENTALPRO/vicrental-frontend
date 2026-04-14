@@ -6626,6 +6626,85 @@ function toggleOwnerForm() {
 function renderImportPage() {}
 function seedDemo() {}
 
+
+
+document.addEventListener('input',e=>{if(e.target?.id==='clDate')updateFinaliseDate();});
+document.addEventListener('DOMContentLoaded',()=>setTimeout(updateFinaliseDate,800));
+function finaliseChecklist(type){
+  console.log('finaliseChecklist called with type:', type);
+  try {
+  const isNC=type==='noncompliant';
+  const cbId=isNC?'clNonCompliantConfirm':'clFinaliseConfirm';
+  const cb = document.getElementById(cbId);
+  console.log('Checkbox element:', cb, 'checked:', cb?.checked);
+  if(!cb?.checked){alert('Please tick the confirmation box before finalising.');return;}
+  const prop=(document.getElementById('clPropAddress')?.value||'').trim();
+  const owner=(document.getElementById('clOwnerName')?.value||'').trim();
+  const inspector=(document.getElementById('clInspector')?.value||'').trim();
+  const dateVal=document.getElementById('clDate')?.value||new Date().toISOString().split('T')[0];
+  console.log('Fields:', {prop, owner, inspector, dateVal});
+  const missing=[];
+  if(!prop)missing.push('Property Address');
+  if(!owner)missing.push('Owner Name');
+  if(!inspector)missing.push('Inspector');
+  if(missing.length){alert('Please complete:\n• '+missing.join('\n• '));return;}
+
+  const score=document.getElementById('clScoreVal')?.textContent||'—';
+  const grade=document.getElementById('clScoreGrade')?.textContent||'';
+  console.log('Score/grade:', score, grade);
+
+  _lastCertData = {
+    property: prop, certType: 'Inspection Report',
+    status: isNC ? 'Non-Compliant' : 'Compliant',
+    date: dateVal, grade: isNC ? 'Non-Compliant' : grade,
+    score: score && score !== '—' ? score.replace('%','') : null,
+    inspector: inspector, notes: null,
+  };
+
+  // Generate report — don't let this block the popup
+  try { downloadInspectionReport(); console.log('Report generated OK'); }
+  catch(e) { console.error('downloadInspectionReport failed:', e); toast('Report error: '+e.message,'error'); }
+
+  const props2=getManagedProps();
+  const pi=props2.findIndex(p=>p.address?.toLowerCase()===prop.toLowerCase());
+  if(pi!==-1){
+    props2[pi].lastInspectionDate=dateVal;
+    props2[pi].lastInspectionGrade=isNC?'❌ Non-Compliant':grade;
+    props2[pi].lastInspectionScore=score;
+    saveManagedProps(props2);
+  }
+
+  const dateStr=new Date(dateVal).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});
+  const sc=isNC?'#dc2626':'#16a34a';
+  const popupModal=document.getElementById('vaultPopupModal');
+  console.log('Popup modal element:', popupModal);
+  if(popupModal){
+    document.getElementById('vaultPopupIcon').textContent=isNC?'⚠️':'✅';
+    document.getElementById('vaultPopupTitle').textContent=isNC?'Non-Compliant Report Saved':'Compliant Report Saved';
+    document.getElementById('vaultPopupProp').textContent=prop;
+    document.getElementById('vaultPopupOwner').textContent=owner;
+    document.getElementById('vaultPopupInspector').textContent=inspector;
+    document.getElementById('vaultPopupDate').textContent=dateStr;
+    document.getElementById('vaultPopupScore').textContent=score+(grade?' — '+grade:'');
+    document.getElementById('vaultPopupScore').style.color=sc;
+    document.getElementById('vaultPopupMsg').innerHTML='📁 Full inspection report downloaded and saved to <strong>Document Vault</strong> under <strong>'+prop+'</strong>. Visible to the owner in their portal.';
+    const regBtn=document.getElementById('vaultPopupRegBtn');
+    if(regBtn){ regBtn.style.display=''; regBtn.textContent='📤 Push to VIC Registry'; }
+    const regSt=document.getElementById('vaultPopupRegStatus');
+    if(regSt) regSt.textContent = regUser ? '✅ Signed in as '+(regProfile?.full_name||regUser.email) : '⚠️ Not signed in to registry — click button to sign in first';
+    popupModal.style.display='flex';
+    console.log('Popup shown');
+  } else {
+    console.error('vaultPopupModal not found in DOM!');
+    toast(isNC?'Non-Compliant report saved':'Compliant report saved','success');
+  }
+  try { if(typeof renderVault==='function')renderVault(); } catch(e){}
+  } catch(e) {
+    console.error('finaliseChecklist outer error:', e);
+    toast('Error: '+e.message,'error');
+  }
+}
+
 </script>
 
 <!-- Edit Property Modal -->
@@ -7041,82 +7120,7 @@ async function pushJobToCRM(itemId) {
   }catch(e){sEl.style.background='#fee2e2';sEl.style.color='#dc2626';sEl.textContent='❌ Could not reach CRM.';}
 }
 function updateFinaliseDate(){const v=document.getElementById('clDate')?.value;const s=v?new Date(v).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'}):'—';['clFinaliseDate','clFinaliseDate2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=s;});}
-document.addEventListener('input',e=>{if(e.target?.id==='clDate')updateFinaliseDate();});
-document.addEventListener('DOMContentLoaded',()=>setTimeout(updateFinaliseDate,800));
-function finaliseChecklist(type){
-  console.log('finaliseChecklist called with type:', type);
-  try {
-  const isNC=type==='noncompliant';
-  const cbId=isNC?'clNonCompliantConfirm':'clFinaliseConfirm';
-  const cb = document.getElementById(cbId);
-  console.log('Checkbox element:', cb, 'checked:', cb?.checked);
-  if(!cb?.checked){alert('Please tick the confirmation box before finalising.');return;}
-  const prop=(document.getElementById('clPropAddress')?.value||'').trim();
-  const owner=(document.getElementById('clOwnerName')?.value||'').trim();
-  const inspector=(document.getElementById('clInspector')?.value||'').trim();
-  const dateVal=document.getElementById('clDate')?.value||new Date().toISOString().split('T')[0];
-  console.log('Fields:', {prop, owner, inspector, dateVal});
-  const missing=[];
-  if(!prop)missing.push('Property Address');
-  if(!owner)missing.push('Owner Name');
-  if(!inspector)missing.push('Inspector');
-  if(missing.length){alert('Please complete:\n• '+missing.join('\n• '));return;}
 
-  const score=document.getElementById('clScoreVal')?.textContent||'—';
-  const grade=document.getElementById('clScoreGrade')?.textContent||'';
-  console.log('Score/grade:', score, grade);
-
-  _lastCertData = {
-    property: prop, certType: 'Inspection Report',
-    status: isNC ? 'Non-Compliant' : 'Compliant',
-    date: dateVal, grade: isNC ? 'Non-Compliant' : grade,
-    score: score && score !== '—' ? score.replace('%','') : null,
-    inspector: inspector, notes: null,
-  };
-
-  // Generate report — don't let this block the popup
-  try { downloadInspectionReport(); console.log('Report generated OK'); }
-  catch(e) { console.error('downloadInspectionReport failed:', e); toast('Report error: '+e.message,'error'); }
-
-  const props2=getManagedProps();
-  const pi=props2.findIndex(p=>p.address?.toLowerCase()===prop.toLowerCase());
-  if(pi!==-1){
-    props2[pi].lastInspectionDate=dateVal;
-    props2[pi].lastInspectionGrade=isNC?'❌ Non-Compliant':grade;
-    props2[pi].lastInspectionScore=score;
-    saveManagedProps(props2);
-  }
-
-  const dateStr=new Date(dateVal).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});
-  const sc=isNC?'#dc2626':'#16a34a';
-  const popupModal=document.getElementById('vaultPopupModal');
-  console.log('Popup modal element:', popupModal);
-  if(popupModal){
-    document.getElementById('vaultPopupIcon').textContent=isNC?'⚠️':'✅';
-    document.getElementById('vaultPopupTitle').textContent=isNC?'Non-Compliant Report Saved':'Compliant Report Saved';
-    document.getElementById('vaultPopupProp').textContent=prop;
-    document.getElementById('vaultPopupOwner').textContent=owner;
-    document.getElementById('vaultPopupInspector').textContent=inspector;
-    document.getElementById('vaultPopupDate').textContent=dateStr;
-    document.getElementById('vaultPopupScore').textContent=score+(grade?' — '+grade:'');
-    document.getElementById('vaultPopupScore').style.color=sc;
-    document.getElementById('vaultPopupMsg').innerHTML='📁 Full inspection report downloaded and saved to <strong>Document Vault</strong> under <strong>'+prop+'</strong>. Visible to the owner in their portal.';
-    const regBtn=document.getElementById('vaultPopupRegBtn');
-    if(regBtn){ regBtn.style.display=''; regBtn.textContent='📤 Push to VIC Registry'; }
-    const regSt=document.getElementById('vaultPopupRegStatus');
-    if(regSt) regSt.textContent = regUser ? '✅ Signed in as '+(regProfile?.full_name||regUser.email) : '⚠️ Not signed in to registry — click button to sign in first';
-    popupModal.style.display='flex';
-    console.log('Popup shown');
-  } else {
-    console.error('vaultPopupModal not found in DOM!');
-    toast(isNC?'Non-Compliant report saved':'Compliant report saved','success');
-  }
-  try { if(typeof renderVault==='function')renderVault(); } catch(e){}
-  } catch(e) {
-    console.error('finaliseChecklist outer error:', e);
-    toast('Error: '+e.message,'error');
-  }
-}
 function dismissVaultPopup(){document.getElementById('vaultPopupModal').style.display='none';const s=document.getElementById('vaultPopupRegStatus');if(s)s.textContent='';const b=document.getElementById('vaultPopupRegBtn');if(b)b.style.display='';}
 function renderCategories(){const container=document.getElementById('clCategories');if(!container)return;container.innerHTML=CATEGORIES.map((cat,ci)=>{const comp=cat.complianceType?buildComplianceSection(cat):'';const cleaning=cat.hasCleaningSection?buildCleaningSection():'';return `<div class="cat-accordion ${ci===0?'open':''}" id="cacc-${cat.id}"><div class="cat-head" onclick="toggleCat('${cat.id}')"><span class="cat-icon">${cat.icon}</span><div class="cat-info"><div class="cat-title">${cat.title}</div><div class="cat-sub">${cat.subtitle}</div></div><div class="cat-progress" id="catprog-${cat.id}"></div><span class="cat-chevron">▼</span></div><div class="cat-body" id="catbody-${cat.id}">${cat.items.map(item=>renderCheckItem(item,cat)).join('')}${comp}${cleaning}</div></div>`;}).join('');updateCatProgress();['electrical','gas','smoke'].forEach(restoreComplianceDates);restoreCleaningRecords();}
 function buildComplianceSection(cat){const t=cat.complianceType,freq=t==='smoke'?'Every 12 months':'Every 2 years',label=t==='electrical'?'Electrical Safety':t==='gas'?'Gas Safety':'Smoke Alarm',col=t==='electrical'?'#f59e0b':t==='gas'?'#5BB8F5':'#dc2626',inp=`width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Montserrat',sans-serif;font-size:0.82rem;background:#fff;box-sizing:border-box;`;return `<div style="margin:12px 16px 16px;background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:16px;"><div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:12px;">📋 ${label} Compliance Record <span style="background:${col};color:#fff;border-radius:5px;padding:2px 8px;font-size:0.65rem;margin-left:6px;">${freq}</span></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;"><div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Date of Last Inspection</label><input type="date" id="comp_last_${t}" onchange="autoCalcNextDate('${t}')" style="${inp}"></div><div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Next Inspection Due</label><input type="date" id="comp_next_${t}" style="${inp}"></div><div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Company / Inspector</label><input type="text" id="comp_company_${t}" placeholder="e.g. Safe Gas Pty Ltd" oninput="saveComplianceDates('${t}')" style="${inp}"></div></div><button onclick="generateComplianceCert('${t}','${label}')" style="padding:8px 20px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📜 Generate ${label} Compliance Certificate</button></div>`;}
@@ -7181,6 +7185,8 @@ async function regSignOut() {
   toast('Signed out of Registry', 'info');
 }
 
+function closeRegLoginModal(){var m=document.getElementById("regLoginModal");if(m)m.remove();}
+
 function showRegLoginModal() {
   const existing = document.getElementById('regLoginModal');
   if (existing) existing.remove();
@@ -7190,7 +7196,7 @@ function showRegLoginModal() {
   modal.innerHTML = '<div style="background:#fff;border-radius:18px;padding:32px;width:100%;max-width:420px;box-shadow:0 24px 64px rgba(0,0,0,0.3);">' +
     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">' +
       '<div style="font-size:1rem;font-weight:800;color:#0A2F5C;">🏛️ Registry Sign In</div>' +
-      '<button onclick="document.getElementById('regLoginModal').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#64748b;">✕</button>' +
+      '<button onclick="closeRegLoginModal()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#64748b;">✕</button>' +
     '</div>' +
     '<div style="background:#eaf6fe;border:1px solid #5BB8F5;border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:0.8rem;color:#0A2F5C;line-height:1.6;">' +
       'Sign in to the VIC Compliance Registry to automatically push certificates when you generate them in VicRental Pro.' +
@@ -7199,7 +7205,7 @@ function showRegLoginModal() {
       '<input type="email" id="regLoginEmail" placeholder="your@email.com" style="width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:9px 13px;font-family:Montserrat,sans-serif;font-size:0.83rem;outline:none;">' +
     '</div>' +
     '<div style="margin-bottom:18px;"><label style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b;display:block;margin-bottom:5px;">Password</label>' +
-      '<input type="password" id="regLoginPwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doRegLogin()" style="width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:9px 13px;font-family:Montserrat,sans-serif;font-size:0.83rem;outline:none;">' +
+      '<input type="password" id="regLoginPwd" placeholder="••••••••" style="width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:9px 13px;font-family:Montserrat,sans-serif;font-size:0.83rem;outline:none;">' +
     '</div>' +
     '<div id="regLoginMsg" style="display:none;margin-bottom:12px;padding:9px 13px;border-radius:8px;font-size:0.8rem;font-weight:600;"></div>' +
     '<button onclick="doRegLogin()" style="width:100%;padding:11px;background:#0A2F5C;color:#fff;border:none;border-radius:9px;font-size:0.88rem;font-weight:700;cursor:pointer;font-family:Montserrat,sans-serif;">Sign In to Registry →</button>' +
