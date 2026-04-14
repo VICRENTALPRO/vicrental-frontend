@@ -7057,21 +7057,26 @@ function finaliseChecklist(type){
   if(!inspector)missing.push('Inspector');
   if(missing.length){alert('Please complete:\n• '+missing.join('\n• '));return;}
 
-  // Use the full detailed report generator — includes all checklist items and photos
-  downloadInspectionReport();
-
-  // Store cert data for registry push (shown in vault popup)
-  _lastCertData = {
-    property: prop, certType: 'Inspection Report',
-    status: isNC ? 'Non-Compliant' : 'Compliant',
-    date: dateVal, grade: isNC ? 'Non-Compliant' : grade,
-    score: score ? score.replace('%','') : null,
-    inspector: inspector, notes: null,
-  };
-
-  // Update property compliance status
+  // Read score/grade FIRST before using them
   const score=document.getElementById('clScoreVal')?.textContent||'—';
   const grade=document.getElementById('clScoreGrade')?.textContent||'';
+
+  // Store cert data for registry push
+  _lastCertData = {
+    property: prop,
+    certType: 'Inspection Report',
+    status: isNC ? 'Non-Compliant' : 'Compliant',
+    date: dateVal,
+    grade: isNC ? 'Non-Compliant' : grade,
+    score: score && score !== '—' ? score.replace('%','') : null,
+    inspector: inspector,
+    notes: null,
+  };
+
+  // Generate the full detailed report
+  try { downloadInspectionReport(); } catch(e) { console.error('Report error:', e); toast('Report error: '+e.message,'error'); }
+
+  // Update property compliance status
   const props2=getManagedProps();
   const pi=props2.findIndex(p=>p.address?.toLowerCase()===prop.toLowerCase());
   if(pi!==-1){
@@ -7095,6 +7100,14 @@ function finaliseChecklist(type){
     document.getElementById('vaultPopupScore').textContent=score+(grade?' — '+grade:'');
     document.getElementById('vaultPopupScore').style.color=sc;
     document.getElementById('vaultPopupMsg').innerHTML='📁 Full inspection report downloaded and saved to <strong>Document Vault</strong> under <strong>'+prop+'</strong>. Includes all checklist items and photos. Visible to the owner in their portal.';
+    // Show registry push button, update its state based on login status
+    const regBtn=document.getElementById('vaultPopupRegBtn');
+    if(regBtn){
+      regBtn.style.display='';
+      regBtn.textContent = regUser ? '📤 Push to VIC Registry' : '📤 Push to VIC Registry (sign in required)';
+    }
+    const regStatus=document.getElementById('vaultPopupRegStatus');
+    if(regStatus) regStatus.textContent = regUser ? '✅ Signed in as '+( regProfile?.full_name||regUser.email) : 'Not signed in to registry — click to sign in first';
     popupModal.style.display='flex';
   }
   if(typeof renderVault==='function')renderVault();
