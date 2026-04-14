@@ -1573,6 +1573,7 @@ body {
 <script>
 const API_BASE = 'https://vicrental-backend1-production.up.railway.app/api';
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -1636,6 +1637,9 @@ function launchPMApp() {
   }
   try { seedDemo(); } catch(e) { console.log('seedDemo skipped:', e.message); }
   try { showPage('dashboard'); } catch(e) { console.log('showPage error:', e.message); }
+  // Init registry connection
+  const rBar=document.getElementById('regStatusBar');if(rBar)rBar.style.display='';
+  regCheckSession().then(()=>updateRegStatus());
   // Show notification if a doc was just received from owner portal
   if (window._pendingVaultDoc) {
     setTimeout(() => {
@@ -2822,7 +2826,7 @@ function showPage(id) {
 
   // Render page
   if (id === 'dashboard') { loadTenantReqs().then(() => renderDashboard()); renderDashboard(); }
-  else if (id === 'portal') { autoSyncAllPropsToOwnerPortal(); renderPortal(); }
+  else if (id === 'portal') { autoSyncAllPropsToOwnerPortal(); renderPortal(); showRegistryPage(); }
   else if (id === 'workorders') renderWOs();
   else if (id === 'properties') renderProperties();
   else if (id === 'reports') renderReports();
@@ -7056,6 +7060,15 @@ function finaliseChecklist(type){
   // Use the full detailed report generator — includes all checklist items and photos
   downloadInspectionReport();
 
+  // Store cert data for registry push (shown in vault popup)
+  _lastCertData = {
+    property: prop, certType: 'Inspection Report',
+    status: isNC ? 'Non-Compliant' : 'Compliant',
+    date: dateVal, grade: isNC ? 'Non-Compliant' : grade,
+    score: score ? score.replace('%','') : null,
+    inspector: inspector, notes: null,
+  };
+
   // Update property compliance status
   const score=document.getElementById('clScoreVal')?.textContent||'—';
   const grade=document.getElementById('clScoreGrade')?.textContent||'';
@@ -7086,18 +7099,175 @@ function finaliseChecklist(type){
   }
   if(typeof renderVault==='function')renderVault();
 }
-function dismissVaultPopup(){document.getElementById('vaultPopupModal').style.display='none';}
+function dismissVaultPopup(){document.getElementById('vaultPopupModal').style.display='none';const s=document.getElementById('vaultPopupRegStatus');if(s)s.textContent='';const b=document.getElementById('vaultPopupRegBtn');if(b)b.style.display='';}
 function renderCategories(){const container=document.getElementById('clCategories');if(!container)return;container.innerHTML=CATEGORIES.map((cat,ci)=>{const comp=cat.complianceType?buildComplianceSection(cat):'';const cleaning=cat.hasCleaningSection?buildCleaningSection():'';return `<div class="cat-accordion ${ci===0?'open':''}" id="cacc-${cat.id}"><div class="cat-head" onclick="toggleCat('${cat.id}')"><span class="cat-icon">${cat.icon}</span><div class="cat-info"><div class="cat-title">${cat.title}</div><div class="cat-sub">${cat.subtitle}</div></div><div class="cat-progress" id="catprog-${cat.id}"></div><span class="cat-chevron">▼</span></div><div class="cat-body" id="catbody-${cat.id}">${cat.items.map(item=>renderCheckItem(item,cat)).join('')}${comp}${cleaning}</div></div>`;}).join('');updateCatProgress();['electrical','gas','smoke'].forEach(restoreComplianceDates);restoreCleaningRecords();}
 function buildComplianceSection(cat){const t=cat.complianceType,freq=t==='smoke'?'Every 12 months':'Every 2 years',label=t==='electrical'?'Electrical Safety':t==='gas'?'Gas Safety':'Smoke Alarm',col=t==='electrical'?'#f59e0b':t==='gas'?'#5BB8F5':'#dc2626',inp=`width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Montserrat',sans-serif;font-size:0.82rem;background:#fff;box-sizing:border-box;`;return `<div style="margin:12px 16px 16px;background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:16px;"><div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:12px;">📋 ${label} Compliance Record <span style="background:${col};color:#fff;border-radius:5px;padding:2px 8px;font-size:0.65rem;margin-left:6px;">${freq}</span></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;"><div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Date of Last Inspection</label><input type="date" id="comp_last_${t}" onchange="autoCalcNextDate('${t}')" style="${inp}"></div><div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Next Inspection Due</label><input type="date" id="comp_next_${t}" style="${inp}"></div><div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;">Company / Inspector</label><input type="text" id="comp_company_${t}" placeholder="e.g. Safe Gas Pty Ltd" oninput="saveComplianceDates('${t}')" style="${inp}"></div></div><button onclick="generateComplianceCert('${t}','${label}')" style="padding:8px 20px;background:#0A2F5C;color:#fff;border:none;border-radius:8px;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📜 Generate ${label} Compliance Certificate</button></div>`;}
 function buildCleaningSection(){const i=`width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Montserrat',sans-serif;font-size:0.82rem;background:#fff;box-sizing:border-box;`;return `<div style="margin:12px 16px 16px;background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:16px;"><div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:14px;">🧹 Cleaning Records</div><div style="background:#fff;border:1px solid var(--border);border-radius:9px;padding:14px;margin-bottom:12px;"><div style="font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:10px;">🏠 Professional Property Clean</div><div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:12px;align-items:center;"><label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;font-weight:600;cursor:pointer;"><input type="checkbox" id="clean_prof_done" onchange="saveCleaningRecords()" style="width:16px;height:16px;accent-color:#0A2F5C;"> Completed</label><div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Date of Clean</label><input type="date" id="clean_prof_date" onchange="saveCleaningRecords()" style="${i}"></div><div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Company</label><input type="text" id="clean_prof_company" placeholder="e.g. CleanPro" oninput="saveCleaningRecords()" style="${i}"></div><div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Receipt</label><label style="display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px dashed var(--border);border-radius:7px;cursor:pointer;background:#fafafa;font-size:0.78rem;color:var(--muted);">📎 Upload<input type="file" accept="image/*,.pdf" style="display:none;" onchange="handleCleaningReceipt(event,'prof')"></label><div id="clean_prof_receipt_name" style="font-size:0.7rem;color:#16a34a;margin-top:3px;"></div></div></div><div id="clean_prof_receipt_preview" style="margin-top:6px;"></div></div><div style="background:#fff;border:1px solid var(--border);border-radius:9px;padding:14px;"><div style="font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:10px;">🪣 Carpet Steam Clean</div><div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:12px;align-items:center;"><label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;font-weight:600;cursor:pointer;"><input type="checkbox" id="clean_carpet_done" onchange="saveCleaningRecords()" style="width:16px;height:16px;accent-color:#0A2F5C;"> Completed</label><div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Date of Clean</label><input type="date" id="clean_carpet_date" onchange="saveCleaningRecords()" style="${i}"></div><div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Company</label><input type="text" id="clean_carpet_company" placeholder="e.g. Steam King" oninput="saveCleaningRecords()" style="${i}"></div><div><label style="font-size:0.7rem;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Receipt</label><label style="display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px dashed var(--border);border-radius:7px;cursor:pointer;background:#fafafa;font-size:0.78rem;color:var(--muted);">📎 Upload<input type="file" accept="image/*,.pdf" style="display:none;" onchange="handleCleaningReceipt(event,'carpet')"></label><div id="clean_carpet_receipt_name" style="font-size:0.7rem;color:#16a34a;margin-top:3px;"></div></div></div><div id="clean_carpet_receipt_preview" style="margin-top:6px;"></div></div></div>`;}
 function autoCalcNextDate(t){const last=document.getElementById('comp_last_'+t)?.value;const nextEl=document.getElementById('comp_next_'+t);if(!last||!nextEl)return;const d=new Date(last);d.setMonth(d.getMonth()+(t==='smoke'?12:24));nextEl.value=d.toISOString().split('T')[0];saveComplianceDates(t);}
 function saveComplianceDates(t){localStorage.setItem('vicrental_comp_'+t,JSON.stringify({last:document.getElementById('comp_last_'+t)?.value||'',next:document.getElementById('comp_next_'+t)?.value||'',company:document.getElementById('comp_company_'+t)?.value||''}));}
 function restoreComplianceDates(t){try{const d=JSON.parse(localStorage.getItem('vicrental_comp_'+t)||'null');if(!d)return;['last','next','company'].forEach(f=>{const el=document.getElementById('comp_'+f+'_'+t);if(el&&d[f])el.value=d[f];});}catch(e){}}
-function generateComplianceCert(type,typeLabel){const prop=(document.getElementById('clPropAddress')?.value||'').trim();const owner=(document.getElementById('clOwnerName')?.value||'').trim();const lastDate=document.getElementById('comp_last_'+type)?.value||'';const nextDate=document.getElementById('comp_next_'+type)?.value||'';const company=document.getElementById('comp_company_'+type)?.value||'';if(!prop){alert('Please enter the Property Address.');return;}if(!lastDate){alert('Please enter the Date of Last Inspection.');return;}if(!company){alert('Please enter the Company / Inspector name.');return;}const fmt=iso=>iso?new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'}):'—';const freq=type==='smoke'?'Every 12 months':'Every 2 years';const today=new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});const col=type==='electrical'?'#f59e0b':type==='gas'?'#0A2F5C':'#dc2626';const certId='CERT-'+type.toUpperCase()+'-'+Date.now();const certHtml=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${typeLabel} Certificate</title><style>body{font-family:Arial,sans-serif;margin:40px;color:#1a1a2e;}.hdr{display:flex;align-items:center;justify-content:space-between;border-bottom:4px solid #0A2F5C;padding-bottom:16px;margin-bottom:24px;}.logo{font-size:22px;font-weight:800;color:#0A2F5C;}.logo span{color:#5BB8F5;}.badge{background:${col};color:#fff;padding:6px 16px;border-radius:8px;font-weight:700;}.ok{background:#dcfce7;border:2px solid #16a34a;border-radius:10px;padding:16px;text-align:center;margin:20px 0;}.ok-text{font-size:22px;font-weight:800;color:#16a34a;}.sec{background:#f0f4f8;border-radius:10px;padding:16px 20px;margin-bottom:16px;}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0;}.row:last-child{border-bottom:none;}.lbl{font-size:11px;color:#666;font-weight:600;text-transform:uppercase;}.val{font-size:13px;font-weight:700;color:#0A2F5C;}.footer{margin-top:32px;border-top:2px solid #0A2F5C;padding-top:16px;font-size:11px;color:#888;}</style></head><body><div class="hdr"><div><div class="logo">Vic<span>Rental</span> PRO</div></div><div class="badge">${typeLabel} Compliance Certificate</div></div><div class="ok"><div class="ok-text">✅ COMPLIANT</div></div><div class="sec"><div class="row"><span class="lbl">Property</span><span class="val">${prop}</span></div><div class="row"><span class="lbl">Owner</span><span class="val">${owner||'—'}</span></div></div><div class="sec"><div class="row"><span class="lbl">Date of Inspection</span><span class="val">${fmt(lastDate)}</span></div><div class="row"><span class="lbl">Next Due</span><span class="val">${fmt(nextDate)}</span></div><div class="row"><span class="lbl">Frequency</span><span class="val">${freq}</span></div><div class="row"><span class="lbl">Company / Inspector</span><span class="val">${company}</span></div></div><div class="footer">Generated: ${today} via VicRental Pro · ${certId}</div></body></html>`;const dataUrl='data:text/html;charset=utf-8,'+encodeURIComponent(certHtml);const blob=new Blob([certHtml],{type:'text/html;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=typeLabel.replace(/\s/g,'_')+'_Certificate.html';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);const vault=S.get(KEY_VAULT,[]);vault.unshift({id:certId,name:typeLabel+' Compliance Certificate — '+prop,type:'compliance_cert',category:'Compliance Certificate',fileName:typeLabel.replace(/\s/g,'_')+'_Certificate.html',property:prop,owner:owner||'',date:lastDate,nextDue:nextDate,company,uploadedAt:new Date().toISOString(),ownerVisible:true,fileType:'html',isHtml:true,dataUrl});S.set(KEY_VAULT,vault);if(typeof showToast==='function')showToast(typeLabel+' certificate saved to vault ✅','ok');if(typeof renderVault==='function')renderVault();}
+function generateComplianceCert(type,typeLabel){const prop=(document.getElementById('clPropAddress')?.value||'').trim();const owner=(document.getElementById('clOwnerName')?.value||'').trim();const lastDate=document.getElementById('comp_last_'+type)?.value||'';const nextDate=document.getElementById('comp_next_'+type)?.value||'';const company=document.getElementById('comp_company_'+type)?.value||'';if(!prop){alert('Please enter the Property Address.');return;}if(!lastDate){alert('Please enter the Date of Last Inspection.');return;}if(!company){alert('Please enter the Company / Inspector name.');return;}const fmt=iso=>iso?new Date(iso).toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'}):'—';const freq=type==='smoke'?'Every 12 months':'Every 2 years';const today=new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'long',year:'numeric'});const col=type==='electrical'?'#f59e0b':type==='gas'?'#0A2F5C':'#dc2626';const certId='CERT-'+type.toUpperCase()+'-'+Date.now();const certHtml=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${typeLabel} Certificate</title><style>body{font-family:Arial,sans-serif;margin:40px;color:#1a1a2e;}.hdr{display:flex;align-items:center;justify-content:space-between;border-bottom:4px solid #0A2F5C;padding-bottom:16px;margin-bottom:24px;}.logo{font-size:22px;font-weight:800;color:#0A2F5C;}.logo span{color:#5BB8F5;}.badge{background:${col};color:#fff;padding:6px 16px;border-radius:8px;font-weight:700;}.ok{background:#dcfce7;border:2px solid #16a34a;border-radius:10px;padding:16px;text-align:center;margin:20px 0;}.ok-text{font-size:22px;font-weight:800;color:#16a34a;}.sec{background:#f0f4f8;border-radius:10px;padding:16px 20px;margin-bottom:16px;}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e2e8f0;}.row:last-child{border-bottom:none;}.lbl{font-size:11px;color:#666;font-weight:600;text-transform:uppercase;}.val{font-size:13px;font-weight:700;color:#0A2F5C;}.footer{margin-top:32px;border-top:2px solid #0A2F5C;padding-top:16px;font-size:11px;color:#888;}</style></head><body><div class="hdr"><div><div class="logo">Vic<span>Rental</span> PRO</div></div><div class="badge">${typeLabel} Compliance Certificate</div></div><div class="ok"><div class="ok-text">✅ COMPLIANT</div></div><div class="sec"><div class="row"><span class="lbl">Property</span><span class="val">${prop}</span></div><div class="row"><span class="lbl">Owner</span><span class="val">${owner||'—'}</span></div></div><div class="sec"><div class="row"><span class="lbl">Date of Inspection</span><span class="val">${fmt(lastDate)}</span></div><div class="row"><span class="lbl">Next Due</span><span class="val">${fmt(nextDate)}</span></div><div class="row"><span class="lbl">Frequency</span><span class="val">${freq}</span></div><div class="row"><span class="lbl">Company / Inspector</span><span class="val">${company}</span></div></div><div class="footer">Generated: ${today} via VicRental Pro · ${certId}</div></body></html>`;const dataUrl='data:text/html;charset=utf-8,'+encodeURIComponent(certHtml);const blob=new Blob([certHtml],{type:'text/html;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=typeLabel.replace(/\s/g,'_')+'_Certificate.html';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);const vault=S.get(KEY_VAULT,[]);vault.unshift({id:certId,name:typeLabel+' Compliance Certificate — '+prop,type:'compliance_cert',category:'Compliance Certificate',fileName:typeLabel.replace(/\s/g,'_')+'_Certificate.html',property:prop,owner:owner||'',date:lastDate,nextDue:nextDate,company,uploadedAt:new Date().toISOString(),ownerVisible:true,fileType:'html',isHtml:true,dataUrl});S.set(KEY_VAULT,vault);if(typeof showToast==='function')showToast(typeLabel+' certificate saved to vault ✅','ok');if(typeof renderVault==='function')renderVault();_lastCertData={property:prop,certType:typeLabel,status:'Compliant',date:lastDate,nextDue:nextDate||null,company:company||null,notes:null};const rBar=document.getElementById('regStatusBar');if(rBar){rBar.style.display='';updateRegStatus();}}
 function handleCleaningReceipt(event,type){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const dataUrl=e.target.result;const n=document.getElementById('clean_'+type+'_receipt_name');const p=document.getElementById('clean_'+type+'_receipt_preview');if(n)n.textContent='✅ '+file.name;if(p)p.innerHTML=file.type.startsWith('image/')?`<img src="${dataUrl}" style="max-width:200px;max-height:120px;border-radius:6px;border:1px solid var(--border);">`:`<div style="font-size:0.78rem;color:var(--muted);padding:6px 10px;background:#f8fafc;border-radius:6px;">📄 ${file.name}</div>`;const c=JSON.parse(localStorage.getItem('vicrental_cleaning')||'{}');c[type+'_receipt']={name:file.name,dataUrl,type:file.type};localStorage.setItem('vicrental_cleaning',JSON.stringify(c));};reader.readAsDataURL(file);}
 function saveCleaningRecords(){const d={prof_done:document.getElementById('clean_prof_done')?.checked||false,prof_date:document.getElementById('clean_prof_date')?.value||'',prof_company:document.getElementById('clean_prof_company')?.value||'',carpet_done:document.getElementById('clean_carpet_done')?.checked||false,carpet_date:document.getElementById('clean_carpet_date')?.value||'',carpet_company:document.getElementById('clean_carpet_company')?.value||''};const e=JSON.parse(localStorage.getItem('vicrental_cleaning')||'{}');localStorage.setItem('vicrental_cleaning',JSON.stringify({...e,...d}));}
 function restoreCleaningRecords(){try{const d=JSON.parse(localStorage.getItem('vicrental_cleaning')||'{}');const set=(id,val)=>{const el=document.getElementById(id);if(el){if(typeof val==='boolean')el.checked=val;else el.value=val;}};set('clean_prof_done',d.prof_done||false);set('clean_prof_date',d.prof_date||'');set('clean_prof_company',d.prof_company||'');set('clean_carpet_done',d.carpet_done||false);set('clean_carpet_date',d.carpet_date||'');set('clean_carpet_company',d.carpet_company||'');['prof','carpet'].forEach(type=>{const r=d[type+'_receipt'];if(!r)return;const n=document.getElementById('clean_'+type+'_receipt_name');const p=document.getElementById('clean_'+type+'_receipt_preview');if(n)n.textContent='✅ '+r.name;if(p)p.innerHTML=r.type?.startsWith('image/')?`<img src="${r.dataUrl}" style="max-width:200px;max-height:120px;border-radius:6px;border:1px solid var(--border);">`:`<div style="font-size:0.78rem;color:var(--muted);padding:6px 10px;background:#f8fafc;border-radius:6px;">📄 ${r.name}</div>`;});}catch(e){}}
 function closePropSummary(){document.getElementById('propSummaryModal').style.display='none';}
+
+// ═══════════════════════════════════════════════════════════════════════
+// VIC COMPLIANCE REGISTRY INTEGRATION
+// ═══════════════════════════════════════════════════════════════════════
+const REG_URL  = 'https://yrcsbqozmlwydllwhtuc.supabase.co';
+const REG_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyY3NicW96bWx3eWRsbHdodHVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzk3MTIsImV4cCI6MjA5MTY1NTcxMn0.9eGdKS0t5zZvPR5krB0sX3yxNPh0CDLKiYqqWVTOQdQ';
+let regClient = null;
+let regUser   = null;
+let regProfile = null;
+
+function getRegClient() {
+  if (!regClient && window.supabase) {
+    regClient = window.supabase.createClient(REG_URL, REG_ANON);
+  }
+  return regClient;
+}
+
+function normAddr(addr) {
+  if (!addr) return '';
+  return addr.split(',').map(p=>p.trim()).filter(p=>p&&p.toUpperCase()!=='AUSTRALIA'&&p.toUpperCase()!=='MELBOURNE'&&!/^(City|Shire|Municipality|Greater|Region) of /i.test(p)&&!/^(Victoria|VIC)$/i.test(p.trim())).slice(0,3).join(', ').toLowerCase().replace(/\s+/g,' ').trim();
+}
+
+async function regCheckSession() {
+  const sb = getRegClient();
+  if (!sb) return;
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) {
+    regUser = session.user;
+    const { data } = await sb.from('registry_users').select('*').eq('id', session.user.id).single();
+    regProfile = data;
+    updateRegStatus();
+  }
+}
+
+function updateRegStatus() {
+  const el = document.getElementById('regStatusBar');
+  if (!el) return;
+  if (regUser) {
+    el.innerHTML = '<span style="color:#16a34a;font-weight:700;">✅ Connected to Registry</span> as <strong>' + (regProfile?.full_name || regUser.email) + '</strong> · <a href="#" onclick="regSignOut()" style="color:var(--navy);font-size:0.78rem;">Sign out</a>';
+  } else {
+    el.innerHTML = '<span style="color:#64748b;">Not connected.</span> <a href="#" onclick="showRegLoginModal()" style="color:var(--navy);font-weight:700;">Sign in to Registry →</a>';
+  }
+}
+
+async function regSignOut() {
+  const sb = getRegClient();
+  if (sb) await sb.auth.signOut();
+  regUser = null; regProfile = null;
+  updateRegStatus();
+  toast('Signed out of Registry', 'info');
+}
+
+function showRegLoginModal() {
+  const existing = document.getElementById('regLoginModal');
+  if (existing) existing.remove();
+  const modal = document.createElement('div');
+  modal.id = 'regLoginModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9800;display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.innerHTML = '<div style="background:#fff;border-radius:18px;padding:32px;width:100%;max-width:420px;box-shadow:0 24px 64px rgba(0,0,0,0.3);">' +
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">' +
+      '<div style="font-size:1rem;font-weight:800;color:#0A2F5C;">🏛️ Registry Sign In</div>' +
+      '<button onclick="document.getElementById('regLoginModal').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#64748b;">✕</button>' +
+    '</div>' +
+    '<div style="background:#eaf6fe;border:1px solid #5BB8F5;border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:0.8rem;color:#0A2F5C;line-height:1.6;">' +
+      'Sign in to the VIC Compliance Registry to automatically push certificates when you generate them in VicRental Pro.' +
+    '</div>' +
+    '<div style="margin-bottom:12px;"><label style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b;display:block;margin-bottom:5px;">Email</label>' +
+      '<input type="email" id="regLoginEmail" placeholder="your@email.com" style="width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:9px 13px;font-family:Montserrat,sans-serif;font-size:0.83rem;outline:none;">' +
+    '</div>' +
+    '<div style="margin-bottom:18px;"><label style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b;display:block;margin-bottom:5px;">Password</label>' +
+      '<input type="password" id="regLoginPwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doRegLogin()" style="width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:9px 13px;font-family:Montserrat,sans-serif;font-size:0.83rem;outline:none;">' +
+    '</div>' +
+    '<div id="regLoginMsg" style="display:none;margin-bottom:12px;padding:9px 13px;border-radius:8px;font-size:0.8rem;font-weight:600;"></div>' +
+    '<button onclick="doRegLogin()" style="width:100%;padding:11px;background:#0A2F5C;color:#fff;border:none;border-radius:9px;font-size:0.88rem;font-weight:700;cursor:pointer;font-family:Montserrat,sans-serif;">Sign In to Registry →</button>' +
+  '</div>';
+  document.body.appendChild(modal);
+}
+
+async function doRegLogin() {
+  const email = document.getElementById('regLoginEmail')?.value.trim();
+  const pwd   = document.getElementById('regLoginPwd')?.value;
+  const msgEl = document.getElementById('regLoginMsg');
+  if (!email || !pwd) { if(msgEl){msgEl.textContent='Please enter email and password';msgEl.style.display='';msgEl.style.background='#fee2e2';msgEl.style.color='#dc2626';} return; }
+  if(msgEl){msgEl.textContent='Signing in…';msgEl.style.display='';msgEl.style.background='#eaf6fe';msgEl.style.color='#0A2F5C';}
+  const sb = getRegClient();
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pwd });
+  if (error) { if(msgEl){msgEl.textContent='Error: '+error.message;msgEl.style.background='#fee2e2';msgEl.style.color='#dc2626';} return; }
+  regUser = data.user;
+  const { data: prof } = await sb.from('registry_users').select('*').eq('id', data.user.id).single();
+  regProfile = prof;
+  updateRegStatus();
+  document.getElementById('regLoginModal')?.remove();
+  toast('✅ Connected to VIC Compliance Registry', 'success');
+}
+
+// Store last generated cert for registry push
+let _lastCertData = null;
+
+function pushCurrentCertToRegistry() {
+  if (!_lastCertData) { toast('No certificate data available to push', 'error'); return; }
+  const statusEl = document.getElementById('vaultPopupRegStatus');
+  if (statusEl) statusEl.textContent = 'Pushing to registry…';
+  pushToRegistry(_lastCertData).then(ok => {
+    if (ok && statusEl) {
+      statusEl.innerHTML = '✅ <strong>Pushed to VIC Compliance Registry</strong>';
+      document.getElementById('vaultPopupRegBtn').style.display = 'none';
+    }
+  });
+}
+
+function showRegistryPage() {
+  // Show registry connect panel in owner portal page
+  const el = document.getElementById('regConnectPanel');
+  if (el) {
+    el.style.display = '';
+    const bar = document.getElementById('regStatusBar');
+    if (bar) bar.style.display = '';
+    updateRegStatus();
+  }
+}
+
+async function pushToRegistry(certData) {
+  if (!regUser) {
+    // Prompt login first, then push after
+    window._pendingRegistryPush = certData;
+    showRegLoginModal();
+    // After login, auto-push
+    const origClose = doRegLogin;
+    return;
+  }
+  const sb = getRegClient();
+  const rec = {
+    property_address:            certData.property,
+    property_address_normalised: normAddr(certData.property),
+    cert_type:           certData.certType,
+    status:              certData.status || 'Compliant',
+    cert_date:           certData.date   || new Date().toISOString().split('T')[0],
+    next_due:            certData.nextDue || null,
+    company:             certData.company || null,
+    score:               certData.score   ? parseInt(certData.score) : null,
+    grade:               certData.grade   || null,
+    notes:               certData.notes   || null,
+    submitted_by:        regUser.id,
+    submitted_by_agency: regProfile?.agency_name || null,
+  };
+  const { error } = await sb.from('compliance_records').insert(rec);
+  if (error) {
+    toast('Registry push failed: ' + error.message, 'error');
+    return false;
+  }
+  toast('✅ Certificate pushed to VIC Compliance Registry', 'success');
+  return true;
+}
+
+// Auto-push any pending cert after login
+const _origDoRegLogin = doRegLogin;
+
 </script>
 
 <!-- Vault Popup Modal -->
@@ -7110,7 +7280,11 @@ function closePropSummary(){document.getElementById('propSummaryModal').style.di
       Owner: <strong id="vaultPopupOwner"></strong><br>Inspector: <strong id="vaultPopupInspector"></strong><br>Date: <strong id="vaultPopupDate"></strong><br>Result: <strong id="vaultPopupScore"></strong>
     </div>
     <div id="vaultPopupMsg" style="font-size:0.83rem;color:var(--text);line-height:1.6;margin-bottom:22px;text-align:left;"></div>
-    <button onclick="dismissVaultPopup()" style="padding:10px 28px;background:var(--navy);color:#fff;border:none;border-radius:9px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;font-weight:700;">OK — Close</button>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button onclick="dismissVaultPopup()" style="padding:10px 24px;background:#f0f4f8;color:#0A2F5C;border:1px solid #e2e8f0;border-radius:9px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;font-weight:700;">OK — Close</button>
+      <button id="vaultPopupRegBtn" onclick="pushCurrentCertToRegistry()" style="padding:10px 24px;background:#0A2F5C;color:#fff;border:none;border-radius:9px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.85rem;font-weight:700;">📤 Push to VIC Registry</button>
+    </div>
+    <div id="vaultPopupRegStatus" style="margin-top:10px;font-size:0.75rem;color:#64748b;text-align:center;"></div>
   </div>
 </div>
 </body>
