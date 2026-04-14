@@ -7226,71 +7226,102 @@ async function doRegLogin() {
   const { data: prof } = await sb.from('registry_users').select('*').eq('id', data.user.id).single();
   regProfile = prof;
   updateRegStatus();
-  document.getElementById('regLoginModal')?.remove();
+  closeRegLoginModal();
   toast('✅ Connected to VIC Compliance Registry', 'success');
+
+  // Auto-push any pending cert
+  if (window._pendingRegistryPush) {
+    var pending = window._pendingRegistryPush;
+    window._pendingRegistryPush = null;
+    var ok = await pushToRegistry(pending);
+    if (ok) {
+      var statusEl = document.getElementById('vaultPopupRegStatus');
+      var regBtn   = document.getElementById('vaultPopupRegBtn');
+      if (statusEl) statusEl.innerHTML = '✅ <strong>Pushed to VIC Compliance Registry</strong>';
+      if (regBtn)   regBtn.style.display = 'none';
+    }
+  }
 }
 
 // Store last generated cert for registry push
 let _lastCertData = null;
 
 function pushCurrentCertToRegistry() {
-  if (!_lastCertData) { toast('No certificate data available to push', 'error'); return; }
   const statusEl = document.getElementById('vaultPopupRegStatus');
-  if (statusEl) statusEl.textContent = 'Pushing to registry…';
-  pushToRegistry(_lastCertData).then(ok => {
-    if (ok && statusEl) {
-      statusEl.innerHTML = '✅ <strong>Pushed to VIC Compliance Registry</strong>';
-      document.getElementById('vaultPopupRegBtn').style.display = 'none';
+  const regBtn   = document.getElementById('vaultPopupRegBtn');
+
+  if (!_lastCertData) {
+    toast('No certificate data to push', 'error');
+    return;
+  }
+
+  // Not logged in — show login modal, then auto-push after
+  if (!regUser) {
+    window._pendingRegistryPush = _lastCertData;
+    showRegLoginModal();
+    return;
+  }
+
+  if (statusEl) statusEl.textContent = '⏳ Pushing to registry…';
+  if (regBtn)   regBtn.disabled = true;
+
+  pushToRegistry(_lastCertData).then(function(ok) {
+    if (ok) {
+      if (statusEl) statusEl.innerHTML = '✅ <strong>Pushed to VIC Compliance Registry</strong>';
+      if (regBtn)   regBtn.style.display = 'none';
+      toast('✅ Certificate pushed to VIC Compliance Registry', 'success');
+    } else {
+      if (regBtn) regBtn.disabled = false;
     }
   });
 }
 
 function showRegistryPage() {
-  // Show registry connect panel in owner portal page
-  const el = document.getElementById('regConnectPanel');
-  if (el) {
-    el.style.display = '';
-    const bar = document.getElementById('regStatusBar');
-    if (bar) bar.style.display = '';
-    updateRegStatus();
-  }
+  const bar = document.getElementById('regStatusBar');
+  if (bar) { bar.style.display = ''; updateRegStatus(); }
+}
+
+function normAddr(addr) {
+  if (!addr) return '';
+  return addr.split(',').map(function(p){return p.trim();}).filter(function(p){
+    return p && p.toUpperCase()!=='AUSTRALIA' && p.toUpperCase()!=='MELBOURNE' &&
+      !/^(City|Shire|Municipality|Borough|Greater|Region) of /i.test(p) &&
+      !/^(Victoria|VIC)$/i.test(p.trim());
+  }).slice(0,3).join(', ').toLowerCase().replace(/\s+/g,' ').trim();
 }
 
 async function pushToRegistry(certData) {
-  if (!regUser) {
-    // Prompt login first, then push after
-    window._pendingRegistryPush = certData;
-    showRegLoginModal();
-    // After login, auto-push
-    const origClose = doRegLogin;
-    return;
-  }
-  const sb = getRegClient();
-  const rec = {
+  if (!regUser) return false;
+  var sb = getRegClient();
+  if (!sb) { toast('Registry client not initialised', 'error'); return false; }
+  var rec = {
     property_address:            certData.property,
     property_address_normalised: normAddr(certData.property),
-    cert_type:           certData.certType,
-    status:              certData.status || 'Compliant',
-    cert_date:           certData.date   || new Date().toISOString().split('T')[0],
-    next_due:            certData.nextDue || null,
-    company:             certData.company || null,
-    score:               certData.score   ? parseInt(certData.score) : null,
-    grade:               certData.grade   || null,
-    notes:               certData.notes   || null,
+    cert_type:   certData.certType,
+    status:      certData.status  || 'Compliant',
+    cert_date:   certData.date    || new Date().toISOString().split('T')[0],
+    next_due:    certData.nextDue || null,
+    company:     certData.company || null,
+    score:       certData.score   ? parseInt(certData.score) : null,
+    grade:       certData.grade   || null,
+    notes:       certData.notes   || null,
     submitted_by:        regUser.id,
-    submitted_by_agency: regProfile?.agency_name || null,
+    submitted_by_agency: regProfile ? regProfile.agency_name : null,
   };
-  const { error } = await sb.from('compliance_records').insert(rec);
-  if (error) {
-    toast('Registry push failed: ' + error.message, 'error');
+  try {
+    var result = await sb.from('compliance_records').insert(rec);
+    if (result.error) {
+      toast('Registry push failed: ' + result.error.message, 'error');
+      console.error('Registry push error:', result.error);
+      return false;
+    }
+    return true;
+  } catch(e) {
+    toast('Registry push error: ' + e.message, 'error');
+    console.error('pushToRegistry exception:', e);
     return false;
   }
-  toast('✅ Certificate pushed to VIC Compliance Registry', 'success');
-  return true;
 }
-
-// Auto-push any pending cert after login
-const _origDoRegLogin = doRegLogin;
 
 </script>
 
